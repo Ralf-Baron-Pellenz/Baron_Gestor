@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Produto</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+
+      // Funções globais de navegação usadas pela plataforma
+      // "Criar Novo Produto" → SEM kit=1
+      function irParaNovoProduto(platformId) {
+        sessionStorage.removeItem("current_is_kit");
+        window.location.href = "produto.html?p=" + platformId + "&new=1";
+      }
+      // "Criar Kit Composto" → COM kit=1
+      function irParaNovoKit(platformId) {
+        sessionStorage.removeItem("current_is_kit");
+        window.location.href = "produto.html?p=" + platformId + "&new=1&kit=1";
+      }
+    </script>
+  <style>
+    /* Oculta os botões "+ Adicionar Campos" quando ativado no Configurar Campos */
+    body.ocultar-add-campos .btn-adicionar-kit-campo { display: none !important; }
+
+    /* ── (1) Campos personalizados das seções principais: 4 por linha ──
+       A largura padrão de .campo-personalizado-row (calc(50% - 4px)) vem do
+       style.css e vale 2 por linha. Aqui reduzimos SÓ nas 3 áreas principais
+       (Identificação, Custos e Venda) para caber 4. Os campos dentro dos
+       cards de kit continuam com a largura padrão. */
+    #listCfIdent .campo-personalizado-row,
+    #listCfCusto .campo-personalizado-row,
+    #listCfVenda .campo-personalizado-row {
+      width: calc(25% - 6px);
+      min-width: 130px;
+    }
+
+    /* Campos "Taxas Adicionais" dentro dos cards de kit: 3 por linha */
+    .kit-cfs-list .campo-personalizado-row {
+      width: calc(33.333% - 4px);
+      min-width: 105px;
+    }
+
+    /* ── (2) Remover botão "Configurar Campos" do box Margem de Lucro ── */
+    #boxMargem .btn-editar-campos { display: none !important; }
+
+    /* ── (3) Kits e Variações: evitar que os botões escapem no zoom ── */
+    .kits-header,
+    .kits-header-col { flex-wrap: wrap; }
+    @media (max-width: 720px) {
+      .kit-top-row-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    }
+
+    /* ── (4) Modal "Ordenar Imagens": alça de arrastar ── */
+    .ordenar-item { cursor: grab; }
+    .ordenar-item.dragging { opacity: 0.5; cursor: grabbing; }
+    .ordenar-item.drag-over {
+      border-color: var(--clr-primary) !important;
+      box-shadow: inset 0 0 0 2px var(--clr-primary);
+    }
+    .ordenar-drag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--clr-text-3);
+      cursor: grab;
+      flex-shrink: 0;
+      padding: 2px;
+    }
+    .ordenar-drag:active { cursor: grabbing; }
+  </style>
+    <!-- Senha nos botões (Usuários e Senhas): os botões escolhidos pedem
+         usuário e senha antes de agir. Sem data-modulo: esta tela não é um
+         módulo bloqueado, o arquivo só traz a proteção dos botões. -->
+    <script src="JS/senhas.js"></script>
+  </head>
+  <body class="tem-barra-salvar">
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label" id="platformBreadcrumb">Plataforma</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="productBreadcrumb">Novo Produto</span>
+        </div>
+
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">
+            ⚪
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="dark"
+            title="Modo Padrão (Escuro)"
+          >
+            🔵
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="midnight"
+            title="Modo Dark Absoluto"
+          >
+            ⚫
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+          <button
+            class="btn-home"
+            onclick="goBack()"
+            style="max-width:150px; margin-left:auto; margin-right:auto; padding:6px 14px; min-height:0; display:flex; align-items:center; justify-content:center; gap:6px;"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Voltar
+          </button>
+        </div>
+        <div class="sidebar-section" style="margin-top: var(--sp-xs)">
+          <button
+            class="btn-home"
+            style="
+              background: transparent;
+              color: var(--clr-text-2);
+              border: 1px solid var(--clr-border);
+            "
+            onclick="window.location.href = 'index.html'"
+          >
+            ⌂ &nbsp;Tela Inicial
+          </button>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">Plataformas</p>
+          <ul class="sidebar-nav" id="sidebarNav"></ul>
+        </div>
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-section">
+          <p
+            class="sidebar-label"
+            style="font-size: 11px; color: var(--clr-text-3)"
+          >
+            Precificador v3.0
+          </p>
+        </div>
+      </aside>
+
+      <main class="main-content" id="mainContent">
+        <div class="card mb-lg" id="cardIdentificacao" style="animation: fadeUp 0.4s ease both">
+          <div class="card-title">
+            <span class="card-title-dot"></span>
+            Identificação do Produto
+          </div>
+
+          <div class="product-image-area">
+            <div class="product-image-col">
+              <!-- Galeria de imagens (até 3) — preenchida dinamicamente -->
+              <div class="product-gallery" id="productGallery"></div>
+            </div>
+
+            <input
+              type="file"
+              class="product-img-input"
+              id="productImgInput"
+              accept="image/*"
+              style="display: none"
+            />
+
+            <div class="product-identity">
+              <div class="field-group mb-md">
+                <label for="productName">Nome do Produto</label>
+                <input
+                  type="text"
+                  id="productName"
+                  class="input-field"
+                  placeholder="Ex: Kit Organizador de Gaveta Premium"
+                />
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label for="productSku">SKU Principal</label>
+                  <input
+                    type="text"
+                    id="productSku"
+                    class="input-field"
+                    placeholder="Ex: ORG-GAV-001"
+                  />
+                </div>
+                <div class="field-group">
+                  <label for="productId">ID do Produto</label>
+                  <input
+                    type="text"
+                    id="productId"
+                    class="input-field"
+                    placeholder="Ex: 123456789"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="card mb-lg"
+          id="kitComponentsSection"
+          style="display: none; animation: fadeUp 0.4s ease both"
+        >
+          <div class="card-title">
+            <span class="card-title-dot"></span>
+            Componentes do Kit
+          </div>
+
+          <div class="field-group">
+            <label>Buscar produto para adicionar ao kit</label>
+            <div
+              style="
+                display: flex;
+                gap: 8px;
+                margin-bottom: 12px;
+                max-width: 35%;
+              "
+            >
+              <!-- A lista de sugestões precisa de um pai posicionado para
+                   abrir logo abaixo do campo. O wrapper existe só para isso. -->
+              <div style="flex: 1; position: relative">
+                <input
+                  type="text"
+                  id="componentSearch"
+                  class="input-field"
+                  placeholder="Digite o SKU ou nome do produto..."
+                  style="width: 100%"
+                  autocomplete="off"
+                  role="combobox"
+                  aria-expanded="false"
+                  aria-autocomplete="list"
+                  aria-controls="componentSugestoes"
+                />
+                <div
+                  class="comp-sugestoes"
+                  id="componentSugestoes"
+                  role="listbox"
+                  style="display: none"
+                ></div>
+              </div>
+              <button type="button" class="btn-secondary" id="btnAddComponent">
+                Adicionar
+              </button>
+            </div>
+          </div>
+
+          <div id="componentsList"></div>
+
+          <div class="field-group mt-md">
+            <label for="kitCustoTotalInput">Preço de Custo do Kit</label>
+            <!-- A explicação passou de <small> abaixo do campo para DENTRO
+                 dele, no mesmo padrão do "Total em Impostos": a classe
+                 `tem-dica` no wrapper e um `<span class="input-dica">` ao
+                 lado do valor. Ganha uma linha de altura e a informação
+                 fica onde ela é lida. -->
+            <div class="input-addon-wrap tem-dica">
+              <span class="input-prefix">R$</span>
+              <input
+                type="number"
+                id="kitCustoTotalInput"
+                class="input-field"
+                placeholder="0,00"
+                min="0"
+                step="0.01"
+                readonly
+              />
+              <span
+                class="input-dica"
+                title="Este valor é calculado automaticamente pela soma dos componentes e não pode ser editado manualmente."
+                >Este valor é calculado automaticamente pela soma dos
+                componentes e não pode ser editado manualmente.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="card mb-lg calc-card-wrapper"
+          data-secao-prod="calculo"
+          data-secao-nome="Cálculo (Custos e Variáveis)"
+          style="animation: fadeUp 0.4s 0.1s ease both"
+        >
+          <!-- BOX: Formação do Custo Total -->
+          <div class="calc-section-box" id="boxCustoTotal">
+            <div class="calc-section-header" data-secao="custo">
+              <span class="calc-section-title">Formação do Custo Total</span>
+            </div>
+
+            <div
+              id="custoInputsGrid"
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: var(--sp-md);
+                margin-bottom: var(--sp-lg);
+              "
+            >
+              <div class="field-group">
+                <label for="custoCusto">Preço de Custo</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoCusto"
+                    class="input-field calc-input money-input"
+                    maxlength="16"
+                    placeholder="0,00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="custoEmbalagem">Embalagem</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoEmbalagem"
+                    class="input-field calc-input money-input"
+                    maxlength="16"
+                    placeholder="0,00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="custoEtiqueta">Etiqueta</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoEtiqueta"
+                    class="input-field calc-input money-input"
+                    maxlength="16"
+                    placeholder="0,00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="custoFrete">Frete Pago</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoFrete"
+                    class="input-field calc-input money-input"
+                    maxlength="16"
+                    placeholder="0,00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Impostos sobre o custo. IPI, DIFAL e ST incidem sempre sobre o
+                 Preço de Custo; a Alíquota incide sobre o Custo Total da Unidade. -->
+            <div
+              id="custoImpostosGrid"
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: var(--sp-md);
+                margin-bottom: var(--sp-lg);
+              "
+            >
+              <div class="field-group">
+                <label for="custoIpi">IPI (%)</label>
+                <div class="input-addon-wrap input-addon-wrap-suffix">
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoIpi"
+                    class="input-field calc-input percent-input"
+                    maxlength="8"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    title="Calculado sobre o Preço de Custo"
+                  />
+                  <span class="input-suffix">%</span>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="custoDifal">DIFAL (%)</label>
+                <div class="input-addon-wrap input-addon-wrap-suffix">
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoDifal"
+                    class="input-field calc-input percent-input"
+                    maxlength="8"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    title="Calculado sobre o Preço de Custo"
+                  />
+                  <span class="input-suffix">%</span>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="custoSt">ST (%)</label>
+                <div class="input-addon-wrap input-addon-wrap-suffix">
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoSt"
+                    class="input-field calc-input percent-input"
+                    maxlength="8"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    title="Substituição Tributária, calculada sobre o Preço de Custo"
+                  />
+                  <span class="input-suffix">%</span>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="custoAliquota">Alíquota (%)</label>
+                <div class="input-addon-wrap input-addon-wrap-suffix">
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="custoAliquota"
+                    class="input-field calc-input percent-input"
+                    maxlength="8"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    title="Calculada sobre o Custo Total da Unidade"
+                  />
+                  <span class="input-suffix">%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- A linha é dividida em duas metades, com o mesmo espaço entre
+                 as caixas das linhas de cima. O Custo Total ocupa a primeira;
+                 o Total em Impostos fica só do tamanho do que mostra,
+                 encostado nele (ver o CSS, "4.1 O Total em Impostos"). -->
+            <div
+              class="totais-linha"
+              style="
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: var(--sp-md);
+                margin-bottom: 0;
+              "
+            >
+              <div class="field-group" style="margin-bottom: 0">
+                <label for="custoTotal">Custo Total da Unidade</label>
+                <!-- A explicação foi para DENTRO da caixa, à direita do valor.
+                     Antes era um <small> solto abaixo do campo. -->
+                <div class="input-addon-wrap tem-dica">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    type="text"
+                    id="custoTotal"
+                    class="result-field"
+                    readonly
+                    tabindex="-1"
+                    title="Preço de Custo + Embalagem + Etiqueta + Frete Pago"
+                    value="0,00"
+                  />
+                  <span
+                    class="input-dica"
+                    title="Soma dos campos do: Formação do Custo Total."
+                    >Soma dos campos do: Formação do Custo Total.</span
+                  >
+                </div>
+              </div>
+
+              <div class="field-group" style="margin-bottom: 0">
+                <label for="custoTotalImpostos">Total em Impostos</label>
+                <div class="input-addon-wrap tem-dica">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    type="text"
+                    id="custoTotalImpostos"
+                    class="result-field"
+                    readonly
+                    tabindex="-1"
+                    title="Soma dos impostos aplicados ao custo: IPI + DIFAL + ST + Alíquota"
+                    value="0,00"
+                  />
+                  <span
+                    class="input-dica"
+                    title="Dos quais em impostos: IPI + DIFAL + ST + Alíquota."
+                    >Dos quais em impostos: IPI + DIFAL + ST + Alíquota.</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOX: Variáveis de Venda & Plataforma -->
+          <div class="calc-section-box" id="boxVendaVariaveis">
+            <div class="calc-section-header" data-secao="venda">
+              <span class="calc-section-title"
+                >Variáveis de Venda &amp; Plataforma</span
+              >
+            </div>
+
+            <div
+              id="vendaInputsGrid"
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: var(--sp-md);
+              "
+            >
+              <div class="field-group">
+                <label for="freteProduto">Frete do Produto</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="freteProduto"
+                    class="input-field calc-input money-input"
+                    maxlength="16"
+                    placeholder="0,00"
+                    min="0"
+                    step="0.01"
+                    title="Será a base para o primeiro Frete do Kit"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="taxaFixa">Taxa Fixa Da plataforma</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="taxaFixa"
+                    class="input-field calc-input money-input"
+                    maxlength="16"
+                    placeholder="0,00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="taxaPlataforma">Taxa Da Plataforma (%)</label>
+                <div class="input-addon-wrap input-addon-wrap-suffix">
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="taxaPlataforma"
+                    class="input-field calc-input percent-input"
+                    placeholder="0"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                  />
+                  <span class="input-suffix">%</span>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="impostoNF">Imposto NF (%)</label>
+                <div class="input-addon-wrap input-addon-wrap-suffix">
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="impostoNF"
+                    class="input-field calc-input percent-input"
+                    placeholder="0"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                  />
+                  <span class="input-suffix">%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Linha de 3 colunas: Margem | Resultado | Cabeçalho Kits -->
+          <div class="produto-3cols">
+          <!-- BOX: Margem de Lucro -->
+          <div
+            class="calc-section-box"
+            id="boxMargem"
+            style="margin-bottom: var(--sp-lg)"
+          >
+            <div class="calc-section-header" data-secao="margem">
+              <span class="calc-section-title">Margem de Lucro</span>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                align-items: flex-end;
+                gap: var(--sp-md);
+                flex-wrap: wrap;
+              "
+            >
+              <div class="field-group" style="margin: 0">
+                <label>Tipo de Margem</label>
+                <div class="margem-toggle">
+                  <button
+                    class="toggle-btn active"
+                    id="btnMargemPct"
+                    data-type="pct"
+                  >
+                    % Percentual
+                  </button>
+                  <button
+                    class="toggle-btn"
+                    id="btnMargemFixed"
+                    data-type="fixed"
+                  >
+                    R$ Fixo
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="field-group"
+                style="margin: 0; flex: 1; min-width: 160px"
+              >
+                <label for="margemValor" id="margemLabel"
+                  >Margem Desejada</label
+                >
+                <div
+                  class="input-addon-wrap input-addon-wrap-suffix"
+                  id="margemAddonWrap"
+                >
+                  <input
+                    inputmode="decimal"
+                    type="text"
+                    id="margemValor"
+                    class="input-field calc-input margem-input"
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- As três caixas desta linha (Margem, Valor e Kits) seguem o
+               mesmo padrão: título com a bolinha, a linha embaixo e o
+               conteúdo. No Mercado Livre esta caixa dá lugar ao painel
+               "Valores Premium e Clássico", montado pelo produto.js. -->
+          <div class="resultado-box">
+            <div class="calc-section-header">
+              <span class="calc-section-title">Valor Final de Venda — Unidade</span>
+            </div>
+            <div class="resultado-value" id="resultadoUnidade">R$ 0,00</div>
+            <div class="resultado-breakdown" id="resultadoBreakdown">
+              <span class="resultado-breakdown-item"
+                >Custo base: <strong id="bkCustoTotal">R$ 0,00</strong></span
+              >
+              <span class="resultado-breakdown-item"
+                >Lucro estimado: <strong id="bkLucro">R$ 0,00</strong></span
+              >
+              <span class="resultado-breakdown-item"
+                >Margem real: <strong id="bkMargem">0%</strong></span
+              >
+            </div>
+          </div>
+
+          <!-- Cabeçalho dos Kits (3ª coluna): título, linha, texto e botão,
+               no mesmo padrão da Margem de Lucro. -->
+          <div class="kits-header kits-header-col">
+            <div class="calc-section-header">
+              <span class="calc-section-title">Kits e Variações</span>
+            </div>
+            <p class="kits-desc">
+              O custo é multiplicado pela quantidade. Cada kit pode ter seu
+              próprio frete e taxas personalizadas.
+            </p>
+            <button class="btn-accent" id="btnAddKit">
+              + &nbsp;Adicionar Kit
+            </button>
+          </div>
+          </div><!-- /.produto-3cols -->
+        </div>
+
+        <!-- ═══════════ PREÇOS EXTRAS ═══════════
+             Três preços de referência. Em cada nível, o preço é digitado
+             (Preço) ou calculado por uma margem (Margem % ou Margem R$);
+             o sistema recalcula TODAS as taxas e impostos sobre ele e
+             mostra quanto sobra de lucro naquele preço. Os botões e a
+             linha da margem são montados pelo produto.js.
+
+             A Margem Desejada da ficha não é tocada: estes campos não
+             alteram a precificação, só respondem "e se eu vender por X?"
+             (ou "por quanto vender para ganhar Y?"). -->
+        <div class="card mb-lg precos-extras-card" data-secao-prod="precos-extras"
+             data-secao-nome="Preços Extras">
+          <div class="calc-section-header">
+            <span class="calc-section-title">Preços Extras</span>
+            <!-- A explicação da área fica no "?" ao lado do título: abre ao
+                 passar o mouse (e no foco do teclado), em vez de ocupar um
+                 parágrafo fixo na tela. -->
+            <span class="pe-ajuda">
+              <button type="button" class="pe-ajuda__btn" aria-label="Sobre os Preços Extras" aria-describedby="precosExtrasAjuda">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </button>
+              <span class="pe-ajuda__txt" id="precosExtrasAjuda" role="tooltip">
+                Em cada nível, escolha: Preço — digite um preço de venda e veja quanto
+                sobra de lucro nele; Margem % ou Margem R$ — digite quanto quer ganhar e o
+                sistema calcula o preço. As taxas, comissões e impostos entram na conta.
+              </span>
+            </span>
+          </div>
+
+          <div class="precos-extras-grid">
+            <div class="preco-extra" data-nivel="min">
+              <label for="precoMinimo">Preço Mínimo</label>
+              <div class="input-addon-wrap">
+                <span class="input-prefix">R$</span>
+                <input
+                  inputmode="decimal"
+                  type="text"
+                  id="precoMinimo"
+                  class="input-field money-input preco-extra__input"
+                  maxlength="16"
+                  placeholder="0,00"
+                />
+              </div>
+              <div class="preco-extra__saida" id="precoMinimoSaida"></div>
+            </div>
+
+            <div class="preco-extra" data-nivel="ideal">
+              <label for="precoIdeal">Preço Ideal</label>
+              <div class="input-addon-wrap">
+                <span class="input-prefix">R$</span>
+                <input
+                  inputmode="decimal"
+                  type="text"
+                  id="precoIdeal"
+                  class="input-field money-input preco-extra__input"
+                  maxlength="16"
+                  placeholder="0,00"
+                />
+              </div>
+              <div class="preco-extra__saida" id="precoIdealSaida"></div>
+            </div>
+
+            <div class="preco-extra" data-nivel="max">
+              <label for="precoMaximo">Preço Máximo</label>
+              <div class="input-addon-wrap">
+                <span class="input-prefix">R$</span>
+                <input
+                  inputmode="decimal"
+                  type="text"
+                  id="precoMaximo"
+                  class="input-field money-input preco-extra__input"
+                  maxlength="16"
+                  placeholder="0,00"
+                />
+              </div>
+              <div class="preco-extra__saida" id="precoMaximoSaida"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════ KITS DO PRODUTO ═══════════
+             Um quadro só, como o dos Preços Extras: o título em cima e
+             todos os kits DENTRO dele, cada um no seu cartão. -->
+        <div class="card mb-lg kits-section kits-card" data-secao-prod="kits" data-secao-nome="Kits e Variações">
+          <div class="calc-section-header kits-card__cab" id="kitsSecaoTitulo">
+            <span class="kits-card__tit">
+              <span class="calc-section-title">Kits do Produto</span>
+              <span class="kits-card__sub">Cada kit tem o próprio SKU, custo, frete, taxas e Preços Extras.</span>
+            </span>
+            <span class="kits-card__qtd" id="kitsSecaoQtd">Nenhum kit</span>
+          </div>
+          <div class="kits-grid" id="kitsGrid"></div>
+
+          <div id="kitsEmpty" style="display: none">
+            <div class="empty-state" style="padding: var(--sp-xl) var(--sp-lg)">
+              <div class="empty-state-icon" style="font-size: 36px"></div>
+              <div class="empty-state-title" style="font-size: 15px">
+                Nenhum kit adicionado
+              </div>
+              <p class="empty-state-text" style="font-size: 13px">
+                Clique em <strong>Adicionar Kit</strong> para criar kits com 2,
+                3, 4 unidades ou mais.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seções personalizadas (criadas pelo usuário) -->
+        <div id="secoesCustomContainer"></div>
+      </main>
+    </div>
+
+    <!-- Salvar / Cancelar: fixos no canto inferior direito da tela. -->
+    <div class="action-bar barra-salvar" role="region" aria-label="Salvar ou cancelar">
+      <span class="action-bar-info" id="actionBarInfo"
+        >Produto não salvo</span
+      >
+      <div class="action-bar-btns">
+        <button type="button" class="btn-secondary" id="btnCancelarProduto" onclick="goBack()">Cancelar</button>
+        <button type="button" class="btn-primary" id="btnSalvar">✓ Salvar</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalKit" style="display: none">
+      <div class="modal">
+        <div class="modal-title">Adicionar Kit</div>
+        <div class="modal-subtitle">
+          Defina a quantidade de unidades e o SKU do kit.
+        </div>
+
+        <div class="field-group mb-md">
+          <label for="kitQty">Quantidade de Unidades</label>
+          <input
+            type="number"
+            id="kitQty"
+            class="input-field"
+            placeholder="Ex: 2"
+            min="2"
+            step="1"
+          />
+        </div>
+
+        <div class="field-group mb-md">
+          <label for="kitSku">SKU do Kit</label>
+          <input
+            type="text"
+            id="kitSku"
+            class="input-field"
+            placeholder="Ex: ORG-GAV-KIT-02"
+          />
+        </div>
+
+        <div class="field-group mb-md">
+          <label for="kitFrete">Frete Exclusivo do Kit (R$)</label>
+          <div class="input-addon-wrap">
+            <span class="input-prefix">R$</span>
+            <input
+              type="number"
+              id="kitFrete"
+              class="input-field"
+              placeholder="0,00"
+              min="0"
+              step="0.01"
+            />
+          </div>
+          <small
+            style="
+              font-size: 11px;
+              color: var(--clr-text-3);
+              margin-top: 4px;
+              display: block;
+            "
+          >
+            Valor inicial será puxado do "Frete do Produto", mas você pode
+            alterá-lo.
+          </small>
+        </div>
+
+        <div
+          id="kitPreviewBox"
+          style="
+            background: var(--clr-primary-lt);
+            border: 1px solid var(--clr-result-border);
+            border-radius: var(--r-md);
+            padding: var(--sp-md);
+            margin-top: var(--sp-md);
+            display: none;
+          "
+        >
+          <div
+            style="
+              font-size: 11px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.8px;
+              color: var(--clr-primary);
+              margin-bottom: 6px;
+            "
+          >
+            Pré-visualização
+          </div>
+          <div
+            style="
+              font-family: &quot;Sora&quot;, sans-serif;
+              font-size: 22px;
+              font-weight: 800;
+              color: var(--clr-primary);
+            "
+            id="kitPreviewValue"
+          >
+            R$ 0,00
+          </div>
+          <div
+            style="font-size: 12px; color: var(--clr-text-2); margin-top: 4px"
+            id="kitPreviewDetail"
+          ></div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" id="btnCancelKit">Cancelar</button>
+          <button class="btn-primary" id="btnConfirmKit">Criar Kit</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/imagestore.js"></script>
+    <script src="JS/calculadora.js"></script>
+    <script src="JS/campos.js"></script>
+    <script src="JS/produto.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_produto.js"></script>
+  </body>
+</html>

@@ -1,0 +1,285 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Bapell Gestor Pro — lembrete-aviso.css
+   A janela de aviso de lembrete (lembrete-aviso.html): abre no canto
+   da tela quando um lembrete vence. Cores das variáveis do tema
+   (style.css) — Claro, Padrão e Dark.
+   ═══════════════════════════════════════════════════════════════════ */
+
+html,
+body {
+  height: auto;
+  margin: 0;
+  overflow: hidden;
+  background: var(--clr-surface);
+}
+
+body {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.av {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  overflow: hidden;
+}
+
+/* A faixa colorida no alto: âmbar quando vence agora, vermelha quando já
+   passou um tempo (o mesmo vermelho do "Vencido" da lista). */
+.av-faixa {
+  height: 4px;
+  background: linear-gradient(90deg, var(--clr-warning), var(--clr-accent));
+}
+.av--atrasado .av-faixa {
+  background: linear-gradient(90deg, var(--clr-danger), var(--clr-warning));
+}
+
+/* ── Topo (arrastável) ── */
+.av-topo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 4px 14px;
+  -webkit-app-region: drag;
+}
+.av-topo button { -webkit-app-region: no-drag; }
+
+.av-sino {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--clr-warning-lt);
+  color: var(--clr-warning);
+  animation: avBalanco 1.2s ease 0.2s 2;
+  transform-origin: 50% 20%;
+}
+.av--atrasado .av-sino { background: var(--clr-danger-lt); color: var(--clr-danger); }
+@keyframes avBalanco {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-12deg); }
+  45% { transform: rotate(8deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .av-sino { animation: none; }
+}
+
+.av-rotulo {
+  font-family: "Sora", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--clr-text-2);
+}
+.av-app {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.av-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+.av-nav[hidden] { display: none; }
+.av-nav + .av-x { margin-left: 2px; }
+.av-nav__txt {
+  min-width: 46px;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--clr-text-2);
+}
+.av-nav__btn,
+.av-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--clr-text-3);
+  cursor: pointer;
+}
+.av-x { margin-left: auto; }
+.av-nav__btn:hover,
+.av-x:hover { background: var(--clr-surface-alt); color: var(--clr-text); }
+.av-nav__btn:disabled { opacity: 0.35; cursor: default; background: transparent; }
+.av-nav__btn:focus-visible,
+.av-x:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: 1px; }
+
+/* ── O lembrete ── */
+.av-corpo {
+  padding: 6px 16px 12px;
+}
+.av-titulo {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: "Sora", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--clr-text);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.av-quando {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--clr-text-2);
+}
+.av-selo {
+  padding: 2px 9px;
+  border: 1px solid var(--clr-warning);
+  border-radius: 999px;
+  background: var(--clr-warning-lt);
+  color: var(--clr-warning);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.av--atrasado .av-selo {
+  border-color: var(--clr-danger);
+  background: var(--clr-danger-lt);
+  color: var(--clr-danger);
+}
+
+.av-metas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.av-metas:empty { display: none; }
+.av-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 4px 9px;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: var(--clr-surface-alt);
+  font-size: 12px;
+  color: var(--clr-text-2);
+}
+.av-meta svg { flex-shrink: 0; color: var(--clr-text-3); }
+.av-meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.av-meta--valor {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+  color: var(--clr-text);
+  font-weight: 700;
+}
+.av-meta--valor svg { color: var(--clr-primary); }
+
+.av-obs {
+  display: -webkit-box;
+  margin-top: 10px;
+  padding: 8px 10px;
+  overflow: hidden;
+  border-left: 3px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  border-radius: 0 8px 8px 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--clr-text-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.av-obs[hidden] { display: none; }
+
+/* ── Adiar ── */
+.av-adiar {
+  padding: 10px 16px 0;
+  border-top: 1px solid var(--clr-border);
+}
+.av-adiar__rot {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--clr-text-3);
+}
+.av-adiar__opcoes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+.av-chip {
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: var(--clr-surface-alt);
+  color: var(--clr-text);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.av-chip:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+}
+.av-chip:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: 1px; }
+
+/* ── Ações ── */
+.av-acoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px 16px 14px;
+}
+.av-btn {
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 13.5px;
+}
+.av-btn--concluir {
+  border-color: var(--clr-success);
+  background: var(--clr-success);
+  box-shadow: none;
+}
+.av-btn--concluir:hover {
+  border-color: var(--clr-success);
+  background: color-mix(in srgb, var(--clr-success) 86%, #000);
+}
+.av button:disabled { cursor: default; }
+.av-btn[hidden] { display: none; }
+/* Lembretes protegido por senha: sem "Concluir", o "Abrir" ocupa a linha. */
+.av--protegido .av-acoes { grid-template-columns: 1fr; }

@@ -1,0 +1,1294 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Bapell Gestor Pro — Gestor de Devoluções
+   Usa as variáveis de tema do style.css (Claro, Padrão e Dark Absoluto).
+   O botão das empresas do menu lateral (.empresa-item-btn) vem do ean.css,
+   como nas Notas Fiscais.
+
+   Organização:
+     1. Página e cabeçalho
+     2. Menu lateral (telas, atalhos e empresas)
+     3. Cards do painel
+     4. Filtros
+     5. Listagem
+     6. Janelas (adicionar/editar, exportar, empresas)
+     7. Formulário da devolução
+     8. Telas menores
+     9. Futuras devoluções (registrar, acompanhar e lembrete)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Página e cabeçalho ─────────────────────────────────────────── */
+
+/* O conteúdo mede a própria largura: cards e filtros se arrumam pelo
+   espaço real (menu lateral aberto ou recolhido). */
+.dev-pagina { container: devpag / inline-size; }
+
+.dev-header-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 22px;
+}
+.dev-header-centro { min-width: 0; text-align: center; }
+.dev-titulo {
+  font-family: "Sora", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--clr-text);
+  margin: 0;
+}
+.dev-subtitulo {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--clr-text-3);
+}
+.dev-subtitulo:empty { display: none; }
+.dev-subtitulo strong { color: var(--clr-text-2); font-weight: 600; }
+.dev-header-acoes {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dev-btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+
+/* Sem empresa no cadastro */
+.dev-sem-empresa {
+  max-width: 520px;
+  margin: 40px auto;
+  text-align: center;
+  padding: 36px 28px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+.dev-sem-empresa[hidden] { display: none; }
+.dev-sem-empresa__ico {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 14px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+.dev-sem-empresa h2 {
+  font-family: "Sora", sans-serif;
+  font-size: 19px;
+  color: var(--clr-text);
+  margin: 0 0 8px;
+}
+.dev-sem-empresa p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--clr-text-2);
+  margin: 0 0 20px;
+}
+#devConteudo[hidden] { display: none; }
+
+/* As três telas do Gestor: uma à vista por vez. */
+.dev-vista[hidden] { display: none !important; }
+
+/* ── 2. Menu lateral (telas, atalhos e empresas) ───────────────────── */
+/* Telas e atalhos: altura do conteúdo (um pouco mais justa que as outras
+   seções); as empresas ficam com o resto e rolam se não couberem. */
+.dev-aside-nav { flex: 0 0 auto; }
+.sidebar .sidebar-section.dev-aside-nav { padding-top: 16px !important; padding-bottom: 16px !important; }
+.dev-aside-titulo {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--clr-text-3);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.dev-aside-titulo--atalhos { margin-top: 14px; }
+.dev-nav { display: flex; flex-direction: column; gap: 4px; }
+.dev-aside-nav > .sidebar-item-btn + .sidebar-item-btn { margin-top: 4px; }
+/* A tela aberta fica acesa (como a visão escolhida nos Lembretes). */
+.sidebar-item-btn.dev-nav-btn.ativo {
+  background: var(--clr-primary-lt);
+  border-color: transparent;
+  color: var(--clr-primary);
+}
+.sidebar-item-btn.dev-nav-btn.ativo .sidebar-btn-icon { color: var(--clr-primary); }
+/* Quantas aguardam chegada: um selo no canto do ícone (assim o nome da
+   tela cabe inteiro e o número continua à vista com o menu recolhido). */
+.dev-nav-btn .sidebar-btn-icon { position: relative; }
+.dev-nav-contagem {
+  position: absolute;
+  top: -6px;
+  right: -5px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 999px;
+  box-sizing: border-box;
+  font-size: 9px;
+  font-weight: 800;
+  font-style: normal;
+  line-height: 14px;
+  text-align: center;
+  color: #fff;
+  background: var(--clr-primary);
+  box-shadow: 0 0 0 2px var(--clr-surface);
+  pointer-events: none;
+}
+.dev-nav-contagem[hidden] { display: none !important; }
+
+.dev-lista-empresas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* "Todas as empresas": o mesmo botão, com um ícone no lugar da logo. */
+.dev-emp-todas-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+}
+.empresa-item-btn.ativa .dev-emp-todas-ico {
+  color: var(--clr-primary);
+  border-color: var(--clr-primary);
+}
+.dev-emp-contagem {
+  margin-left: auto;
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--clr-text-3);
+  background: var(--clr-surface-alt);
+  flex-shrink: 0;
+}
+.empresa-item-btn.ativa .dev-emp-contagem {
+  color: #fff;
+  background: var(--clr-primary);
+}
+.dev-emp-vazio {
+  font-size: 12px;
+  color: var(--clr-text-3);
+  padding: 10px 4px;
+  text-align: center;
+  line-height: 1.45;
+}
+
+/* ── 3. Cards do painel ────────────────────────────────────────────── */
+.dev-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+/* Cinco por linha até 900px; depois 3 + 2 (as duas de baixo mais largas),
+   2 + 2 + 1 e, por fim, uma por linha — sem buraco no fim da grade. */
+@container devpag (max-width: 900px) {
+  .dev-cards { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .dev-cards > .dev-card { grid-column: span 2; }
+  .dev-cards > .dev-card:nth-child(n + 4) { grid-column: span 3; }
+}
+@container devpag (max-width: 640px) {
+  .dev-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dev-cards > .dev-card,
+  .dev-cards > .dev-card:nth-child(n + 4) { grid-column: auto; }
+  .dev-cards > .dev-card:last-child { grid-column: 1 / -1; }
+}
+@container devpag (max-width: 440px) {
+  .dev-cards { grid-template-columns: minmax(0, 1fr); }
+}
+
+.dev-card {
+  --tom: var(--clr-primary);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 16px 18px 14px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  container-type: inline-size;
+  transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+}
+.dev-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--tom) 45%, var(--clr-border));
+}
+/* Faixa fina na cor do indicador, no alto do card (como no Financeiro). */
+.dev-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tom), color-mix(in srgb, var(--tom) 15%, transparent));
+}
+.dev-card[data-tom="primario"] { --tom: var(--clr-primary); }
+.dev-card[data-tom="aviso"] { --tom: var(--clr-warning); }
+.dev-card[data-tom="perigo"] { --tom: var(--clr-danger); }
+.dev-card[data-tom="sucesso"] { --tom: var(--clr-success); }
+.dev-card[data-tom="neutro"] { --tom: var(--clr-accent); }
+
+.dev-card__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-text-3);
+  margin-bottom: 10px;
+  min-width: 0;
+}
+/* O título quebra em duas linhas em vez de ser cortado. */
+.dev-card__titulo > span:not(.dev-card__ico) {
+  min-width: 0;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.dev-card__ico {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tom);
+  background: color-mix(in srgb, var(--tom) 15%, transparent);
+}
+.dev-card__valor {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(17px, 9cqi, 26px);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  color: var(--clr-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+/* Nome de produto ou de loja: menor que um número, para caber. */
+.dev-card__valor--texto {
+  font-size: clamp(14px, 6.5cqi, 18px);
+  letter-spacing: -0.2px;
+}
+.dev-card[data-tom="perigo"] .dev-card__valor.tem-valor { color: var(--clr-danger); }
+.dev-card[data-tom="sucesso"] .dev-card__valor.tem-valor { color: var(--clr-success); }
+.dev-card__sub {
+  margin-top: 6px;
+  min-height: 18px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--clr-text-3);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+/* Produtos mais devolvidos: o 2º e o 3º lugares, embaixo do 1º. */
+.dev-card__ranking {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  counter-reset: devrank 1;
+}
+.dev-card__ranking[hidden] { display: none; }
+.dev-card__ranking li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--clr-text-2);
+  counter-increment: devrank;
+}
+.dev-card__ranking li::before {
+  content: counter(devrank) "º";
+  flex: 0 0 auto;
+  min-width: 18px;
+  font-weight: 700;
+  color: var(--clr-text-3);
+}
+.dev-card__ranking-nome {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dev-card__ranking-n {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: var(--clr-text);
+  font-variant-numeric: tabular-nums;
+}
+.dev-cards-nota {
+  margin: 10px 2px 18px;
+  font-size: 12px;
+  color: var(--clr-text-3);
+}
+.dev-cards-nota:empty { margin-bottom: 14px; }
+.dev-cards-nota strong { color: var(--clr-text-2); }
+
+/* ── 4. Filtros ────────────────────────────────────────────────────── */
+.dev-bloco-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.dev-bloco-titulo { margin: 0; }
+.dev-bloco-acoes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dev-filtros-contagem,
+.dev-lista-contagem {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+.dev-lista-contagem:empty { display: none; }
+.dev-filtros-contagem[hidden] { display: none; }
+
+.dev-btn-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: var(--clr-surface);
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.dev-btn-mini:hover:not(:disabled) {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background: color-mix(in srgb, var(--clr-primary) 8%, var(--clr-surface));
+}
+.dev-btn-mini:disabled { opacity: 0.45; cursor: default; }
+.dev-btn-mini--financeiro:hover:not(:disabled) {
+  border-color: var(--clr-danger);
+  color: var(--clr-danger);
+  background: var(--clr-danger-lt);
+}
+.dev-btn-mini:focus-visible,
+.dev-acao:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+}
+
+.dev-filtros { margin-bottom: 18px; }
+.dev-filtros-grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+@container devpag (max-width: 1080px) {
+  .dev-filtros-grade { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container devpag (max-width: 720px) {
+  .dev-filtros-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container devpag (max-width: 460px) {
+  .dev-filtros-grade { grid-template-columns: minmax(0, 1fr); }
+}
+.dev-filtro { min-width: 0; }
+.dev-filtro label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-3);
+  margin-bottom: 5px;
+}
+.dev-filtro .input-field { font-size: 13px; padding: 8px 11px; }
+.dev-filtro select.input-field { padding-right: 30px; }
+/* Filtro em uso: a borda acende, para ver de longe o que está filtrando. */
+.dev-filtro .input-field.dev-filtro-ativo {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-lt);
+}
+.dev-filtro--busca { grid-column: span 2; }
+.dev-filtro--periodo { grid-column: span 2; }
+@container devpag (max-width: 460px) {
+  .dev-filtro--busca, .dev-filtro--periodo { grid-column: auto; }
+}
+.dev-busca { position: relative; }
+.dev-busca svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-text-3);
+  pointer-events: none;
+}
+.dev-busca .input-field { padding-left: 32px; }
+.dev-periodo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+}
+.dev-periodo > .input-field,
+.dev-periodo > .dtp-wrap { flex: 1 1 0; min-width: 0; }
+.dev-periodo .dtp-field { width: 100%; font-size: 13px; padding: 8px 11px; }
+
+/* ── 5. Listagem ───────────────────────────────────────────────────── */
+.dev-lista { margin-bottom: 40px; }
+.dev-tabela-wrap { overflow-x: auto; }
+.dev-tabela {
+  width: 100%;
+  min-width: 1000px; /* abaixo disso, a lista rola de lado (e a página não) */
+  border-collapse: collapse;
+}
+/* A coluna do produto fica com o espaço que sobra: as outras têm o tamanho
+   do conteúdo e esta encolhe (o nome quebra em até duas linhas). */
+.dev-tabela .dev-td-prod { width: 100%; max-width: 0; }
+.dev-tabela th,
+.dev-tabela td {
+  padding: 10px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--clr-border);
+  font-size: 13px;
+  color: var(--clr-text);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.dev-tabela th {
+  color: var(--clr-text-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+}
+.dev-tabela th.num,
+.dev-tabela td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.dev-tabela tbody tr { cursor: pointer; transition: background var(--t-fast); }
+.dev-tabela tbody tr:hover { background: var(--clr-surface-alt); }
+.dev-tabela tbody tr:last-child td { border-bottom: none; }
+.dev-tabela th.dev-ordenavel { cursor: pointer; user-select: none; }
+.dev-tabela th.dev-ordenavel:hover { color: var(--clr-text); }
+.dev-tabela th.dev-ordenavel::after { content: "↕"; margin-left: 4px; opacity: 0.35; }
+.dev-tabela th.dev-ordenavel.asc::after { content: "↑"; opacity: 0.9; color: var(--clr-primary); }
+.dev-tabela th.dev-ordenavel.desc::after { content: "↓"; opacity: 0.9; color: var(--clr-primary); }
+.dev-col-acoes { text-align: right !important; }
+
+/* Linha recém-salva: pisca uma vez. */
+@keyframes devLinhaNova {
+  0% { background: color-mix(in srgb, var(--clr-primary) 22%, transparent); }
+  100% { background: transparent; }
+}
+.dev-tabela tbody tr.dev-linha-nova { animation: devLinhaNova 1.6s ease-out 1; }
+
+.dev-prod {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.dev-prod__img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+}
+.dev-prod__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dev-prod__txt { min-width: 0; }
+.dev-prod__nome {
+  font-weight: 700;
+  color: var(--clr-text);
+  white-space: normal;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+.dev-prod__meta {
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.dev-prod__tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+
+.dev-loja {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+.dev-loja__logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--clr-text-3);
+}
+.dev-loja__logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dev-loja__txt { min-width: 0; line-height: 1.3; }
+.dev-loja__nome { font-weight: 600; }
+.dev-loja__emp { font-size: 11.5px; color: var(--clr-text-3); }
+
+.dev-sub-num { display: block; font-size: 11px; color: var(--clr-text-3); font-weight: 500; }
+.dev-sub-num--reemb { color: var(--clr-success); font-weight: 700; }
+.dev-sub-num--extra { color: var(--clr-text-2); font-weight: 600; }
+.dev-valor-nada { color: var(--clr-text-3); }
+.dev-prejuizo { font-weight: 800; color: var(--clr-danger); }
+.dev-prejuizo--zero { font-weight: 600; color: var(--clr-text-3); }
+.dev-riscado { text-decoration: line-through; color: var(--clr-text-3); }
+
+/* Etiquetas */
+.dev-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: var(--clr-text-2);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+}
+.dev-tag svg { flex-shrink: 0; }
+.dev-tag--kit { color: var(--clr-primary); background: var(--clr-primary-lt); border-color: transparent; }
+.dev-tag--reputacao { color: var(--clr-warning); background: var(--clr-warning-lt); border-color: transparent; }
+.dev-tag--obs { color: var(--clr-text-3); }
+.dev-tag--extra { color: var(--clr-danger); border-color: color-mix(in srgb, var(--clr-danger) 35%, var(--clr-border)); }
+.dev-tag--fin { color: var(--clr-danger); background: var(--clr-danger-lt); border-color: transparent; }
+.dev-tag--alerta { color: var(--clr-warning); background: var(--clr-warning-lt); border-color: transparent; }
+
+/* Estado do produto: cada um com a sua cor. */
+.dev-estado { --cor: var(--clr-text-3); color: var(--cor); background: color-mix(in srgb, var(--cor) 14%, transparent); border-color: transparent; }
+.dev-estado[data-estado="avariado"] { --cor: var(--clr-warning); }
+.dev-estado[data-estado="danificado"] { --cor: var(--clr-danger); }
+.dev-estado[data-estado="bom"] { --cor: var(--clr-success); }
+.dev-estado[data-estado="garantia"] { --cor: var(--clr-primary); }
+.dev-estado[data-estado="outros"] { --cor: var(--clr-text-2); }
+
+/* A tag do Financeiro, como aparece no extrato de lá. */
+.dev-tag-fin {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: var(--clr-danger);
+  background: var(--clr-danger-lt);
+}
+
+/* Ações da linha */
+.dev-acoes { display: inline-flex; align-items: center; gap: 4px; }
+.dev-acao {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--clr-border);
+  background: transparent;
+  color: var(--clr-text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.dev-acao:hover { border-color: var(--clr-primary); color: var(--clr-primary); background: var(--clr-primary-lt); }
+.dev-acao.danger:hover { border-color: var(--clr-danger); color: var(--clr-danger); background: var(--clr-danger-lt); }
+.dev-acao.dev-acao--fin:hover { border-color: var(--clr-danger); color: var(--clr-danger); background: var(--clr-danger-lt); }
+.dev-acao.dev-acao--feito { color: var(--clr-success); border-color: color-mix(in srgb, var(--clr-success) 45%, var(--clr-border)); }
+.dev-acao.dev-acao--aviso { color: var(--clr-warning); border-color: color-mix(in srgb, var(--clr-warning) 55%, var(--clr-border)); }
+.dev-acao:disabled,
+.dev-acao.dev-acao--inativo { opacity: 0.35; cursor: default; }
+.dev-acao.dev-acao--inativo:hover { border-color: var(--clr-border); color: var(--clr-text-2); background: transparent; }
+
+.dev-vazio {
+  text-align: center;
+  padding: 36px 20px 30px;
+}
+.dev-vazio[hidden] { display: none; }
+.dev-vazio__ico {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+}
+.dev-vazio__titulo {
+  font-family: "Sora", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin-bottom: 6px;
+}
+.dev-vazio__texto { font-size: 13px; color: var(--clr-text-3); margin: 0; }
+
+.dev-mais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 16px;
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+}
+.dev-mais[hidden] { display: none; }
+.dev-btn-mais { min-height: 36px; font-size: 13px; }
+
+/* ── 6. Janelas ────────────────────────────────────────────────────── */
+/* O .modal-overlay do style.css já define display:flex; o [hidden] precisa
+   vencer essa regra para a janela ficar fechada. */
+.modal-overlay.dev-overlay[hidden] { display: none !important; }
+.modal-overlay.dev-overlay {
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 40px 16px;
+  /* Abaixo das janelas de senha e de confirmação (BapellModal), que
+     abrem por cima desta. */
+  z-index: 99999;
+}
+.dev-modal {
+  width: 780px;
+  max-width: 100%;
+  padding: 24px 26px 22px;
+  border: 1px solid var(--clr-border);
+  margin: auto 0;
+}
+.dev-modal--estreito { width: 520px; }
+/* Adicionar/editar devolução: larga e baixa (os campos em linhas de 2 e de
+   4); em telas menores, o formulário se rearruma pela própria largura. */
+.dev-modal--devolucao { width: 1040px; }
+.dev-modal__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.dev-modal__titulo { font-size: 20px; margin-bottom: 4px; }
+.dev-modal__sub { font-size: 13px; color: var(--clr-text-3); line-height: 1.5; }
+.dev-modal__fechar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  border: 1px solid var(--clr-border);
+  background: transparent;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dev-modal__fechar:hover { border-color: var(--clr-danger); color: var(--clr-danger); }
+.dev-modal__acoes { margin-top: 18px; }
+.dev-modal__acoes .btn-danger {
+  min-height: 42px;
+  padding: 0 var(--sp-lg);
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dev-modal__acoes .btn-danger:disabled,
+.dev-modal__acoes .btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+/* ── 7. Formulário da devolução ────────────────────────────────────── */
+.dev-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+.dev-form--uma { grid-template-columns: minmax(0, 1fr); }
+.dev-campo { min-width: 0; }
+.dev-campo[hidden] { display: none; }
+.dev-campo--cheio { grid-column: 1 / -1; }
+.dev-campo > label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-3);
+  margin-bottom: 6px;
+}
+.dev-obrig { color: var(--clr-danger); font-weight: 700; }
+.dev-campo-dica {
+  margin-top: 5px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--clr-text-3);
+}
+.dev-campo-dica:empty { display: none; }
+.dev-campo-dica strong { color: var(--clr-text-2); }
+.dev-textarea { resize: vertical; min-height: 74px; font-family: inherit; line-height: 1.45; }
+/* Observações: a última linha, ao lado do valor extra; a caixa de texto
+   cresce até a altura do valor extra com o motivo. */
+.dev-campo--obs {
+  display: flex;
+  flex-direction: column;
+}
+.dev-campo--obs .dev-textarea { flex: 1 1 auto; min-height: 62px; }
+/* Valor extra (frete da devolução, por exemplo): o valor e, embaixo, o
+   motivo dele. */
+.dev-campo--extra .dev-extra-motivo-rotulo { margin-top: 10px; }
+/* Plataforma reembolsou?: com "Sim", a lista (35%) e o valor reembolsado
+   (65%) dividem o mesmo espaço. */
+.dev-reemb-linha { display: flex; gap: 8px; align-items: stretch; }
+.dev-reemb-linha > select { flex: 1 1 100%; min-width: 0; }
+.dev-reemb-linha.com-valor > select { flex: 0 0 calc(35% - 4px); padding-right: 26px; }
+.dev-reemb-valor { flex: 0 0 calc(65% - 4px); min-width: 0; }
+.dev-reemb-valor[hidden] { display: none; }
+.dev-reemb-valor .input-addon-wrap { width: 100%; }
+
+/* O formulário da devolução em linhas: uma grade de 20 colunas.
+     Linha 1 — empresa e loja ................. 10 + 10
+     Linha 2 — SKU e data de chegada .......... 12 + 8 (60% e 40%)
+     Linha 3 — valor, quantidade, venda, ERP .. 5 + 5 + 5 + 5
+     Linha 4 — imposto, reputação, reembolso,
+               estado ......................... 5 + 5 + 5 + 5
+     Linha 5 — observações e valor extra ...... 12 + 8 (60% e 40%)
+   A grade mede o próprio espaço (container): na janela ou na tela
+   "Registrar futuras devoluções", com o menu aberto ou recolhido. */
+.dev-corpo-form { container: devform / inline-size; }
+.dev-form--devolucao {
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+.dev-form--devolucao > .dev-c-5 { grid-column: span 5; }
+.dev-form--devolucao > .dev-c-8 { grid-column: span 8; }
+.dev-form--devolucao > .dev-c-10 { grid-column: span 10; }
+.dev-form--devolucao > .dev-c-12 { grid-column: span 12; }
+@container devform (max-width: 820px) {
+  .dev-form--devolucao > .dev-c-5 { grid-column: span 10; }
+}
+@container devform (max-width: 560px) {
+  .dev-form--devolucao > .dev-c-5,
+  .dev-form--devolucao > .dev-c-8,
+  .dev-form--devolucao > .dev-c-10,
+  .dev-form--devolucao > .dev-c-12 { grid-column: 1 / -1; }
+}
+/* As perguntas da linha 4: lista de opções (Sim/Não e os estados). */
+.dev-form--devolucao select.dev-escolha { cursor: pointer; }
+/* Na tela de futuras devoluções, só empresa, loja e produto (ou nº da
+   venda) são obrigatórios: os asteriscos do lançamento somem. */
+.dev-corpo-form.dev-modo-futura .dev-obrig--lancar { display: none; }
+
+/* Rodapé dos formulários: o responsável à esquerda, os botões à direita. */
+.dev-rodape-form {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+.dev-resp-campo { flex: 0 1 340px; min-width: 220px; }
+.dev-rodape-botoes { display: flex; align-items: center; gap: var(--sp-sm); margin-left: auto; }
+.dev-campo input[type="number"] { -moz-appearance: textfield; }
+/* Datas da janela (chegada e lançamento): o calendário na largura do campo. */
+.dev-form .dtp-wrap { display: block; width: 100%; }
+.dev-form .dtp-field { width: 100%; }
+
+/* Select com a logo ao lado (empresa e loja) */
+.dev-select-logo { display: flex; align-items: center; gap: 8px; }
+.dev-select-logo select { flex: 1 1 auto; min-width: 0; }
+.dev-select-logo__img {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+  font-size: 11px;
+  font-weight: 800;
+}
+.dev-select-logo__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Busca por SKU com sugestões */
+.dev-sku-box { position: relative; }
+.dev-sku-box__lupa {
+  position: absolute;
+  left: 12px;
+  top: 21px;
+  transform: translateY(-50%);
+  color: var(--clr-text-3);
+  pointer-events: none;
+}
+.dev-sku-box .input-field { padding-left: 34px; }
+.dev-sku-box .input-field:disabled { opacity: 0.55; cursor: not-allowed; }
+.dev-sugestoes {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 290px;
+  overflow-y: auto;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+}
+.dev-sugestoes[hidden] { display: none; }
+.dev-sug {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--clr-text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dev-sug:hover,
+.dev-sug.ativo { background: var(--clr-surface-alt); }
+.dev-sug.ativo { outline: 1px solid var(--clr-primary); outline-offset: -1px; }
+.dev-sug__txt { flex: 1 1 auto; min-width: 0; }
+.dev-sug__nome {
+  font-size: 13.5px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dev-sug__meta { font-size: 11.5px; color: var(--clr-text-3); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+.dev-sug__sku { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--clr-text-2); font-weight: 600; }
+.dev-sug__sku mark { background: color-mix(in srgb, var(--clr-primary) 28%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
+.dev-sug__preco { font-size: 12.5px; font-weight: 700; color: var(--clr-text-2); white-space: nowrap; text-align: right; }
+.dev-sug__preco small { display: block; font-size: 10.5px; font-weight: 600; color: var(--clr-text-3); }
+.dev-sug-vazio {
+  padding: 12px 12px;
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+  text-align: center;
+  line-height: 1.45;
+}
+
+/* Produto escolhido */
+.dev-produto {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--clr-success) 55%, var(--clr-border));
+  background: var(--clr-success-lt);
+}
+.dev-produto--orfao {
+  border-color: color-mix(in srgb, var(--clr-warning) 60%, var(--clr-border));
+  background: var(--clr-warning-lt);
+}
+.dev-produto__img {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+}
+.dev-produto__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dev-produto__txt { flex: 1 1 auto; min-width: 0; }
+.dev-produto__nome {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--clr-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dev-produto__meta { font-size: 12px; color: var(--clr-text-2); margin-top: 3px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.dev-produto__anuncio { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.dev-anuncio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dev-anuncio-btn strong { color: var(--clr-text); }
+.dev-anuncio-btn.ativo { border-color: var(--clr-primary); color: var(--clr-primary); background: var(--clr-primary-lt); }
+.dev-anuncio-btn.ativo strong { color: var(--clr-primary); }
+.dev-produto__trocar { flex-shrink: 0; }
+
+/* Sim / Não */
+.dev-simnao {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  width: 100%;
+  max-width: 260px;
+  border: 1.5px solid var(--clr-input-border);
+  border-radius: var(--r-sm);
+  background: var(--clr-input-bg);
+  overflow: hidden;
+}
+.dev-simnao button {
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.dev-simnao button + button { border-left: 1.5px solid var(--clr-input-border); }
+.dev-simnao button:hover { background: var(--clr-surface-alt); }
+.dev-simnao button.ativo[data-valor="sim"] { background: var(--clr-primary); color: #fff; }
+.dev-simnao button.ativo[data-valor="nao"] { background: var(--clr-text-3); color: #fff; }
+.dev-simnao button:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: -2px; }
+.dev-simnao.campo-erro { border-color: var(--clr-danger); }
+
+/* Escolhas em pílulas (estado do produto, data dos lançamentos) */
+.dev-escolhas { display: flex; flex-wrap: wrap; gap: 8px; }
+.dev-escolhas button {
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1.5px solid var(--clr-input-border);
+  background: var(--clr-input-bg);
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+.dev-escolhas button:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
+.dev-escolhas button.ativo { border-color: var(--clr-primary); background: var(--clr-primary); color: #fff; }
+.dev-escolhas button:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: 2px; }
+.dev-escolhas.campo-erro { outline: 2px solid var(--clr-danger); outline-offset: 4px; border-radius: 12px; }
+
+/* Caixa do imposto (quando gerou imposto) */
+.dev-info-imposto {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--clr-text-2);
+  background: var(--clr-primary-lt);
+  border: 1px solid color-mix(in srgb, var(--clr-primary) 35%, var(--clr-border));
+}
+.dev-info-imposto[hidden] { display: none; }
+.dev-info-imposto svg { flex-shrink: 0; margin-top: 2px; color: var(--clr-primary); }
+.dev-info-imposto strong { color: var(--clr-text); }
+.dev-info-imposto a { color: var(--clr-primary); font-weight: 600; }
+.dev-info-imposto--aviso {
+  background: var(--clr-warning-lt);
+  border-color: color-mix(in srgb, var(--clr-warning) 55%, var(--clr-border));
+}
+.dev-info-imposto--aviso svg { color: var(--clr-warning); }
+
+/* A conta ao vivo */
+.dev-resumo {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+}
+.dev-resumo__item { min-width: 0; padding: 4px 6px; }
+.dev-resumo__item span {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-3);
+}
+.dev-resumo__item strong {
+  display: block;
+  font-family: "Sora", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--clr-text);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dev-resumo__item small {
+  display: block;
+  font-size: 11px;
+  color: var(--clr-text-3);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+.dev-resumo__item--prejuizo strong { color: var(--clr-danger); }
+.dev-resumo__item--prejuizo.zero strong { color: var(--clr-text-2); }
+.dev-resumo__item--reembolso strong { color: var(--clr-success); }
+.dev-resumo__item--reembolso.zero strong { color: var(--clr-text-2); }
+/* Formulário estreito: as cinco partes da conta em três colunas. */
+@container devform (max-width: 720px) {
+  .dev-resumo { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Devolução já lançada no Financeiro */
+.dev-aviso-fin {
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--clr-text-2);
+  background: var(--clr-warning-lt);
+  border: 1px solid color-mix(in srgb, var(--clr-warning) 55%, var(--clr-border));
+}
+.dev-aviso-fin[hidden] { display: none; }
+.dev-aviso-fin strong { color: var(--clr-text); }
+.dev-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--clr-text);
+  cursor: pointer;
+}
+.dev-check input { width: 16px; height: 16px; accent-color: var(--clr-primary); cursor: pointer; }
+
+/* Exportar: o que vai ser lançado */
+.dev-exp-resumo {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  font-size: 13px;
+  color: var(--clr-text-2);
+  line-height: 1.5;
+}
+.dev-exp-linha { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.dev-exp-linha span { color: var(--clr-text-3); }
+.dev-exp-linha strong { color: var(--clr-text); text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dev-exp-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--clr-border);
+}
+.dev-exp-total span { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--clr-text-3); }
+.dev-exp-total strong { font-family: "Sora", sans-serif; font-size: 20px; font-weight: 800; color: var(--clr-danger); }
+.dev-exp-nota { margin-top: 8px; font-size: 12px; color: var(--clr-text-3); }
+
+/* Adicionar Empresa: as cadastradas */
+.dev-emp-lista { display: flex; flex-direction: column; gap: 6px; max-height: 50vh; overflow-y: auto; }
+.dev-emp-opcao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  color: var(--clr-text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dev-emp-opcao:hover { border-color: var(--clr-primary); }
+.dev-emp-opcao__nome { flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dev-emp-opcao__acao { font-size: 11.5px; font-weight: 700; color: var(--clr-primary); flex-shrink: 0; }
+
+/* Logo mini das empresas (menu e janelas) */
+.dev-logo-mini {
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--clr-border);
+  flex-shrink: 0;
+}
+.dev-logo-mini--vazio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+  background: var(--clr-surface-alt);
+}
+
+/* ── 8. Telas menores ──────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .dev-header-bar { grid-template-columns: minmax(0, 1fr); }
+  .dev-header-lado { display: none; }
+  .dev-header-acoes { justify-self: center; }
+}
+@media (max-width: 680px) {
+  /* O formulário da devolução se arruma pela própria largura (seção 7). */
+  .dev-form:not(.dev-form--devolucao) { grid-template-columns: minmax(0, 1fr); }
+  .dev-resumo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dev-modal { padding: 20px 18px; }
+  .dev-simnao { max-width: none; }
+  .dev-resp-campo { flex: 1 1 100%; }
+  .dev-rodape-botoes { margin-left: 0; width: 100%; justify-content: flex-end; }
+}
+
+/* ── 9. Futuras devoluções ─────────────────────────────────────────── */
+/* Registrar: o mesmo formulário da janela, num cartão no meio da tela. */
+.dev-fut-card {
+  max-width: 1120px;
+  margin: 0 auto 40px;
+}
+.dev-fut-intro {
+  margin: -4px 0 18px;
+  max-width: 82ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--clr-text-3);
+}
+.dev-fut-intro strong { color: var(--clr-text-2); font-weight: 600; }
+.dev-fut-editando {
+  color: var(--clr-warning);
+  background: var(--clr-warning-lt);
+  border-color: transparent;
+}
+.dev-fut-editando[hidden] { display: none; }
+.dev-fut-rodape {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--clr-border);
+}
+
+/* Acompanhar: busca e situação no topo da lista. */
+.dev-fut-filtros { gap: 8px; flex-wrap: nowrap; }
+.dev-fut-busca { flex: 0 1 300px; width: 300px; max-width: 100%; }
+.dev-fut-filtros .input-field { height: 36px; font-size: 13px; padding-top: 6px; padding-bottom: 6px; }
+.dev-fut-filtros select.input-field { width: auto; min-width: 180px; padding-right: 30px; }
+.dev-tabela--fut { min-width: 980px; }
+.dev-tabela--fut .dev-td-resp { line-height: 1.3; }
+.dev-resp-nome { font-weight: 600; }
+
+/* Situação da devolução futura */
+.dev-sit { --cor: var(--clr-text-3); color: var(--cor); background: color-mix(in srgb, var(--cor) 14%, transparent); border-color: transparent; }
+.dev-sit[data-sit="aguardando"] { --cor: var(--clr-primary); }
+.dev-sit[data-sit="atrasada"] { --cor: var(--clr-warning); }
+.dev-sit[data-sit="lancada"] { --cor: var(--clr-success); }
+.dev-sit[data-sit="excluida"] { --cor: var(--clr-danger); }
+.dev-sit-sub { display: block; margin-top: 3px; font-size: 11px; color: var(--clr-text-3); white-space: nowrap; }
+.dev-tag--lembrete { color: var(--clr-primary); background: var(--clr-primary-lt); border-color: transparent; cursor: pointer; font-family: inherit; }
+.dev-tag--lembrete:hover { text-decoration: underline; }
+.dev-tag--lembrete:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: 2px; }
+
+/* Ações da linha: lançar (a principal) e lembrete */
+.dev-acao.dev-acao--lancar { color: var(--clr-success); border-color: color-mix(in srgb, var(--clr-success) 45%, var(--clr-border)); }
+.dev-acao.dev-acao--lancar:hover { color: var(--clr-success); border-color: var(--clr-success); background: var(--clr-success-lt); }
+.dev-acao.dev-acao--lembrete-on { color: var(--clr-primary); border-color: color-mix(in srgb, var(--clr-primary) 45%, var(--clr-border)); }
+
+/* Janela do lembrete: hora e minutos lado a lado */
+.dev-hora { display: flex; align-items: center; gap: 6px; color: var(--clr-text-3); font-weight: 700; }
+.dev-hora select { flex: 1 1 0; min-width: 0; }
+.dev-form--lembrete .dev-textarea { min-height: 150px; }
+
+@media (max-width: 860px) {
+  .dev-fut-filtros { width: 100%; flex-wrap: wrap; }
+  .dev-fut-busca { flex: 1 1 200px; width: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-item-btn.dev-nav-btn { transition: none !important; }
+}

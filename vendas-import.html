@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Importar Vendas</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/vendas-import.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <!-- Senha de acesso (Administrador ou Colaborador), se este módulo
+         estiver bloqueado em Dados da Empresa › Usuários e Senhas. No
+         <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-modulo="processador"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Importar Vendas</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button class="sidebar-item-btn" onclick="window.location.href='index.html'" title="Voltar">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section" style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <button class="sidebar-item-btn ativo" onclick="window.location.href='vendas-import.html'" title="Importar Vendas">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
+            <span class="sidebar-label-txt">Importar Vendas</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='produto.html'" title="Produtos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></span>
+            <span class="sidebar-label-txt">Produtos</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='financeiro.html'" title="Controle Financeiro">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span>
+            <span class="sidebar-label-txt">Controle Financeiro</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='empresa.html'" title="Dados da Empresa">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path></svg></span>
+            <span class="sidebar-label-txt">Dados da Empresa</span>
+          </button>
+        </div>
+
+        <div class="sidebar-footer-index">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+        <div class="sidebar-toggle-footer">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+            <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="vi-wrap">
+          <!-- ═══════════ ABAS ═══════════ -->
+          <div class="vi-tabs">
+            <button class="vi-tab ativa" data-aba="importar">Importar Vendas</button>
+            <button class="vi-tab" data-aba="historico">Importações Salvas</button>
+            <button class="vi-tab" data-aba="impostos">Meus Impostos</button>
+          </div>
+
+          <!-- ═══════════ ABA: IMPORTAR ═══════════ -->
+          <section class="vi-aba ativa" data-aba="importar">
+            <!-- Passo 1 -->
+            <div class="vi-card">
+              <div class="vi-card-title"><span class="vi-passo">1</span> Empresa e Plataforma</div>
+              <p class="vi-hint">
+                A empresa define a porcentagem de imposto usada no cálculo. A plataforma
+                define em quais produtos o sistema vai procurar cada SKU.
+              </p>
+              <div class="vi-grid-2">
+                <div class="field-group">
+                  <label for="viEmpresa">Empresa <span class="vi-req">*</span></label>
+                  <select id="viEmpresa" class="input-field">
+                    <option value="">Selecione...</option>
+                  </select>
+                  <small class="vi-sub" id="viEmpresaInfo">—</small>
+                </div>
+                <div class="field-group">
+                  <label for="viPlataforma">Plataforma <span class="vi-req">*</span></label>
+                  <select id="viPlataforma" class="input-field">
+                    <option value="">Selecione...</option>
+                  </select>
+                  <small class="vi-sub" id="viPlataformaInfo">—</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Passo 2 -->
+            <div class="vi-card">
+              <div class="vi-card-title"><span class="vi-passo">2</span> Planilha de Vendas</div>
+              <p class="vi-hint">
+                Aceita <strong>.xlsx</strong>, <strong>.xls</strong> e <strong>.csv</strong>.
+                A planilha é usada apenas para ler os valores e é descartada em seguida —
+                nada dela fica guardado.
+              </p>
+              <div class="vi-upload" id="viUpload">
+                <input type="file" id="viArquivo" accept=".xlsx,.xls,.csv" hidden />
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div class="vi-upload-txt">Clique para escolher a planilha</div>
+                <div class="vi-upload-sub" id="viArquivoNome">Nenhum arquivo escolhido</div>
+              </div>
+              <div class="vi-planilha-info" id="viPlanilhaInfo" style="display:none;"></div>
+              <div class="field-group" id="viAbaWrap" style="display:none; margin-top:14px;">
+                <label for="viAbaPlanilha">Aba da planilha</label>
+                <select id="viAbaPlanilha" class="input-field"></select>
+              </div>
+            </div>
+
+            <!-- Passo 3. Escondido até a planilha ser escolhida: sem o
+                 arquivo aberto não há como saber as letras das colunas, e
+                 os campos vazios só ocupariam a tela. -->
+            <div class="vi-card" id="viCardIntervalos" style="display:none;">
+              <div class="vi-card-title"><span class="vi-passo">3</span> Intervalos das Colunas</div>
+              <p class="vi-hint">
+                Informe onde cada informação começa e termina, como
+                <strong>H7</strong> até <strong>H100</strong>. Abra a planilha e confira a
+                letra da coluna e a primeira linha com valor — o sistema soma exatamente o
+                que você indicar aqui.
+              </p>
+
+              <div class="vi-range-linha">
+                <div class="vi-range-rot">
+                  SKU <span class="vi-req">*</span>
+                  <small>Coluna com o código de cada produto vendido</small>
+                </div>
+                <input type="text" id="viSkuIni" class="input-field vi-cel" placeholder="U7" autocomplete="off" />
+                <span class="vi-ate">até</span>
+                <input type="text" id="viSkuFim" class="input-field vi-cel" placeholder="U100" autocomplete="off" />
+              </div>
+
+              <div class="vi-range-linha">
+                <div class="vi-range-rot">
+                  Valor Bruto <span class="vi-req">*</span>
+                  <small>Total vendido, antes de qualquer desconto</small>
+                </div>
+                <input type="text" id="viBrutoIni" class="input-field vi-cel" placeholder="H7" autocomplete="off" />
+                <span class="vi-ate">até</span>
+                <input type="text" id="viBrutoFim" class="input-field vi-cel" placeholder="H100" autocomplete="off" />
+              </div>
+
+              <!-- Modo 1: a planilha traz o líquido (ex.: Mercado Livre) -->
+              <div class="vi-range-linha" data-modo="liquido">
+                <div class="vi-range-rot">
+                  Valor Recebido <span class="vi-req">*</span>
+                  <small>O que sobrou depois dos descontos da plataforma</small>
+                </div>
+                <input type="text" id="viLiquidoIni" class="input-field vi-cel" placeholder="R7" autocomplete="off" />
+                <span class="vi-ate">até</span>
+                <input type="text" id="viLiquidoFim" class="input-field vi-cel" placeholder="R100" autocomplete="off" />
+              </div>
+
+              <div class="vi-range-linha">
+                <div class="vi-range-rot">
+                  Unidades Vendidas <span class="vi-req">*</span>
+                  <small>
+                    Quantas unidades cada venda levou. No relatório do Mercado
+                    Livre é a coluna <strong>Unidades</strong>.
+                    <span class="vi-ajuda">
+                      <button type="button" class="vi-ajuda-btn" aria-label="Por que isto é obrigatório?">
+                        Por que isto é obrigatório?
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                      </button>
+                      <span class="vi-ajuda-txt" role="tooltip">
+                        Uma única venda pode levar várias unidades. Sem esta coluna o
+                        sistema contaria uma unidade por linha, o custo dos produtos
+                        sairia menor do que o real e o Valor Real Final ficaria maior
+                        do que de verdade.
+                      </span>
+                    </span>
+                  </small>
+                </div>
+                <input type="text" id="viQtdIni" class="input-field vi-cel" placeholder="G7" autocomplete="off" />
+                <span class="vi-ate">até</span>
+                <input type="text" id="viQtdFim" class="input-field vi-cel" placeholder="G100" autocomplete="off" />
+              </div>
+
+              <!-- DE ONDE VEM O VALOR RECEBIDO
+                   Cada marketplace informa isso de um jeito, e o mesmo
+                   marketplace muda com o tempo. Em vez de presumir um formato,
+                   a tela pergunta. Assim nenhuma mudança de relatório quebra a
+                   importação: basta escolher outra opção. -->
+              <div class="vi-range-linha vi-modo-linha">
+                <div class="vi-range-rot">
+                  De onde vem o valor recebido <span class="vi-req">*</span>
+                  <small>Escolha o que existir na sua planilha</small>
+                </div>
+                <select id="viModoLiquido" class="input-field vi-modo-sel">
+                  <option value="liquido">Da coluna com o valor recebido</option>
+                  <option value="taxa">Do valor bruto menos as colunas de desconto</option>
+                  <option value="pct">Do valor bruto menos um percentual que eu informo</option>
+                </select>
+              </div>
+
+              <!-- Modo 2: a planilha traz as taxas cobradas.
+                   Aceita VÁRIAS colunas: a Shopee, por exemplo, separa o
+                   desconto em três (comissão, taxa de serviço e frete). Só as
+                   LETRAS são informadas — as linhas são as mesmas do Valor
+                   Bruto, o que torna impossível desalinhar os intervalos. -->
+              <div class="vi-range-linha" data-modo="taxa" style="display:none;">
+                <div class="vi-range-rot">
+                  Colunas de desconto <span class="vi-req">*</span>
+                  <small>
+                    Só as letras, separadas por vírgula. Ex.:
+                    <strong>AQ, AT, AV</strong> — o sistema soma todas e
+                    desconta do Valor Bruto, usando as mesmas linhas.
+                  </small>
+                </div>
+                <input type="text" id="viTaxaCols" class="input-field vi-cel-larga" placeholder="AQ, AT, AV" autocomplete="off" />
+              </div>
+
+              <!-- Modo 3: nada disso existe -->
+              <div class="vi-range-linha" data-modo="pct" style="display:none;">
+                <div class="vi-range-rot">
+                  Percentual descontado pela plataforma <span class="vi-req">*</span>
+                  <small>Aplicado sobre o valor bruto de cada venda</small>
+                </div>
+                <input type="text" id="viPctComissao" class="input-field vi-cel percent-input" placeholder="16,00" autocomplete="off" />
+                <span class="vi-ate">%</span>
+              </div>
+              <div class="vi-range-linha" data-modo="pct" style="display:none;">
+                <div class="vi-range-rot">
+                  Taxa fixa por venda
+                  <small class="vi-opc">opcional — deixe vazio se não houver</small>
+                </div>
+                <input type="text" id="viTaxaFixa" class="input-field vi-cel money-input" placeholder="0,00" autocomplete="off" />
+                <span class="vi-ate">R$</span>
+              </div>
+              <div class="vi-aviso" data-modo="pct" style="display:none;">
+                Neste modo o valor recebido é <strong>estimado</strong>: a planilha
+                não informa quanto a plataforma reteve. O relatório mostra os
+                valores como estimativa, e não como o efetivamente creditado.
+              </div>
+
+              <!-- ═══════════════════════════════════════════════════════
+                   PERSONALIZAÇÃO DOS CÁLCULOS
+
+                   Camada de ajuste sobre os TOTAIS. As regras não tocam nas
+                   vendas individuais nem no relatório por SKU: elas rodam
+                   depois da soma, na ordem em que aparecem aqui.
+
+                     vendas → soma → TOTAIS → regras → totais ajustados
+                   ═══════════════════════════════════════════════════════ -->
+              <div class="vi-regras">
+                <div class="vi-regras-topo">
+                  <div>
+                    <span class="vi-regras-titulo">Personalização dos Cálculos</span>
+                    <span class="vi-ajuda">
+                      <button type="button" class="vi-ajuda-btn" aria-label="Como funcionam as regras">
+                        Como funciona?
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                      </button>
+                      <span class="vi-ajuda-txt" role="tooltip">
+                        As regras são aplicadas sobre os TOTAIS, depois de somar
+                        todas as vendas — nunca em cada venda separadamente.
+                        Elas rodam na ordem em que aparecem, e o resultado de
+                        uma pode alimentar a seguinte. O relatório por SKU não
+                        é alterado. Se o Valor Real Final mudar, o valor
+                        exportado para o Financeiro muda junto.
+                      </span>
+                    </span>
+                  </div>
+                  <button type="button" class="btn-secondary vi-btn-add-regra" id="viAddRegra">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Adicionar Campo de Cálculo
+                  </button>
+                </div>
+
+                <p class="vi-regras-vazio" id="viRegrasVazio">
+                  Nenhuma regra criada. Os totais serão usados como vêm da planilha.
+                </p>
+
+                <div id="viRegrasLista"></div>
+              </div>
+
+              <div class="vi-acoes">
+                <button class="btn-primary" id="viProcessar">Processar Planilha</button>
+                <button class="btn-secondary" id="viLimpar">Limpar</button>
+              </div>
+              <div class="vi-erro" id="viErro" style="display:none;"></div>
+            </div>
+
+            <!-- O resultado abre em modal: a conferência acontece de uma vez,
+                 sobre a tela, e sai do caminho quando termina. O formulário
+                 continua atrás, intacto, para ajustar as células e processar
+                 de novo sem redigitar nada. -->
+            <div class="vi-modal" id="viResultado" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="viModalTitulo">
+              <div class="vi-modal-caixa">
+                <header class="vi-modal-topo">
+                  <div>
+                    <h2 class="vi-modal-titulo" id="viModalTitulo">Resultado da importação</h2>
+                    <p class="vi-modal-sub" id="viModalSub"></p>
+                  </div>
+                  <button type="button" class="vi-modal-fechar" id="viFechar" aria-label="Fechar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                  </button>
+                </header>
+
+                <div class="vi-modal-corpo">
+                  <div class="vi-conta">
+                    <div class="vi-etapa">
+                      <span class="vi-etapa-rot">Você vendeu</span>
+                      <span class="vi-etapa-val" id="viMBruto">R$ 0,00</span>
+                    </div>
+
+                    <div class="vi-etapa">
+                      <span class="vi-etapa-rot">A plataforma pagou</span>
+                      <span class="vi-etapa-val" id="viMLiquido">R$ 0,00</span>
+                    </div>
+
+                    <!-- O custo é dinheiro que SAI, então recebe cor própria:
+                         distingue-se dos dois valores que entram, à esquerda. -->
+                    <div class="vi-etapa vi-etapa-custo">
+                      <span class="vi-etapa-rot">Custo total dos produtos</span>
+                      <span class="vi-etapa-val" id="viMCusto">R$ 0,00</span>
+                      <span class="vi-etapa-sub" id="viMCustoSub"></span>
+                    </div>
+
+                    <div class="vi-etapa vi-etapa-final">
+                      <span class="vi-etapa-rot">Sobrou para você</span>
+                      <span class="vi-etapa-val" id="viMFinal">R$ 0,00</span>
+                    </div>
+                  </div>
+
+                  <p class="vi-resumo-linha" id="viResumoCusto"></p>
+                  <div class="vi-ajustes" id="viAjustes" style="display:none;"></div>
+                  <div class="vi-aviso" id="viAvisoSku" style="display:none;"></div>
+
+                  <h3 class="vi-modal-secao">Relatório por SKU</h3>
+                  <div class="vi-tabela-wrap">
+                    <table class="vi-tabela">
+                      <thead>
+                        <tr>
+                          <th>SKU</th>
+                          <th class="num">Qtd</th>
+                          <th class="num">Valor bruto</th>
+                          <th class="num">Recebido</th>
+                          <th class="num">Custo unit.</th>
+                          <th class="num">Custo total</th>
+                          <th class="num">Valor Real Final</th>
+                        </tr>
+                      </thead>
+                      <tbody id="viTbody"></tbody>
+                      <tfoot id="viTfoot"></tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                <footer class="vi-modal-rodape">
+                  <button class="btn-secondary" id="viVoltar">Voltar e ajustar</button>
+                  <div class="vi-rodape-dir">
+                    <!-- O "?" vive DENTRO do botão. É um <span>, não um
+                         <button>: botão dentro de botão é HTML inválido e o
+                         navegador desfaz o aninhamento. O balão abre ao passar
+                         o mouse no ícone e some ao sair, sem disparar o clique
+                         de salvar. -->
+                    <button class="btn-primary vi-btn-com-ajuda" id="viSalvar">
+                      Salvar Importação
+                      <span class="vi-ajuda-mini" role="button" tabindex="0" aria-label="O que estes botões fazem">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        <span class="vi-ajuda-txt vi-ajuda-txt-esq" role="tooltip">
+                          Salvar guarda este relatório em Importações Salvas.
+                          Exportar cria um lançamento de venda no Controle
+                          Financeiro com o Valor Real Final. A empresa e a
+                          plataforma vão junto automaticamente.
+                        </span>
+                      </span>
+                    </button>
+                    <button class="btn-accent" id="viExportar">Exportar para o Financeiro</button>
+                  </div>
+                </footer>
+              </div>
+            </div>
+          </section>
+
+          <!-- ═══════════ ABA: HISTÓRICO ═══════════ -->
+          <section class="vi-aba" data-aba="historico">
+            <div class="vi-card">
+              <div class="vi-card-title">Importações Salvas</div>
+              <p class="vi-hint">
+                Cada importação fica guardada com seus totais e o relatório por SKU.
+                A planilha não é armazenada.
+              </p>
+              <div class="vi-filtro">
+                <select id="viHistEmpresa" class="input-field">
+                  <option value="">Todas as empresas</option>
+                </select>
+                <input type="text" id="viHistBusca" class="input-field" placeholder="Buscar por plataforma ou observação..." />
+              </div>
+              <div id="viHistLista"></div>
+            </div>
+          </section>
+
+          <!-- ═══════════ ABA: IMPOSTOS ═══════════ -->
+          <section class="vi-aba" data-aba="impostos">
+            <div class="vi-card">
+              <div class="vi-card-title">Meus Impostos</div>
+              <div class="vi-grid-2">
+                <div class="field-group">
+                  <label for="viImpEmpresa">Empresa</label>
+                  <select id="viImpEmpresa" class="input-field">
+                    <option value="">Selecione...</option>
+                  </select>
+                </div>
+                <div class="field-group">
+                  <label for="viImpPeriodo">Período</label>
+                  <select id="viImpPeriodo" class="input-field">
+                    <option value="todos">Todas as importações</option>
+                    <option value="mes">Mês atual</option>
+                    <option value="ano">Ano atual</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="vi-metricas vi-metricas-3" id="viImpMetricas" style="display:none;">
+                <div class="vi-metrica">
+                  <div class="vi-metrica-rot">Total Vendido — Valor Bruto</div>
+                  <div class="vi-metrica-val" id="viImpBruto">R$ 0,00</div>
+                </div>
+                <div class="vi-metrica">
+                  <div class="vi-metrica-rot">Porcentagem de imposto por nota</div>
+                  <div class="vi-metrica-val" id="viImpPct">—</div>
+                  <div class="vi-metrica-sub">Vem do cadastro da empresa</div>
+                </div>
+                <div class="vi-metrica vi-m-imposto">
+                  <div class="vi-metrica-rot">Imposto estimado</div>
+                  <div class="vi-metrica-val" id="viImpValor">R$ 0,00</div>
+                </div>
+              </div>
+
+              <div id="viImpVazio" class="vi-vazio">
+                Selecione uma empresa para ver os faturamentos importados.
+              </div>
+
+              <div class="vi-tabela-wrap" id="viImpTabelaWrap" style="display:none; margin-top:16px;">
+                <table class="vi-tabela">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Plataforma</th>
+                      <th class="num">Valor Bruto</th>
+                      <th class="num">Imposto estimado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="viImpTbody"></tbody>
+                </table>
+              </div>
+
+              <div class="vi-legal">
+                Atenção: Este é um cálculo aproximado baseado nas configurações manuais
+                inseridas. Os valores podem sofrer alterações. Isso não substitui um
+                contador. Se tiver dúvidas, procure um.
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal: exportar para o Financeiro -->
+    <div class="modal-overlay" id="viModalExport" style="display:none;">
+      <div class="modal" style="max-width:460px; width:90%;">
+        <div class="modal-title" id="viExpTitulo">Exportar para o Financeiro</div>
+        <div class="modal-subtitle" id="viExportResumo" style="margin-bottom:var(--sp-lg);"></div>
+
+        <!-- Qual valor vai para o Financeiro.
+             Antes o sistema escolhia o Valor Real Final sozinho. Agora a
+             escolha é do usuário: cada lojista lança no financeiro o número
+             que faz sentido para o controle dele. -->
+        <div class="field-group" style="margin-bottom:var(--sp-md);">
+          <label>Qual valor lançar <span class="vi-req">*</span></label>
+          <div class="vi-esc-valor" id="viExpValores"></div>
+        </div>
+
+        <div class="field-group" style="margin-bottom:var(--sp-md);">
+          <label for="viExpResponsavel">Responsável pelo lançamento <span class="vi-req">*</span></label>
+          <select id="viExpResponsavel" class="input-field" title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"></select>
+        </div>
+        <div class="field-group" style="margin-bottom:var(--sp-lg);">
+          <label for="viExpObs">Observação</label>
+          <textarea id="viExpObs" class="input-field" rows="3" placeholder="Opcional"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="viExpCancelar">Cancelar</button>
+          <button class="btn-primary" id="viExpConfirmar" style="padding:10px var(--sp-lg); font-size:14px;">Salvar Exportação</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ── ORDEM OBRIGATÓRIA DOS SCRIPTS ──────────────────────────────
+         1) xlsx: biblioteca local (sem CDN, funciona offline no Electron).
+         2) utils: armazenamento dos produtos e helpers compartilhados.
+         3) theme: troca de tema.
+         4) vendas-import: a tela. Precisa de todos os anteriores. -->
+    <!-- Guarda de licença. Esta tela é um MÓDULO LICENCIÁVEL: sem este
+       script, nenhuma regra de licença se aplica aqui e o módulo abriria
+       para qualquer chave. Vem primeiro, como nas demais telas. -->
+  <script src="JS/licenca-ui.js"></script>
+  <script src="JS/error-handler.js"></script>
+    <script src="JS/xlsx.full.min.js"></script>
+    <script src="JS/utils.js"></script>
+    <!-- calculadora.js: traz calcularUnidade(), a fórmula oficial do
+         "Custo Total da Unidade". Sem ela o custo cairia numa soma simples,
+         sem impostos nem campos personalizados — e o Valor Real Final sairia
+         maior do que o real. Precisa vir DEPOIS do utils.js. -->
+    <script src="JS/calculadora.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/vendas-import.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_processador.js"></script>
+  </body>
+</html>

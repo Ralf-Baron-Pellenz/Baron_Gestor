@@ -1,0 +1,1203 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Bapell Gestor Pro — Controle Financeiro (DRE)
+   Usa as variáveis de tema do style.css (Claro, Padrão e Dark Absoluto).
+
+   Organização:
+     1. Página e cabeçalho (título + "Adicionar Campos")
+     2. Botões da tela
+     3. Período e meta
+     4. Indicadores (KPIs)
+     5. Insights (dois por linha)
+     6. Formulários: Registrar Entrada / Registrar Saída
+     7. DRE do período
+     8. Desempenho por canal
+     9. Gráficos
+    10. Extrato
+    11. Configurar Campos, datas e modais
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Página e cabeçalho ─────────────────────────────────────────── */
+
+/* Largura padrão de TODOS os campos de data desta tela: formulários de
+   Entrada e Saída, período do painel, período do extrato e a edição de um
+   lançamento (que abre fora do conteúdo — por isso fica no :root). */
+:root { --fin-data-w: 160px; }
+
+/* O conteúdo mede a própria largura: os blocos se arrumam pelo espaço
+   real (menu lateral aberto ou recolhido), não pela largura da janela. */
+#finConteudo { container: fin / inline-size; }
+
+.mt-lg { margin-top: var(--sp-lg); }
+
+/* Título no centro; o botão "+ Adicionar Campos" na mesma linha, à
+   direita. As duas colunas laterais têm a mesma largura, então o título
+   fica centrado de verdade. */
+.fin-header-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 16px;
+  margin-bottom: 22px;
+  width: 100%;
+  position: relative;
+}
+.fin-header-centro {
+  min-width: 0;
+  text-align: center;
+}
+.fin-header-title-simples {
+  font-family: "Sora", sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--clr-text);
+  margin: 0;
+  text-align: center;
+}
+.fin-header-sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--clr-text-3);
+}
+.fin-header-sub:empty { display: none; }
+.fin-header-sub strong { color: var(--clr-text-2); font-weight: 600; }
+.fin-header-actions {
+  justify-self: end;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 860px) {
+  .fin-header-bar { grid-template-columns: minmax(0, 1fr); }
+  .fin-header-lado { display: none; }
+  .fin-header-actions { justify-self: center; }
+}
+
+/* ── 2. Botões da tela ─────────────────────────────────────────────── */
+
+/* "+ Adicionar Campos": o mesmo botão da tela do produto
+   (.btn-add-campos-unico), um pouco maior por estar ao lado do título. */
+.fin-btn-add-campos {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 15px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+.fin-btn-add-campos svg { flex-shrink: 0; }
+
+/* Botão pequeno da tela (Definir meta, Detalhar, Planilha). */
+.fin-btn-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: var(--clr-surface);
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.fin-btn-mini:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background: color-mix(in srgb, var(--clr-primary) 8%, var(--clr-surface));
+}
+.fin-btn-mini[aria-pressed="true"] {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+}
+.fin-btn-mini--icone { height: 34px; }
+.fin-btn-mini:focus-visible,
+.fin-acao-btn:focus-visible,
+.fin-collapse-seta:focus-visible,
+.fin-toggle-bl:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+}
+
+/* Os dois botões de lançar: o tamanho dos botões padrão do app. */
+.fin-btn-lancar {
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.fin-btn-saida {
+  justify-content: center;
+  background: var(--clr-danger);
+  border: 1px solid var(--clr-danger);
+  color: #fff;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--clr-danger) 30%, transparent);
+  transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+}
+.fin-btn-saida:hover {
+  background: color-mix(in srgb, var(--clr-danger) 86%, #000);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--clr-danger) 38%, transparent);
+}
+.fin-btn-saida:active { transform: translateY(0); }
+
+/* Ícone num quadradinho colorido (formulários, período). */
+.fin-ico-tile {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-primary);
+  background: color-mix(in srgb, var(--clr-primary) 14%, transparent);
+}
+.fin-ico-tile--sm { width: 28px; height: 28px; border-radius: 8px; }
+.fin-ico-tile--sucesso {
+  color: var(--clr-success);
+  background: color-mix(in srgb, var(--clr-success) 15%, transparent);
+}
+.fin-ico-tile--perigo {
+  color: var(--clr-danger);
+  background: color-mix(in srgb, var(--clr-danger) 15%, transparent);
+}
+
+/* ── 3. Período e meta ─────────────────────────────────────────────── */
+.fin-toolbar { width: 100%; padding: 18px 22px; }
+.fin-toolbar__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 28px;
+  flex-wrap: wrap;
+}
+.fin-periodo {
+  flex: 1 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* "Período" no mesmo formato do título da meta, ao lado. */
+.fin-periodo__rotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-text-2);
+}
+.fin-periodo__rotulo svg { color: var(--clr-primary); }
+.fin-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.fin-chips .filter-chip { padding: 6px 13px; font-size: 12.5px; }
+.fin-periodo__custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+}
+/* As datas do período (painel e extrato): a mesma largura padrão das datas
+   dos formulários e a altura dos filtros ao lado (34px). */
+.fin-periodo__custom .input-field {
+  width: var(--fin-data-w);
+  height: 34px;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+#periodoExtratoCustom { margin-bottom: 12px; }
+.fin-periodo__info {
+  display: flex;
+  align-items: center;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--clr-text-3);
+}
+.fin-periodo__info:empty { display: none; }
+.fin-periodo__info strong { color: var(--clr-text-2); font-weight: 600; }
+.fin-periodo__sep { opacity: 0.5; }
+
+.fin-meta-header {
+  flex: 0 1 380px;
+  min-width: 260px;
+  max-width: 400px;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 1px solid var(--clr-border);
+  padding-left: 22px;
+}
+.fin-meta__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fin-meta__titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-text-2);
+}
+.fin-meta__titulo svg { color: var(--clr-primary); }
+.fin-meta__valores {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+#metaAtual {
+  font-family: "Sora", sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--clr-text);
+}
+#metaAlvo { font-size: 12.5px; color: var(--clr-text-3); }
+.fin-meta__trilho {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  overflow: hidden;
+}
+#metaBarra {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--clr-primary), color-mix(in srgb, var(--clr-primary) 55%, var(--clr-success)));
+  transition: width 0.5s ease;
+}
+#metaBarra.batida {
+  background: linear-gradient(90deg, var(--clr-success), color-mix(in srgb, var(--clr-success) 70%, var(--clr-primary)));
+}
+.fin-meta__rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--clr-text-3);
+}
+#metaPct { text-align: right; white-space: nowrap; font-weight: 600; }
+#metaProjecao strong { color: var(--clr-text-2); }
+
+@container fin (max-width: 900px) {
+  .fin-meta-header {
+    flex-basis: 100%;
+    max-width: none;
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--clr-border);
+    padding-top: 14px;
+  }
+}
+
+/* ── 4. Indicadores (KPIs) ─────────────────────────────────────────── */
+
+/* O número de colunas vem do financeiro.js (--kpi-cols): ele divide os
+   cards visíveis em linhas equilibradas (6 → 3 + 3, 4 → 2 + 2), em vez
+   de deixar um card sozinho na última linha. */
+.fin-cards {
+  display: grid;
+  grid-template-columns: repeat(var(--kpi-cols, 3), minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: var(--sp-lg);
+}
+.fin-card {
+  --tom: var(--clr-primary);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 16px 18px 0;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  container-type: inline-size;
+  transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
+}
+.fin-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--tom) 45%, var(--clr-border));
+}
+/* Faixa fina na cor do indicador, no alto do card. */
+.fin-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tom), color-mix(in srgb, var(--tom) 15%, transparent));
+}
+.fin-card[data-tom="primario"] { --tom: var(--clr-primary); }
+.fin-card[data-tom="aviso"] { --tom: var(--clr-warning); }
+.fin-card[data-tom="perigo"] { --tom: var(--clr-danger); }
+.fin-card[data-tom="sucesso"] { --tom: var(--clr-success); }
+.fin-card[data-tom="neutro"] { --tom: var(--clr-accent); }
+
+.fin-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-text-3);
+  margin-bottom: 10px;
+  min-width: 0;
+}
+/* O texto do título reticencia; o ícone nunca some nem espreme. */
+.fin-card-title > span:not(.fin-card-ico) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fin-card-ico {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tom);
+  background: color-mix(in srgb, var(--tom) 15%, transparent);
+}
+.fin-card-ico svg { flex-shrink: 0; }
+.fin-card-value {
+  font-family: "Sora", sans-serif;
+  /* Acompanha a largura do próprio card: cabe "R$ 1.234.567,89" em
+     qualquer coluna, sem passar da borda. */
+  font-size: clamp(17px, 8.6cqi, 26px);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  color: var(--clr-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.fin-card-rodape {
+  display: flex;
+  align-items: center;
+  gap: 6px 8px;
+  flex-wrap: wrap;
+  min-height: 22px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+}
+.fin-card-sub {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fin-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--clr-text-2);
+  background: color-mix(in srgb, var(--clr-text-3) 16%, transparent);
+}
+.fin-delta:empty { display: none; }
+.fin-delta.bom {
+  color: var(--clr-success);
+  background: color-mix(in srgb, var(--clr-success) 16%, transparent);
+}
+.fin-delta.ruim {
+  color: var(--clr-danger);
+  background: color-mix(in srgb, var(--clr-danger) 16%, transparent);
+}
+/* Minigráfico dos últimos meses, encostado na base do card. */
+.fin-spark {
+  height: 40px;
+  margin: 10px -18px 0;
+  color: var(--tom);
+}
+.fin-spark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* ── 5. Insights (dois por linha) ─────────────────────────────────── */
+.fin-contador {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--clr-primary);
+  background: color-mix(in srgb, var(--clr-primary) 14%, transparent);
+}
+.fin-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@container fin (max-width: 560px) {
+  .fin-insights-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.fin-insight {
+  --tom: var(--clr-primary);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--tom) 30%, var(--clr-border));
+  background: color-mix(in srgb, var(--tom) 6%, var(--clr-surface));
+}
+.fin-insight--perigo { --tom: var(--clr-danger); }
+.fin-insight--aviso { --tom: var(--clr-warning); }
+.fin-insight--sucesso { --tom: var(--clr-success); }
+.fin-insight--info { --tom: var(--clr-primary); }
+.fin-insight--neutro { --tom: var(--clr-text-3); }
+.fin-insight__ico {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tom);
+  background: color-mix(in srgb, var(--tom) 16%, transparent);
+}
+.fin-insight__corpo { min-width: 0; }
+.fin-insight__titulo {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin-bottom: 3px;
+}
+.fin-insight__texto {
+  font-size: 12.8px;
+  line-height: 1.5;
+  color: var(--clr-text-2);
+}
+.fin-insight__texto strong { color: var(--clr-text); font-weight: 700; }
+
+/* ── 6. Formulários ────────────────────────────────────────────────── */
+
+/* Formulários e gráficos: duas colunas quando há espaço. */
+.fin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 20px;
+}
+@container fin (max-width: 820px) {
+  .fin-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.fin-form-card { display: flex; flex-direction: column; min-width: 0; }
+.fin-form-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.fin-form-topo__textos { min-width: 0; }
+.card-title.fin-form-titulo { margin: 0; color: var(--clr-text); letter-spacing: 0.6px; }
+.fin-form-sub { margin-top: 3px; font-size: 12.5px; color: var(--clr-text-3); }
+
+.fin-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+.fin-form-grid .field-group { margin-bottom: 0; min-width: 0; }
+/* Data + lista (Canal de Venda / Categoria) na mesma linha: a data tem a
+   largura padrão das datas da tela (--fin-data-w) e a lista fica com o
+   resto. Antes a data ocupava meia linha — e cada formulário tinha uma
+   largura diferente. */
+.fin-linha-data {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: var(--fin-data-w) minmax(0, 1fr);
+  gap: 14px;
+}
+.fin-form-grid .dtp-wrap { display: block; }
+/* Mesma altura para todos os campos dos formulários: texto, listas e datas
+   (a lista e a data ficavam com alturas diferentes das caixas de texto). */
+.fin-form-grid .field-group > input.input-field,
+.fin-form-grid .field-group > select.input-field,
+.fin-form-grid .dtp-field {
+  height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.fin-span-2 { grid-column: span 2; }
+.fin-opcional {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  color: var(--clr-text-3);
+}
+.fin-obrigatorio { color: var(--clr-danger); }
+.fin-label-flex { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+@container fin (max-width: 520px) {
+  .fin-form-grid { grid-template-columns: minmax(0, 1fr); }
+  .fin-span-2 { grid-column: auto; }
+}
+@container fin (max-width: 400px) {
+  .fin-linha-data { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Alternar Valor Bruto / Valor Líquido */
+.fin-toggle-bl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--clr-border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--clr-primary);
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.fin-toggle-bl:hover { border-color: var(--clr-primary); }
+.fin-toggle-bl.ativo {
+  background: var(--clr-primary);
+  border-color: var(--clr-primary);
+  color: #fff;
+}
+
+/* Toggle R$/% nos campos */
+.fin-toggle-unidade {
+  display: inline-flex;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  margin-left: 2px;
+}
+.fin-toggle-unidade button {
+  background: var(--clr-surface);
+  border: none;
+  color: var(--clr-text-3);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.fin-toggle-unidade button.active {
+  background: var(--clr-primary);
+  color: #fff;
+}
+.fin-toggle-unidade button:disabled { opacity: 0.6; }
+
+/* "Lançar de novo": as contas que se repetem, a um clique. */
+.fin-atalhos {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.fin-atalhos__rotulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-text-3);
+}
+.fin-atalhos__lista { display: flex; gap: 6px; flex-wrap: wrap; min-width: 0; }
+.fin-atalho {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  height: 28px;
+  padding: 0 11px;
+  border: 1px dashed var(--clr-border-soft, var(--clr-border));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.fin-atalho span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fin-atalho svg { flex-shrink: 0; opacity: 0.7; }
+.fin-atalho:hover {
+  border-style: solid;
+  border-color: var(--clr-danger);
+  color: var(--clr-danger);
+  background: color-mix(in srgb, var(--clr-danger) 7%, transparent);
+}
+.fin-atalho:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: 2px; }
+
+/* Rodapé do formulário: a prévia do valor e o botão de lançar. Fica na
+   base do card (as duas caixas terminam alinhadas). */
+.fin-form-rodape {
+  margin-top: auto;
+  padding-top: 18px;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fin-liquido-preview {
+  flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--clr-success) 9%, var(--clr-surface-alt));
+  border: 1px solid color-mix(in srgb, var(--clr-success) 30%, var(--clr-border));
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--clr-text-2);
+  text-align: left;
+}
+.fin-liquido-preview strong {
+  font-family: "Sora", sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--clr-success);
+  white-space: nowrap;
+}
+.fin-liquido-preview.negativo strong { color: var(--clr-danger); }
+.fin-total-saida {
+  background: color-mix(in srgb, var(--clr-danger) 8%, var(--clr-surface-alt));
+  border-color: color-mix(in srgb, var(--clr-danger) 30%, var(--clr-border));
+}
+.fin-total-saida strong { color: var(--clr-danger); }
+
+/* ── 7. DRE do período ─────────────────────────────────────────────── */
+
+/* Cabeçalho dos cards: título à esquerda, informação/ações à direita. */
+.fin-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.fin-card-head .card-title { margin: 0; }
+.fin-card-head__info { font-size: 12px; color: var(--clr-text-3); }
+.fin-card-head__acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.fin-dre-card { container: findre / inline-size; }
+.fin-dre-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+}
+@container findre (min-width: 900px) {
+  .fin-dre-layout {
+    grid-template-columns: minmax(0, 1.9fr) minmax(290px, 1fr);
+    align-items: start;
+  }
+}
+.fin-dre-tabela-wrap { overflow-x: auto; min-width: 0; }
+.fin-dre {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.fin-dre th {
+  padding: 0 8px 9px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-3);
+  border-bottom: 1px solid var(--clr-border);
+  white-space: nowrap;
+}
+.fin-dre td {
+  padding: 9px 8px;
+  color: var(--clr-text);
+  border-bottom: 1px solid color-mix(in srgb, var(--clr-border) 55%, transparent);
+  white-space: nowrap;
+}
+.fin-dre .num { text-align: right; font-variant-numeric: tabular-nums; }
+.fin-dre-conta { white-space: normal !important; min-width: 180px; }
+.fin-dre tr { --tom: var(--clr-text-3); }
+.fin-dre tr.dre-receita { --tom: var(--clr-primary); }
+.fin-dre tr.dre-custo { --tom: var(--clr-danger); }
+.fin-dre tr.dre-resultado { --tom: var(--clr-success); }
+.fin-dre tr.dre-resultado.negativo { --tom: var(--clr-danger); }
+.fin-dre tr.dre-grupo { cursor: pointer; }
+.fin-dre tr.dre-grupo:hover td { background: color-mix(in srgb, var(--clr-surface-alt) 70%, transparent); }
+.fin-dre tr.dre-grupo:focus-visible { outline: 2px solid var(--clr-primary); outline-offset: -2px; }
+.fin-dre-seta {
+  display: inline-flex;
+  width: 16px;
+  margin-right: 2px;
+  color: var(--clr-text-3);
+  transition: transform var(--t-fast);
+}
+.fin-dre tr.dre-grupo.aberto .fin-dre-seta { transform: rotate(90deg); }
+.fin-dre tr.dre-filho td {
+  font-size: 12.5px;
+  color: var(--clr-text-2);
+  background: color-mix(in srgb, var(--clr-surface-alt) 45%, transparent);
+}
+.fin-dre tr.dre-filho .fin-dre-conta { padding-left: 36px; }
+.fin-dre tr.dre-subtotal td {
+  font-weight: 700;
+  border-top: 1px solid var(--clr-border);
+}
+.fin-dre tr.dre-total td {
+  font-size: 14px;
+  font-weight: 800;
+  border-bottom: none;
+  background: color-mix(in srgb, var(--tom) 10%, transparent);
+}
+.fin-dre tr.dre-total td:first-child { border-radius: 10px 0 0 10px; }
+.fin-dre tr.dre-total td:last-child { border-radius: 0 10px 10px 0; }
+.fin-dre tr.dre-total .fin-dre-valor { color: var(--tom); }
+.fin-dre-pct {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.fin-dre-barra {
+  display: inline-block;
+  width: 44px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--clr-surface-alt);
+  overflow: hidden;
+}
+.fin-dre-barra i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--tom);
+}
+.fin-dre-nota {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--clr-text-3);
+  display: flex;
+  gap: 6px 16px;
+  flex-wrap: wrap;
+}
+.fin-dre-nota strong { color: var(--clr-text-2); }
+.fin-dre.sem-comparacao .fin-dre-col-ant,
+.fin-dre.sem-comparacao .fin-dre-col-var { display: none; }
+.fin-var { font-weight: 700; }
+.fin-var.bom { color: var(--clr-success); }
+.fin-var.ruim { color: var(--clr-danger); }
+.fin-var.neutro { color: var(--clr-text-3); font-weight: 600; }
+.fin-mini-titulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-text-3);
+  margin-bottom: 4px;
+}
+
+/* ── 8. Desempenho por canal ───────────────────────────────────────── */
+.fin-canais td:first-child { font-weight: 700; }
+.fin-canais-col-part { min-width: 150px; }
+.fin-part {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fin-part__barra {
+  flex: 1 1 auto;
+  min-width: 60px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--clr-surface-alt);
+  overflow: hidden;
+}
+.fin-part__barra i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cor, var(--clr-primary));
+}
+.fin-part__pct { min-width: 44px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fin-canal-ponto {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+  background: var(--cor, var(--clr-primary));
+  vertical-align: 1px;
+}
+.fin-canais tfoot td {
+  font-weight: 800;
+  border-top: 1px solid var(--clr-border);
+  border-bottom: none;
+}
+.fin-vazio {
+  padding: 18px 10px 6px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--clr-text-3);
+}
+
+/* ── 9. Gráficos ───────────────────────────────────────────────────── */
+/* Sempre duas colunas (uma no estreito): com o menu recolhido cabiam três,
+   e o quarto gráfico ficava sozinho embaixo. */
+.fin-grid--graficos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@container fin (max-width: 820px) {
+  .fin-grid--graficos { grid-template-columns: minmax(0, 1fr); }
+}
+.fin-grid--graficos .fin-chart-card--largo { grid-column: 1 / -1; }
+.fin-chart-card { min-width: 0; }
+.fin-chart-container {
+  position: relative;
+  height: 270px;
+  width: 100%;
+  margin-top: 4px;
+}
+.fin-chart-container--fluxo { height: 300px; }
+.fin-chart-container--cascata { height: 290px; }
+/* "Sem dados" por cima de um gráfico vazio. */
+.fin-chart-vazio {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--clr-text-3);
+  pointer-events: none;
+}
+
+/* ── 10. Extrato ───────────────────────────────────────────────────── */
+.fin-extrato-card { width: 100%; margin-bottom: 40px; }
+.fin-extrato-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.fin-extrato-topo .card-title { margin: 0; }
+.fin-extrato-filtros {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.fin-extrato-filtros select.input-field {
+  width: auto;
+  height: 34px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 12.5px;
+}
+.fin-busca { position: relative; display: flex; align-items: center; }
+.fin-busca svg {
+  position: absolute;
+  left: 10px;
+  color: var(--clr-text-3);
+  pointer-events: none;
+}
+.fin-busca .input-field {
+  width: auto;
+  min-width: 200px;
+  height: 34px;
+  padding: 0 10px 0 30px;
+  font-size: 12.5px;
+}
+.fin-extrato-resumo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.fin-extrato-resumo:empty { display: none; }
+.fin-resumo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  font-size: 12px;
+  color: var(--clr-text-2);
+}
+.fin-resumo-pill strong { color: var(--clr-text); font-weight: 700; font-variant-numeric: tabular-nums; }
+.fin-resumo-pill--entrada strong { color: var(--clr-success); }
+.fin-resumo-pill--saida strong { color: var(--clr-danger); }
+.fin-resumo-pill--saldo.negativo strong { color: var(--clr-danger); }
+.fin-resumo-pill--saldo.positivo strong { color: var(--clr-success); }
+
+.fin-table-container { overflow-x: auto; }
+.fin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.fin-table th,
+.fin-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--clr-border);
+  font-size: 13px;
+  color: var(--clr-text);
+  white-space: nowrap;
+}
+.fin-table th {
+  color: var(--clr-text-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+}
+.fin-table th.num,
+.fin-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.fin-table tbody tr { transition: background var(--t-fast); }
+.fin-table tbody tr:hover { background: var(--clr-surface-alt); }
+.fin-table th.fin-ordenavel { cursor: pointer; user-select: none; }
+.fin-table th.fin-ordenavel:hover { color: var(--clr-text); }
+.fin-table th.fin-ordenavel::after {
+  content: "↕";
+  margin-left: 4px;
+  opacity: 0.35;
+}
+.fin-table th.fin-ordenavel.asc::after { content: "↑"; opacity: 0.9; color: var(--clr-primary); }
+.fin-table th.fin-ordenavel.desc::after { content: "↓"; opacity: 0.9; color: var(--clr-primary); }
+
+.fin-extrato-data { line-height: 1.3; }
+.fin-extrato-hora { font-size: 11px; color: var(--clr-text-3); }
+.fin-extrato-desc { white-space: normal !important; min-width: 180px; }
+.fin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.fin-badge svg { flex-shrink: 0; }
+.fin-badge-venda {
+  background: color-mix(in srgb, var(--clr-success) 14%, transparent);
+  color: var(--clr-success);
+}
+.fin-badge-despesa {
+  background: color-mix(in srgb, var(--clr-danger) 14%, transparent);
+  color: var(--clr-danger);
+}
+.fin-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  vertical-align: 1px;
+}
+.fin-tag--editado { color: var(--clr-warning); }
+.fin-tag--origem { color: var(--clr-primary); }
+.fin-valor-entrada { color: var(--clr-success) !important; font-weight: 700; }
+.fin-valor-saida { color: var(--clr-danger) !important; font-weight: 700; }
+.fin-valor-ded { color: var(--clr-danger) !important; }
+.fin-valor-nada { color: var(--clr-text-3) !important; }
+
+.fin-table td.fin-acoes { text-align: right; white-space: nowrap; }
+.fin-acao-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-left: 4px;
+  padding: 0;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+}
+.fin-acao-btn:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background: color-mix(in srgb, var(--clr-primary) 8%, transparent);
+}
+.fin-acao-btn.danger:hover {
+  border-color: var(--clr-danger);
+  color: var(--clr-danger);
+  background: color-mix(in srgb, var(--clr-danger) 10%, transparent);
+}
+
+.fin-extrato-mais {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+}
+.fin-extrato-mais[hidden] { display: none; }
+.fin-btn-mais { min-height: 36px; padding: 0 16px; font-size: 13px; }
+
+/* Seta de expandir/recolher o extrato */
+.fin-collapse-seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color var(--t-fast), color var(--t-fast);
+}
+.fin-collapse-seta:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
+.fin-collapse-seta.recolhido { transform: rotate(-90deg); }
+
+/* ── 11. Configurar Campos, datas e modais ─────────────────────────── */
+
+/* Accordion do Configurar Campos */
+.cfg-grupo { margin-bottom: 8px; border: 1px solid var(--clr-border); border-radius: var(--r-sm); overflow: hidden; }
+.cfg-grupo-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 11px 12px; background: var(--clr-surface-alt); cursor: pointer;
+}
+.cfg-grupo-head .cfg-seta { transition: transform 0.2s ease; color: var(--clr-text-3); font-size: 11px; }
+.cfg-grupo.aberto .cfg-seta { transform: rotate(180deg); }
+.cfg-grupo-body { display: none; padding: 8px 12px; }
+.cfg-grupo.aberto .cfg-grupo-body { display: block; }
+.cfg-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 10px; margin-bottom: 5px; background: var(--clr-surface);
+  border: 1px solid var(--clr-border); border-radius: var(--r-sm);
+}
+.cfg-item:last-child { margin-bottom: 0; }
+
+/* Inputs de data */
+input[type="date"].input-field {
+  position: relative;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--clr-text);
+}
+input[type="date"].input-field::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+  filter: invert(var(--calendar-icon-invert, 0));
+}
+input[type="date"].input-field::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+input[type="date"].input-field:focus {
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 3px var(--clr-primary-lt);
+}
+/* Nos temas escuros, o ícone do calendário fica claro. */
+[data-theme="dark"] input[type="date"].input-field::-webkit-calendar-picker-indicator,
+[data-theme="midnight"] input[type="date"].input-field::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Escolha da área do "+ Adicionar Campos" (mesmo visual da tela do
+   produto: .escolha-area, no style.css); aqui só o ícone de cada área. */
+.escolha-area__item.fin-area {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.fin-area__textos { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.fin-area .fin-ico-tile { width: 34px; height: 34px; border-radius: 10px; }
+
+/* Dica do "Novo Campo" (o que entra no cálculo) */
+.fin-dica-campo {
+  margin: -6px 0 16px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--clr-text-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fin-card,
+  .fin-acao-btn,
+  .fin-collapse-seta,
+  .fin-dre-seta,
+  #metaBarra { transition: none; }
+  .fin-card:hover { transform: none; }
+}
+
+/* O atributo hidden vale mesmo nos botões e caixas que têm display próprio
+   (os antigos "+ Adicionar Campos" de cada formulário, o contador...). */
+.fin-pagina [hidden] { display: none !important; }
+
+/* A linha recém-lançada pisca no extrato. */
+@keyframes finLinhaNova {
+  from { background: color-mix(in srgb, var(--clr-primary) 24%, transparent); }
+  to { background: transparent; }
+}
+.fin-table tbody tr.fin-linha-nova { animation: finLinhaNova 1.8s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .fin-table tbody tr.fin-linha-nova { animation: none; }
+}

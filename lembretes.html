@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Lembretes</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/datepicker.css" />
+    <link rel="stylesheet" href="CSS/lembretes.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <!-- Senha de acesso (Administrador ou Colaborador), se este módulo
+         estiver bloqueado em Dados da Empresa › Usuários e Senhas. No
+         <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-modulo="lembretes"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Lembretes</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <!-- Voltar (separado por linha) -->
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button class="sidebar-item-btn" onclick="window.location.href='index.html'" title="Voltar">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section" style="flex:1; overflow-y:auto;">
+          <button class="sidebar-item-btn" id="btnNovo" title="Novo lembrete" style="margin-bottom:10px;">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+            <span class="sidebar-label-txt">Novo lembrete</span>
+          </button>
+
+          <button class="sidebar-item-btn lem-vista" data-vista="todos" title="Todos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></span>
+            <span class="sidebar-label-txt">Todos</span>
+            <span class="sidebar-label-txt lem-badge-count" data-count="todos">0</span>
+          </button>
+
+          <button class="sidebar-item-btn lem-vista active" data-vista="proximos" title="Próximos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg></span>
+            <span class="sidebar-label-txt">Próximos</span>
+            <span class="sidebar-label-txt lem-badge-count" data-count="proximos">0</span>
+          </button>
+
+          <button class="sidebar-item-btn lem-vista" data-vista="vencidos" title="Vencidos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Vencidos</span>
+            <span class="sidebar-label-txt lem-badge-count" data-count="vencidos">0</span>
+          </button>
+
+          <button class="sidebar-item-btn lem-vista" data-vista="concluidos" title="Concluídos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+            <span class="sidebar-label-txt">Concluídos</span>
+            <span class="sidebar-label-txt lem-badge-count" data-count="concluidos">0</span>
+          </button>
+
+          <button class="sidebar-item-btn lem-vista" data-vista="ocultos" title="Ocultos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></span>
+            <span class="sidebar-label-txt">Ocultos</span>
+            <span class="sidebar-label-txt lem-badge-count" data-count="ocultos">0</span>
+          </button>
+        </div>
+
+        <!-- Rodapé: Ajuda -->
+        <div class="sidebar-footer-index">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+
+        <div class="sidebar-toggle-footer">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+            <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="lem-toolbar">
+          <h1 class="lem-view-title" id="lemViewTitle">Próximos</h1>
+          <div class="lem-toolbar-spacer"></div>
+          <div class="mini">
+            <label>Empresa</label>
+            <select id="lemFiltroEmpresa" class="input-field"><option value="">Todas</option></select>
+          </div>
+          <div class="mini">
+            <label>De</label>
+            <input type="date" id="lemFiltroIni" class="input-field" style="width:auto;" />
+          </div>
+          <div class="mini">
+            <label>Até</label>
+            <input type="date" id="lemFiltroFim" class="input-field" style="width:auto;" />
+          </div>
+          <div class="mini">
+            <label>Buscar</label>
+            <input type="text" id="lemBusca" class="input-field" placeholder="Título, recebedor…" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="lem-lista" id="lemLista"></div>
+        <div class="lem-vazio" id="lemVazio">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          Nenhum lembrete por aqui.
+        </div>
+      </main>
+    </div>
+
+    <!-- MODAL Criar/Editar -->
+    <div class="lem-modal-overlay" id="lemModal">
+      <div class="lem-modal">
+        <div class="lem-modal-head">
+          <span class="lem-modal-title" id="lemModalTitulo">Novo lembrete</span>
+          <button class="lem-modal-close" id="lemModalClose" title="Fechar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="lem-modal-sub">Preencha os dados do lembrete. Campos com * são obrigatórios.</div>
+
+                <div class="lem-form-grid">
+          <div class="full">
+            <label for="lemTitulo">Título *</label>
+            <input type="text" id="lemTitulo" class="input-field" placeholder="Ex: Pagar boleto" autocomplete="off" />
+          </div>
+
+          <div class="full">
+            <label>Empresa (opcional)</label>
+            <div class="lem-empresa-wrap">
+              <input type="text" id="lemEmpresa" class="input-field" placeholder="Selecione ou digite" autocomplete="off" />
+              <div class="lem-empresa-menu" id="lemEmpresaMenu"></div>
+            </div>
+          </div>
+
+          <div>
+            <label>Status</label>
+            <div class="lem-status-view" id="lemStatusView" title="O status é calculado automaticamente pela data de vencimento">
+              <span class="lem-badge proximo" id="lemStatusBadge">Próximo</span>
+            </div>
+          </div>
+
+          <div>
+            <label>Data e hora *</label>
+            <div class="lem-dt-wrap">
+              <button type="button" class="lem-dt-field" id="lemDTField">
+                <span id="lemDTLabel" class="vazio">Escolher data e hora</span>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </button>
+              <div class="lem-dt-pop" id="lemDTPop">
+                <div class="lem-cal-head">
+                  <button type="button" class="lem-cal-nav" id="lemCalPrev">‹</button>
+                  <span class="lem-cal-titulo" id="lemCalTitulo"></span>
+                  <button type="button" class="lem-cal-nav" id="lemCalNext">›</button>
+                </div>
+                <div class="lem-cal-dows"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+                <div class="lem-cal-grid" id="lemCalGrid"></div>
+                <div class="lem-time-row">
+                  <span class="lbl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg></span>
+                  <select class="lem-time-sel" id="lemHora"></select>
+                  <span class="lem-time-sep">:</span>
+                  <select class="lem-time-sel" id="lemMin"></select>
+                  <button type="button" class="lem-dt-ok" id="lemDTOk">OK</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="lemRecebedor">Recebedor</label>
+            <input type="text" id="lemRecebedor" class="input-field" placeholder="Ex: Fornecedor XYZ" autocomplete="off" />
+          </div>
+
+          <div>
+            <label>Valor</label>
+            <div class="lem-valor-wrap">
+              <input type="text" id="lemValor" class="input-field" placeholder="0,00" autocomplete="off" />
+              <div class="lem-toggle" id="lemValorToggle">
+                <button type="button" data-tipo="rs" class="active">R$</button>
+                <button type="button" data-tipo="texto">Texto</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="full">
+            <label for="lemCriadoPor">Quem colocou</label>
+            <!-- Um dos usuários de Dados da Empresa › Usuários e Senhas (opcional). -->
+            <select id="lemCriadoPor" class="input-field" title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"></select>
+          </div>
+
+          <div class="full">
+            <label for="lemObs">Observações</label>
+            <textarea id="lemObs" class="input-field" rows="2" placeholder="Anotações do lembrete"></textarea>
+          </div>
+        </div>
+
+        <div class="lem-form-msg" id="lemFormMsg"></div>
+
+        <div class="lem-modal-actions">
+          <button class="btn-secondary" id="lemCancelar">Cancelar</button>
+          <button class="btn-primary" id="lemSalvar">Salvar lembrete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/datepicker.js"></script>
+    <script src="JS/lembretes.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_lembretes.js"></script>
+  </body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Central de Cálculos</title>
+
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/calculos.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+
+    <script>
+      // Anti-flicker do tema (igual às outras telas)
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Central de Cálculos</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="calc-layout">
+      <!-- Esquerda: menu de calculadoras -->
+      <aside class="calc-menu-col">
+        <div class="calc-voltar-wrap">
+          <a href="index.html" class="sidebar-item-btn" title="Voltar ao início" style="justify-content: center;">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </a>
+        </div>
+        <div class="calc-menu-busca-wrap">
+          <input type="text" id="calcBusca" class="calc-menu-busca" placeholder="Buscar calculadora..." autocomplete="off" />
+        </div>
+        <div class="calc-menu" id="calcMenu"></div>
+        <div class="calc-menu-rodape">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda" style="justify-content: center;">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Centro: a calculadora selecionada -->
+      <main class="calc-centro" id="calcCentro"></main>
+
+      <!-- Direita: histórico / cálculos salvos -->
+      <aside class="calc-hist-col">
+        <div class="calc-hist-head">
+          <h2 class="calc-hist-titulo">Cálculos salvos</h2>
+          <input type="text" id="calcHistBusca" class="calc-hist-busca" placeholder="Buscar no histórico..." autocomplete="off" />
+        </div>
+        <div class="calc-hist-lista" id="calcHistLista"></div>
+      </aside>
+    </div>
+
+    <script src="JS/licenca-ui.js"></script>
+    <script src="JS/theme.js"></script>
+    <!-- ── CENTRAL DE CÁLCULOS ────────────────────────────────────────
+         A ORDEM ABAIXO É OBRIGATÓRIA:
+
+         1) O MOTOR primeiro. Ele cria window.CentralCalculos (o registrador)
+            e agenda a montagem da interface para o DOMContentLoaded.
+         2) Os LOTES depois. Cada um chama CentralCalculos.registrar([...]).
+         3) O DOMContentLoaded dispara por último, quando todos os <script>
+            síncronos já rodaram — então a interface nasce com TODAS as
+            calculadoras já registradas.
+
+         Inverter a ordem (lote antes do motor) faz o lote não encontrar o
+         registrador e a Central abre vazia. Cada lote avisa isso no console.
+
+         Caminhos relativos, sem CDN e sem fetch: funciona offline e continua
+         encontrando os arquivos depois de empacotado no Electron. -->
+    <script src="JS/calculos.js"></script>
+
+    <script src="Calculos/lote1_precificacao.js"></script>
+    <script src="Calculos/lote2_financeiro.js"></script>
+    <script src="Calculos/lote3_impostos.js"></script>
+    <script src="Calculos/lote4_logistica.js"></script>
+    <script src="Calculos/lote5_matematica.js"></script>
+    <script src="Calculos/lote6_investimentos.js"></script>
+    <script src="Calculos/lote7_conversoes.js"></script>
+    <script src="Calculos/lote8_rh_datas.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_calculos.js"></script>
+  </body>
+</html>

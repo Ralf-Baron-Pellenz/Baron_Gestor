@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Clientes</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/registro-vendas.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute("data-theme", temas.indexOf(saved) >= 0 ? saved : "dark");
+        } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Clientes</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button class="sidebar-item-btn" onclick="window.location.href='index.html'" title="Voltar">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section" style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <button class="sidebar-item-btn" onclick="window.location.href='registro-vendas.html'" title="Registro de Vendas">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></span>
+            <span class="sidebar-label-txt">Registro de Vendas</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='vendas.html'" title="Informações de Venda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span>
+            <span class="sidebar-label-txt">Informações de Venda</span>
+          </button>
+        </div>
+
+        <div class="sidebar-footer-index">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+        <div class="sidebar-toggle-footer">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+            <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="rv-wrap">
+          <div style="position: relative; min-height: 40px; display: flex; align-items: center; justify-content: center;">
+            <h1 class="page-title" style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap;">Clientes</h1>
+          </div>
+          <p class="page-subtitle" style="margin: 0 0 24px; text-align: center;">
+            Clientes salvos nas vendas. Busque por CPF/CNPJ, telefone ou nome.
+          </p>
+
+          <section class="rv-card">
+            <div class="rv-card__head">
+              <div class="rv-card__title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                Meus Clientes <span class="rv-itens-badge">(<span id="cCount">0</span>)</span>
+              </div>
+              <button class="btn-primary" id="btnNovoCliente" type="button" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Novo cliente
+              </button>
+            </div>
+
+            <div class="rv-filters" style="grid-template-columns: 1fr;">
+              <input type="text" id="cSearch" class="rv-filters__search" placeholder="🔎 Buscar por CPF/CNPJ, telefone ou nome" />
+            </div>
+
+            <div id="clientesLista" class="rv-vendas-lista"></div>
+            <div class="rv-empty" id="clientesEmpty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              <h3>Nenhum cliente cadastrado ainda</h3>
+              <p>Os clientes são salvos ao registrar uma venda, ou clique em Novo cliente.</p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal Editar/Novo Cliente -->
+    <div class="rv-modal" id="modalClienteEdit" hidden>
+      <div class="rv-modal__backdrop" data-c-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <button class="rv-modal__close" data-c-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title" id="ceTitulo">Novo cliente</h2>
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--full"><label>Nome completo <span class="req">*</span></label><input id="ceNome" placeholder="Nome do cliente"></div>
+          <div class="rv-field rv-field--2"><label>CPF ou CNPJ</label><input id="ceDoc" placeholder="000.000.000-00" inputmode="numeric"></div>
+          <div class="rv-field rv-field--2"><label>Telefone</label><input id="ceTelefone" placeholder="(00) 00000-0000" inputmode="tel"></div>
+          <div class="rv-field rv-field--2"><label>CEP</label><input id="ceCep" placeholder="00000-000" inputmode="numeric"></div>
+          <div class="rv-field rv-field--2"><label>E-mail</label><input id="ceEmail" type="email" placeholder="cliente@email.com"></div>
+          <div class="rv-field rv-field--full"><label>Endereço (rua, número, bairro, cidade)</label><input id="ceEndereco" placeholder="Rua Exemplo, 123 - Centro"></div>
+          <div class="rv-field rv-field--full"><label>Complemento</label><input id="ceComplemento" placeholder="Apto, bloco, ponto de referência..."></div>
+        </div>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-c-close type="button">Cancelar</button>
+          <button class="btn-primary" id="ceSalvar" type="button">Salvar cliente</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Excluir Cliente -->
+    <div class="rv-modal" id="modalExcluirCliente" hidden>
+      <div class="rv-modal__backdrop" data-c-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <h2 class="rv-modal__title">Excluir cliente?</h2>
+        <p class="rv-modal__sub" id="cdTexto">Esta ação não pode ser desfeita.</p>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-c-close type="button">Cancelar</button>
+          <button class="btn-primary" id="cdConfirmar" type="button" style="background:var(--clr-danger,#ef4444);">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/clientes.js"></script>
+  </body>
+</html>

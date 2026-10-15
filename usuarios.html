@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Usuários e Senhas</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <style>
+      /* O Master (administrador principal): o primeiro cartão da lista, com
+         a faixa e o avatar na cor de destaque e o selo "Master". */
+      .usr-linha--master {
+        border-color: var(--clr-primary);
+        box-shadow: inset 3px 0 0 var(--clr-primary);
+      }
+      .usr-avatar--master { background: var(--clr-primary); color: #fff; }
+      .usr-selo--master {
+        border-color: var(--clr-primary);
+        background: var(--clr-primary-lt);
+        color: var(--clr-primary);
+      }
+      .usr-selo--alerta {
+        border-color: var(--clr-warning);
+        background: var(--clr-warning-lt);
+        color: var(--clr-warning);
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <!-- Só o Administrador abre esta tela: com a senha dele criada, ela é
+         pedida antes de o conteúdo aparecer (a do Colaborador não serve).
+         No <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-admin="1"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Usuários e Senhas</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <!-- ── MENU LATERAL ── -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section sidebar-voltar-sep">
+          <!-- Volta para Dados da Empresa — ou, quando outra tela abriu
+               esta numa aba nova para cadastrar um usuário, fecha esta aba
+               e volta para aquela (ligado no JS/usuarios.js). -->
+          <button type="button" class="sidebar-item-btn" id="usrVoltar" title="Voltar">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section" style="flex: 1; overflow-y: auto;">
+          <button type="button" class="sidebar-item-btn" id="usrNovoAside" title="Novo usuário">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg></span>
+            <span class="sidebar-label-txt">Novo usuário</span>
+          </button>
+          <button type="button" class="sidebar-item-btn" onclick="window.location.href='empresa.html'" title="Dados da Empresa">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path></svg></span>
+            <span class="sidebar-label-txt">Dados da Empresa</span>
+          </button>
+        </div>
+
+        <div class="sidebar-footer-index">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+
+        <div class="sidebar-toggle-footer">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+            <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="usr-cabecalho">
+          <h1 class="usr-titulo">Usuários e Senhas</h1>
+          <p class="usr-intro">
+            Cadastre quem faz os lançamentos, escolha as senhas de acesso aos módulos e os botões que pedem usuário e senha.
+          </p>
+        </div>
+
+        <!-- Aberta por outra tela para cadastrar um usuário: o caminho de volta -->
+        <div class="usr-retorno" id="usrRetorno" hidden>
+          <span class="usr-retorno__ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+          <span class="usr-retorno__txt" id="usrRetornoTxt"></span>
+          <button type="button" class="btn-secondary usr-retorno__btn" id="usrRetornoBtn">Voltar</button>
+        </div>
+
+        <!-- ── Usuários ── -->
+        <section class="card usr-card" id="usrCardUsuarios">
+          <div class="usr-card__topo">
+            <div class="usr-card__tit">
+              <div class="card-title" style="margin:0;">
+                <span class="card-title-dot"></span>
+                Usuários
+                <span class="usr-contador" id="usrContador">0</span>
+              </div>
+              <p class="usr-card__sub">
+                Aparecem no campo <strong>Responsável</strong> do Registro de Vendas, do Controle Financeiro,
+                das Notas Fiscais, das Ações em Massa e do Processador de Planilhas. Quem tem senha só é
+                aceito como responsável digitando a própria senha. O <strong>Master</strong> é o
+                administrador principal: dele, você muda o nome que aparece; a senha é a do Administrador.
+              </p>
+            </div>
+            <button type="button" class="btn-primary usr-btn-novo" id="usrNovo">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Novo usuário
+            </button>
+          </div>
+
+          <div class="usr-lista" id="usrLista"></div>
+
+          <div class="usr-vazio" id="usrVazio" hidden>
+            <span class="usr-vazio__ico" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+            <strong>Nenhum usuário cadastrado</strong>
+            <span>Cadastre quem faz as vendas e os lançamentos. Sem usuários, não há quem escolher no campo Responsável.</span>
+            <button type="button" class="btn-primary" id="usrNovoVazio">Cadastrar o primeiro usuário</button>
+          </div>
+        </section>
+
+        <!-- ── Senhas de acesso (Administrador, Colaborador e módulos) ── -->
+        <section class="card usr-card" id="usrCardSenhas">
+          <div class="usr-card__topo">
+            <div class="usr-card__tit">
+              <div class="card-title" style="margin:0;">
+                <span class="card-title-dot"></span>
+                Senhas de acesso aos módulos
+              </div>
+              <p class="usr-card__sub">
+                A senha do <strong>Administrador</strong> e a do <strong>Colaborador</strong> abrem os módulos
+                protegidos. A senha de um usuário não abre módulos — ela só confirma quem está lançando.
+              </p>
+            </div>
+          </div>
+          <div id="usrGerenciador"></div>
+        </section>
+
+        <!-- ── Senha nos botões: os botões que pedem usuário e senha ──
+             Montado pelo JS/senhas.js; salva junto com as senhas, pelo
+             "Salvar" da barra fixa do canto inferior direito. -->
+        <section class="card usr-card" id="usrCardBotoes">
+          <div id="usrBotoes"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/usuarios.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_usuarios.js"></script>
+  </body>
+</html>

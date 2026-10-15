@@ -1,0 +1,258 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Bapell Gestor Pro — exportar-produtos.css
+   "Exportar para Planilha" (lista de produtos da plataforma).
+   A janela usa a mesma base do "Adicionar pela Planilha"
+   (importar-produtos.css, classes ip-*); aqui ficam só as partes
+   próprias da exportação. Só variáveis de tema do style.css.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body.ep-aberta { overflow: hidden; }
+
+/* ── 1. Modelo ────────────────────────────────────────────────────── */
+.ep-origens { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ip-origem__logo--outra { color: var(--clr-primary); }
+
+.ep-salvas { margin-top: 20px; }
+.ep-salvas__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ep-salva { display: flex; align-items: stretch; gap: 8px; }
+.ep-salva__usar {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.ep-salva__usar:hover,
+.ep-salva__usar:focus-visible { border-color: var(--clr-primary); box-shadow: 0 0 0 3px var(--clr-primary-lt); outline: none; }
+.ep-salva__nome { font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ep-salva__meta { grid-row: 2; font-size: 12px; color: var(--clr-text-3); }
+.ep-salva__seta { grid-row: 1 / span 2; grid-column: 2; color: var(--clr-text-3); display: inline-flex; }
+
+.ep-icone-btn {
+  flex: 0 0 auto;
+  width: 34px;
+  min-height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--clr-border);
+  background: transparent;
+  color: var(--clr-text-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast);
+}
+.ep-icone-btn:hover,
+.ep-icone-btn:focus-visible { color: var(--clr-danger); border-color: var(--clr-danger); background: var(--clr-danger-lt); outline: none; }
+
+.ep-vazio-plat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 12px;
+  background: var(--clr-surface-alt);
+  color: var(--clr-text-2);
+  font-size: 14px;
+}
+
+/* ── 3. Campos ────────────────────────────────────────────────────── */
+.ep-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--clr-text);
+  background: var(--clr-primary-lt);
+  border: 1px solid color-mix(in srgb, var(--clr-primary) 30%, transparent);
+}
+.ep-banner > svg { flex: 0 0 auto; color: var(--clr-primary); }
+.ep-banner > span { flex: 1 1 260px; }
+.ep-banner .btn-secondary { padding: 6px 12px; font-size: 12.5px; }
+.ep-banner--aviso { background: var(--clr-warning-lt); border-color: color-mix(in srgb, var(--clr-warning) 35%, transparent); }
+.ep-banner--aviso > svg { color: var(--clr-warning); }
+
+.ep-aba-sel {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-right: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--clr-text-2);
+}
+.ep-linhas .ep-aba-sel select { width: auto; min-width: 150px; max-width: 260px; height: 36px; padding: 6px 10px; font-size: 13px; }
+
+.ep-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 10px;
+}
+.ep-barra__conta { font-size: 12.5px; color: var(--clr-text-3); }
+.ep-btn-add { display: inline-flex; align-items: center; gap: 6px; }
+.ep-btn-add:disabled { opacity: 0.5; cursor: default; }
+
+/* Painel "Adicionar Campo" */
+.ep-add {
+  margin: 0 0 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--clr-primary);
+  background: var(--clr-surface);
+  box-shadow: 0 0 0 3px var(--clr-primary-lt);
+}
+.ep-add[hidden] { display: none; }
+.ep-add__linha { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 10px 12px; }
+.ep-add__linha label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--clr-text-3);
+}
+.ep-add__linha label small { font-weight: 500; }
+.ep-add__linha label[hidden] { display: none; }
+.ep-add__linha .input-field { height: 38px; padding: 6px 10px; font-size: 13px; }
+.ep-add__campo { flex: 1 1 260px; min-width: 220px; }
+.ep-add__campo select { width: 100%; }
+.ep-add__linha .ep-cel { width: 110px; }
+.ep-add__botoes { display: flex; gap: 8px; margin-left: auto; }
+.ep-add .ip-dica { margin-top: 10px; }
+.ep-add .ip-erro { margin-top: 10px; }
+
+/* Tabela dos campos */
+.ep-tabela { min-width: 860px; }
+.ep-tabela .ip-sit-col { white-space: normal; min-width: 150px; }
+.ep-tabela .ip-sit { white-space: normal; line-height: 1.35; padding: 3px 9px; }
+.ep-tabela .ip-titulo-col,
+.ep-tabela .ip-exemplo { max-width: 200px; }
+.ep-tabela .ep-usar { width: 46px; text-align: center; }
+.ep-usar input { width: 16px; height: 16px; accent-color: var(--clr-primary); cursor: pointer; }
+.ep-tabela .ip-campo { width: auto; min-width: 210px; }
+.ep-unidade { display: block; margin: 6px 0 0; }
+.ep-cel-td { white-space: nowrap; }
+.ep-cel {
+  width: 82px;
+  height: 34px;
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.ep-cel::placeholder { text-transform: none; font-weight: 500; }
+.ep-acao { width: 46px; text-align: right; }
+.ep-acao .ep-icone-btn { width: 30px; min-height: 30px; }
+.ep-tabela tr.ep-desligado td:not(.ep-usar):not(.ip-sit-col):not(.ep-acao) { opacity: 0.55; }
+.ep-tabela tr.ep-novo td { animation: ep-novo 1.4s ease-out 1; }
+@keyframes ep-novo { from { background: var(--clr-primary-lt); } to { background: transparent; } }
+
+/* ── 4. Conferência ───────────────────────────────────────────────── */
+.ep-destino {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  color: var(--clr-text-2);
+}
+.ep-destino svg { flex: 0 0 auto; color: var(--clr-primary); }
+.ep-destino strong { color: var(--clr-text); }
+
+.ep-existentes {
+  margin: 0 0 16px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--clr-warning) 40%, transparent);
+  background: var(--clr-warning-lt);
+}
+.ep-existentes[hidden] { display: none; }
+.ep-existentes__tit { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; font-weight: 600; color: var(--clr-text); margin-bottom: 10px; }
+.ep-existentes__tit svg { flex: 0 0 auto; margin-top: 2px; color: var(--clr-warning); }
+.ep-modos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ep-modo {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  cursor: pointer;
+  transition: border-color var(--t-fast);
+}
+.ep-modo:hover { border-color: var(--clr-primary); }
+.ep-modo.marcado { border-color: var(--clr-primary); box-shadow: 0 0 0 2px var(--clr-primary-lt); }
+.ep-modo.desativado { opacity: 0.55; cursor: default; }
+.ep-modo.desativado:hover { border-color: var(--clr-border); }
+.ep-modo input { margin-top: 3px; accent-color: var(--clr-primary); flex: 0 0 auto; }
+.ep-modo__txt { display: flex; flex-direction: column; gap: 3px; }
+.ep-modo__txt strong { font-size: 13px; color: var(--clr-text); }
+.ep-modo__txt small { font-size: 12px; line-height: 1.45; color: var(--clr-text-3); }
+
+.ep-check { display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--clr-text-2); cursor: pointer; }
+.ep-check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--clr-primary); flex: 0 0 auto; }
+.ep-check strong { color: var(--clr-text); }
+.ep-check--sub { margin-top: 10px; }
+
+.ep-opcoes { margin-bottom: 14px; }
+.ep-radios { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.ep-radio { display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--clr-text); cursor: pointer; max-width: 560px; }
+.ep-radio input { margin-top: 3px; accent-color: var(--clr-primary); flex: 0 0 auto; }
+.ep-radio small { display: block; font-size: 12px; color: var(--clr-text-3); }
+
+.ep-avisos { display: flex; flex-direction: column; gap: 6px; margin: 0 0 14px; }
+.ep-avisos[hidden] { display: none; }
+.ep-aviso { display: flex; align-items: flex-start; gap: 7px; font-size: 12.5px; line-height: 1.5; color: var(--clr-warning); font-weight: 600; }
+.ep-aviso svg { flex: 0 0 auto; margin-top: 3px; }
+
+.ep-filtros { gap: 10px; }
+.ep-busca { width: min(320px, 100%); height: 36px; padding: 6px 12px; font-size: 13px; }
+.ep-tabela-prod { min-width: 760px; }
+.ep-tabela-prod tr.ep-desligado td:not(.ip-prod__check) { opacity: 0.5; }
+
+.ep-salvar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+}
+.ep-salvar__nome { width: min(280px, 100%); height: 36px; padding: 6px 10px; font-size: 13px; }
+
+/* ── Telas menores ────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ep-origens { grid-template-columns: minmax(0, 1fr); }
+  .ep-modos { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .ep-add__botoes { margin-left: 0; }
+  .ep-barra { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ep-tabela tr.ep-novo td { animation: none; }
+  .ep-salva__usar, .ep-modo, .ep-icone-btn { transition: none; }
+}

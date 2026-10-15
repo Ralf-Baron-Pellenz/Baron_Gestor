@@ -1,0 +1,2459 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Central de Ajuda</title>
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="CSS/style.css" />
+    <!-- CSS ESPECÍFICO DESTA PÁGINA -->
+    <link rel="stylesheet" href="CSS/ajuda.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <!-- Script Anti-Flicker do Tema (Deixe aqui no topo) -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark",
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <style>
+      /* Botão de navegação transparente (mesmo visual do menu lateral) */
+      .btn-nav-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--r-md, 8px);
+        color: var(--clr-text-2);
+        font-family: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .btn-nav-ghost:hover {
+        background: var(--clr-surface-alt);
+        border-color: var(--clr-border);
+        color: var(--clr-primary);
+      }
+    </style>
+    <!-- Senha nos botões (Usuários e Senhas): os botões escolhidos pedem
+         usuário e senha antes de agir. Sem data-modulo: esta tela não é um
+         módulo bloqueado, o arquivo só traz a proteção dos botões. -->
+    <script src="JS/senhas.js"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Central de Ajuda</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">
+            ⚪
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="dark"
+            title="Modo Padrão (Escuro)"
+          >
+            🔵
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="midnight"
+            title="Modo Dark Absoluto"
+          >
+            ⚫
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="app-layout">
+      <main class="main-content" style="margin-left: 0; max-width: 100%">
+        <div class="ajuda-wrap">
+          <!-- Cabeçalho -->
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 28px;
+              position: relative;
+            "
+          >
+            <button
+              class="btn-nav-ghost"
+              onclick="window.location.href = 'index.html'"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              Voltar
+            </button>
+            <h1
+              style="
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                font-family: &quot;Sora&quot;, sans-serif;
+                font-size: 25px;
+                font-weight: 700;
+                color: var(--clr-text);
+                margin: 0;
+                white-space: nowrap;
+              "
+            >
+              Central de Ajuda
+            </h1>
+            <!-- Abrir com o Windows (só aparece no aplicativo instalado) -->
+            <button
+              class="btn-nav-ghost"
+              id="btnInicializar"
+              style="display: none"
+              title="Abrir o Bapell Gestor Pro automaticamente quando o Windows iniciar"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18.36 6.64A9 9 0 1 1 5.64 6.64"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+              </svg>
+              Abrir ao inicializar
+            </button>
+          </div>
+          <!-- ══════════ SEÇÃO: TUTORIAL ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Entenda Como funciona o
+              Bapell Gestor Pro
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Tutorias Em Vídeos</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Acesse nossa playlist de tutorias em vídeos, diretamente no
+                  YouTube.
+                </p>
+                <a
+                  href="https://www.youtube.com/playlist?list=PLQex7HWP3Pj8"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar playlist ➔</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════ SEÇÃO: TUTORIAIS INTERATIVOS ══════════
+               A lista é montada pelo JS/tutoriais/tutorial_core.js dentro de
+               #tutoriaisPainel: um cartão por tela, com o estado (concluído,
+               pulado ou ainda não visto) e o botão que abre a tela já com o
+               tutorial rodando. Abre e fecha como os outros artigos da Ajuda
+               (mesmo accordion do JS/ajuda.js). -->
+          <div class="ajuda-secao" id="secaoTutoriais">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Tutoriais Interativos
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Tours guiados de cada tela</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p class="btu-ajuda-intro">
+                  Cada tela do sistema tem um tour guiado, que aparece sozinho na primeira visita.
+                  Para rever um deles, clique em <strong>Ver agora</strong> ou <strong>Rever</strong>:
+                  a tela abre e o tutorial começa.
+                </p>
+                <div id="tutoriaisPainel"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ajuda-secao">
+  <div class="ajuda-secao-titulo">
+    <span class="card-title-dot"></span> Serviços de RH Parceiro
+  </div>
+  <div class="ajuda-artigo">
+    <div class="ajuda-artigo-header">
+      <span class="ajuda-artigo-titulo">Detalhes dos Serviços</span>
+      <span class="ajuda-artigo-seta">▼</span>
+    </div>
+    <div class="ajuda-artigo-corpo" style="font-size: 13.5px; line-height: 1.6; color: var(--clr-text-2);">
+      <strong style="color: var(--clr-text); display: block; margin-top: 8px;">Recrutamento e seleção:</strong>
+      <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+        <li>Alinhamento de perfil com gestor ou responsável pela solicitação da vaga;</li>
+        <li>Montar descrição da vaga de acordo com o CBO da função;</li>
+        <li>Publicação da vaga em plataformas de divulgação de vagas;</li>
+        <li>Hunting (busca ativa dos candidatos) em plataformas como LinkedIn, Catho, BNE e etc;</li>
+        <li>Seleção, filtro e recrutamento dos candidatos para primeira avaliação (entrevista on-line);</li>
+        <li>Avaliação técnica, comportamental e operacional;</li>
+        <li>Agendamento de entrevistas presenciais para etapa final do processo seletivo.</li>
+      </ul>
+      <strong style="color: var(--clr-text); display: block">Departamento pessoal:</strong>
+      <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+        <li>Recolhimento de documentação para contratação;</li>
+        <li>Agendamento de exames admissionais, periódicos e demissionais;</li>
+        <li>Compra e provisionamento de benefícios;</li>
+        <li>Integração de novos colaboradores;</li>
+        <li>Acompanhamento do período de experiência.</li>
+      </ul>
+      <strong style="color: var(--clr-text); display: block">Endomarketing:</strong>
+      <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+        <li>Ações e promoções para incentivo e desenvolvimento de equipes;</li>
+        <li>Organização de eventos corporativos relacionados às datas comemorativas ao longo do ano, incluindo aniversário dos colaboradores;</li>
+        <li>Pesquisa de clima para redução de rotatividade e avaliação de qualidade de trabalho e bem-estar dos colaboradores.</li>
+      </ul>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfWVwJqUEIlBTc6_y5ZhK-66kVwD8MIuCrRNf8bL_B7igsD9A/viewform?usp=pp_url" target="_blank" class="link-ajuda" data-form-base="https://docs.google.com/forms/d/e/1FAIpQLSfWVwJqUEIlBTc6_y5ZhK-66kVwD8MIuCrRNf8bL_B7igsD9A/viewform" data-form-entry="entry.421112536">Solicitar contato ➔</a>
+    </div>
+  </div>
+</div>
+
+          
+          <!-- ══════════ SEÇÃO: SUPORTE EM PLATAFORMAS ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Suporte em Plataformas
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Detalhes dos Serviços</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div
+                class="ajuda-artigo-corpo"
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                "
+              >
+                <p style="margin-top: 4px">
+                  Oferecemos suporte na configuração, organização e operação das
+                  principais plataformas do mercado, como <strong>Bling</strong>,
+                  <strong>Mercado Livre</strong>, <strong>Shopee</strong>,
+                  <strong>Amazon</strong>, <strong>Magalu</strong> e demais
+                  marketplaces e sistemas de gestão utilizados pela sua empresa.
+                </p>
+
+                <strong
+                  style="
+                    color: var(--clr-text);
+                    display: block;
+                    margin-top: 8px;
+                  "
+                  >Cadastros e configuração:</strong
+                >
+                <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+                  <li>Cadastro e organização de produtos;</li>
+                  <li>Cadastro e organização de categorias;</li>
+                  <li>
+                    Configuração e organização de informações dos produtos;
+                  </li>
+                  <li>Cadastro e configuração de clientes e fornecedores;</li>
+                  <li>
+                    Organização e atualização dos dados dentro das plataformas;
+                  </li>
+                  <li>
+                    Auxílio na configuração geral dos sistemas de acordo com a
+                    necessidade da empresa.
+                  </li>
+                </ul>
+
+                <strong style="color: var(--clr-text); display: block"
+                  >Marketplaces e canais de venda:</strong
+                >
+                <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+                  <li>
+                    Configuração e organização de lojas e canais de venda
+                    (Mercado Livre, Shopee, Amazon, Magalu e outros);
+                  </li>
+                  <li>
+                    Auxílio na integração e configuração de marketplaces com o
+                    Bling e demais sistemas;
+                  </li>
+                  <li>
+                    Configuração de anúncios e informações relacionadas aos
+                    produtos;
+                  </li>
+                  <li>
+                    Organização das informações necessárias para a operação de
+                    vendas em cada plataforma.
+                  </li>
+                </ul>
+
+                <strong style="color: var(--clr-text); display: block"
+                  >Operação, expedição e processos:</strong
+                >
+                <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+                  <li>
+                    Auxílio na definição do fluxo operacional, da venda até a
+                    entrega;
+                  </li>
+                  <li>
+                    Orientação sobre o procedimento de impressão de etiquetas,
+                    notas e documentos de expedição;
+                  </li>
+                  <li>
+                    Organização da rotina de separação, embalagem e envio dos
+                    pedidos;
+                  </li>
+                  <li>
+                    Auxílio na configuração de processos operacionais dentro das
+                    plataformas e sistemas de gestão.
+                  </li>
+                </ul>
+
+                <strong style="color: var(--clr-text); display: block"
+                  >Suporte e orientação:</strong
+                >
+                <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+                  <li>
+                    Auxílio na utilização das funcionalidades das plataformas;
+                  </li>
+                  <li>
+                    Orientação sobre procedimentos e configurações dos sistemas;
+                  </li>
+                  <li>
+                    Identificação e correção de problemas relacionados à
+                    configuração e utilização;
+                  </li>
+                  <li>
+                    Auxílio na organização dos processos da empresa dentro das
+                    plataformas.
+                  </li>
+                </ul>
+
+                <p
+                  style="
+                    background: var(--clr-surface-alt);
+                    border: 1px solid var(--clr-border);
+                    border-radius: 10px;
+                    padding: 12px 14px;
+                    margin: 4px 0 16px 0;
+                    color: var(--clr-text-2);
+                  "
+                >
+                  <strong style="color: var(--clr-text)">Importante:</strong>
+                  Os serviços abrangem configurações, cadastros, organização e
+                  suporte operacional dentro das plataformas e marketplaces. Não
+                  estão incluídos serviços de contabilidade, escrituração
+                  contábil, apuração de impostos ou qualquer atividade de
+                  responsabilidade exclusiva de profissionais da área contábil.
+                </p>
+
+                <a
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSf1yJHppExAdBq0Io4MWdcbeoDubVSVPW9-INkSIGkqPqIwkQ/viewform?usp=publish-editor"
+                  target="_blank"
+                  class="link-ajuda"
+                  id="btnSolicitarBling"
+                  data-form-base="https://docs.google.com/forms/d/e/1FAIpQLSf1yJHppExAdBq0Io4MWdcbeoDubVSVPW9-INkSIGkqPqIwkQ/viewform"
+                  data-form-entry="entry.2073951632"
+                  >Solicitar atendimento ➔</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- ══════════ SEÇÃO: DESENVOLVIMENTO DE SISTEMAS PERSONALIZADOS ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Desenvolvimento de Sistemas
+              Personalizados
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Tenha um sistema desenvolvido para a sua empresa</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div
+                class="ajuda-artigo-corpo"
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                "
+              >
+                <p>
+                  Precisa de um aplicativo, sistema ou programa feito
+                  especificamente para o seu negócio? Podemos desenvolver uma
+                  solução personalizada de acordo com as suas necessidades.
+                </p>
+                <strong
+                  style="
+                    color: var(--clr-text);
+                    display: block;
+                    margin-top: 8px;
+                  "
+                  >O que podemos desenvolver:</strong
+                >
+                <ul style="margin: 4px 0 16px 0; padding-left: 20px">
+                  <li>Sistemas para gestão e organização de processos;</li>
+                  <li>Aplicativos e programas personalizados;</li>
+                  <li>Ferramentas para automatizar tarefas repetitivas;</li>
+                  <li>
+                    Sistemas para controle de produtos, vendas, estoque e
+                    informações;
+                  </li>
+                  <li>Integrações entre sistemas e plataformas;</li>
+                  <li>
+                    Calculadoras e ferramentas específicas para sua operação;
+                  </li>
+                  <li>
+                    Soluções personalizadas para empresas e operações de
+                    e-commerce;
+                  </li>
+                  <li>
+                    Adaptação de sistemas existentes conforme a necessidade do
+                    negócio.
+                  </li>
+                </ul>
+                <p>
+                  A ideia é simples: você explica o que precisa, como gostaria
+                  que funcionasse e quais problemas deseja resolver, e avaliamos
+                  a melhor forma de desenvolver a solução.
+                </p>
+                <p>
+                  Cada projeto é analisado individualmente, de acordo com sua
+                  complexidade, funcionalidades e necessidades.
+                </p>
+                <p style="color: var(--clr-text); font-weight: 600">
+                  Quer transformar uma ideia em um sistema?
+                </p>
+                <p>
+                  Entre em contato para explicar o que você precisa e solicitar
+                  um orçamento personalizado.
+                </p>
+                <a
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSd6kMP1igcBenSUkzVxe9wdL0k1vTg-9JrZFgIIiqMF9EXRiA/viewform?usp=publish-editor"
+                  target="_blank"
+                  class="link-ajuda"
+                  id="btnSolicitarDevSys"
+                  data-form-base="https://docs.google.com/forms/d/e/1FAIpQLSd6kMP1igcBenSUkzVxe9wdL0k1vTg-9JrZFgIIiqMF9EXRiA/viewform"
+                  data-form-entry="entry.2137914064"
+                  >Solicitar orçamento ➔</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- ══════════ SEÇÃO: LINKS OFICIAIS DE TAXAS DAS PLATAFORMAS ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Links Oficiais de Taxas das
+              Plataformas
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Mercado Livre - Custos e Tarifas de Vendas</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Página oficial detalhando todas as tarifas, comissões, taxas
+                  fixas e custos de frete para anúncios Clássico e Premium.
+                </p>
+                <a
+                  href="https://www.mercadolivre.com.br/landing/custos-de-venda"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Mercado Livre - Simulador de Custos</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Calculadora oficial para simular o lucro das suas vendas,
+                  descontando taxas, frete e impostos de forma automática.
+                </p>
+                <a
+                  href="https://www.mercadolivre.com.br/simulador-de-custos#source=landing"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar simulador ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Amazon Brasil - Tabela de Taxas e Comissões</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Documentação completa sobre as taxas de referência, comissões
+                  por categoria e custos logísticos (FBA) para vendedores
+                  parceiros.
+                </p>
+                <a
+                  href="https://sellercentral.amazon.com.br/help/hub/reference/GJLSAYQ5DXWXEEGU"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Amazon Brasil - Calculadora de Receita</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Ferramenta oficial da Amazon para calcular margens de lucro,
+                  comparando os custos de logística própria versus logística do
+                  Amazon FBA.
+                </p>
+                <a
+                  href="https://sellercentral.amazon.com.br/revcal?"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar simulador ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Shopee - Portal de Taxas e Comissões</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Central de educação do vendedor com as políticas atualizadas
+                  de comissionamento, taxas de serviço (como programas de Frete
+                  Grátis) e repasses.
+                </p>
+                <a
+                  href="https://seller.br.shopee.cn/edu/category?sub_cat_id=1103"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Magalu - Políticas de Taxas e Comissões</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Artigo de suporte oficial detalhando a estrutura de comissões,
+                  regras de repasse e tarifas aplicadas aos lojistas do
+                  Marketplace Magalu.
+                </p>
+                <a
+                  href="https://marketplacemagalu.zendesk.com/hc/pt-br/articles/17471999420941"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Magalu - Regras e Custos de Frete</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Tabelas e regras atualizadas sobre custos de envio, subsídios
+                  e coparticipação no frete para vendedores que utilizam o
+                  Magalu Entregas.
+                </p>
+                <a
+                  href="https://marketplacemagalu.zendesk.com/hc/pt-br/articles/25952277865869"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Shein - Política de Comissionamento Nacional</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Página detalhada com as regras de repasse e porcentagens de
+                  comissão cobradas pela Shein para vendedores locais com CNPJ
+                  no Brasil.
+                </p>
+                <a
+                  href="https://br.shein.com/SHEIN-Commission-Policy-a-1420.html"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >MadeiraMadeira - Políticas de Comissionamento</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Regras oficiais de taxas e comissões cobradas por venda no
+                  maior marketplace focado em móveis, casa e decoração do
+                  Brasil.
+                </p>
+                <a
+                  href="https://madeiramadeira.zendesk.com/hc/pt-br/articles/9485012209037--Pol%C3%ADticas-de-Comissionamento"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >KaBuM! - Manual e Taxas do Seller</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Portal do lojista com orientações, manuais e a estrutura de
+                  tarifas aplicadas no marketplace referência em tecnologia e
+                  games.
+                </p>
+                <a
+                  href="https://www.kabum.com.br/hotsite/marketplace/#manualdoseller"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar manual ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Leroy Merlin - FAQ e Taxas do Marketplace</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Central de ajuda detalhando o processo de vendas, requisitos e
+                  as taxas cobradas pelo marketplace especialista em construção,
+                  reforma e decoração.
+                </p>
+                <a
+                  href="https://www.leroymerlin.com.br/faq-marketplace"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar FAQ ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Enjoei - Tarifas, Comissões e Custos</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Guia completo de taxas, tarifas fixas e comissões para venda
+                  de produtos novos e usados na plataforma focada em moda e
+                  lifestyle.
+                </p>
+                <a
+                  href="https://www.enjoei.com.br/ajuda/para-vendedores/sobre-como-vender/tarifas-e-comissoes?srsltid=AfmBOoqOm3VmFQ3RWVH998E6MW4ARuo9KSZJe_B6jJrpKB3sdLS516MM"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Tray - Tarifas sobre Vendas nos Marketplaces</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Documentação do hub da Tray explicando como funcionam as
+                  integrações e as possíveis tarifas extras aplicadas sobre as
+                  vendas conectadas aos marketplaces.
+                </p>
+                <a
+                  href="https://basedeconhecimento.tray.com.br/hc/pt-br/articles/13310903302299-Tarifas-sobre-vendas-nos-marketplaces"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Olist Store - Gestão de Agentes e Comissões</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Regras da plataforma Olist sobre a estrutura de custos, gestão
+                  de tarifas e cálculo da margem de vendas dentro do ecossistema
+                  deles.
+                </p>
+                <a
+                  href="https://ajuda.olist.com/gestao-de-agentes-e-comissoes"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Nuvemshop - Regras de Comissionamento</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Página de suporte detalhando as políticas de repasse e
+                  comissionamento para parceiros e afiliados dentro do
+                  ecossistema de lojas virtuais Nuvemshop.
+                </p>
+                <a
+                  href="https://atendimento.nuvemshop.com.br/pt_BR/regras-gerais-de-comissionamento-dos-parceiros"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Shopify - Taxas e Comissões</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Manual da plataforma explicando a cobrança de transações,
+                  taxas de gateway de pagamento e custos relacionados à rede de
+                  lojas Shopify.
+                </p>
+                <a
+                  href="https://help.shopify.com/pt-BR/manual/promoting-marketing/shopify-product-network/commissions"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar manual ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >iFood - Planos e Parcerias para Restaurantes</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Página oficial detalhando os planos disponíveis (Básico e
+                  Entrega), com informações sobre mensalidades, taxas por pedido
+                  e vantagens de vender na maior plataforma do país.
+                </p>
+                <a
+                  href="https://parceiros.ifood.com.br/restaurante/planos-ifood?network=x&utm_source=google&utm_medium=cpc&utm_campaign=ifood_br_b2b_g-pmax_conversao_o-brasil-que-faz-o-ifood&utm_content=&utm_term=-&gad_source=1&gad_campaignid=20033231474&gbraid=0AAAAABq33MJL9YSzmQx_DauKPZXbrNr9g&gclid=Cj0KCQjwsMLSBhD9ARIsAIpUTDrbyLafjedI77vKSFf5gW-jdXWSEryOTQcpPJC94XyOsizTPIr1picaAuJSEALw_wcB"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar planos ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >99Food - Cadastro e Vendas no App</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Portal dedicado ao cadastro de novos restaurantes, detalhando
+                  como funciona a estrutura da plataforma de delivery da 99 e a
+                  captação de clientes.
+                </p>
+                <a
+                  href="https://merchant.99app.com/pt-BR/store?country=BR&channel=107&campaign_id=23503770204&campaign=BR_google_food_restaurant_acquisition_SEM_full_platform_allothers&ad_group_id&creative_id&source&is_from_marketing=1&utm_term=99%20food%20restaurante&gad_source=1&gad_campaignid=23503770204&gbraid=0AAAAACelNxlwef1zPQCzQPYFVwyeFvYC3&gclid=Cj0KCQjwsMLSBhD9ARIsAIpUTDqVuudLyYhB74ELrmrj3gvbWmWcByw_sJFmjVeBlYB_RBIBbd3CPGYaAhcnEALw_wcB"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Rappi - Taxas e Comissionamento</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Página de suporte oficial aos lojistas parceiros, explicando
+                  de forma transparente as porcentagens de repasse, taxas de
+                  operação e custos logísticos do aplicativo.
+                </p>
+                <a
+                  href="https://merchants.rappi.com/pt-br/taxas-rappi-para-restaurantes"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar política ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Goomer - Planos e Funcionalidades</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Apresentação completa das opções da Goomer, desde o plano
+                  gratuito até os mais avançados, ideais para criar cardápios
+                  digitais sem pagar comissão por venda.
+                </p>
+                <a
+                  href="https://goomer.com.br/planos"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar planos ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Anota AI - Automação e Cardápio Digital</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Plataforma focada em agilizar o atendimento via WhatsApp
+                  através de robôs e criação de um ambiente de pedidos próprio
+                  para o seu negócio.
+                </p>
+                <a
+                  href="https://pagamento.anota.ai/register?network=x&utm_source=googleads&utm_medium=cpa&utm_campaign=anotaai_br_g-pmax_valor-novoscore-campanha_anotaai_br_g-pmax_valor-novoscore-cardapio-digital_imagem-IDT-10051-IDT-10036-IDT-10033-IDT-10049&utm_cid=22763312060&utm_aid=6725144678&gad_source=1&gad_campaignid=22763314253&gbraid=0AAAAADj3N8_W742nabAMA2Yy8KONDDowy&gclid=Cj0KCQjwsMLSBhD9ARIsAIpUTDoU8ef0dFB4fMDsUPQIEwsroRrBdpwiQlRAi4fuE9G1FGpyMPqpMjIaAv8LEALw_wcB&ab_test_mkt=cta_selfcheckout_production&self_source=LP_SELF_CHECKOUT"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Pede.Aí - Licenciamento e Operação</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Página com informações sobre como funciona a operação deste
+                  aplicativo, focando tanto em donos de estabelecimentos quanto
+                  naqueles que desejam ser donos do delivery na sua cidade.
+                </p>
+                <a
+                  href="https://sejadono.pede.ai/#how-it-works"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+          </div>
+          <!-- ══════════ SEÇÃO: FERRAMENTAS PARA O DIA A DIA ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Ferramentas para o Dia a Dia
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Geradores de Dados, Textos e Ferramentas Úteis (4Devs)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Site completo para gerar CPFs, CNPJs, criar senhas fortes,
+                  simular dados variados e formatar textos rapidamente para o
+                  dia a dia.
+                </p>
+                <a
+                  href="https://www.4devs.com.br/"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Edição, Compressão e Conversão de Imagens (iLoveIMG)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Site prático para comprimir, redimensionar, cortar, converter
+                  formatos e editar fotos em massa direto no navegador.
+                </p>
+                <a
+                  href="https://www.iloveimg.com/pt"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Canivete Suíço para Textos e Utilidades Web
+                  (Invertexto)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Plataforma cheia de ferramentas rápidas como contador de
+                  caracteres, gerador de código de barras, e-mail temporário,
+                  conversor de letras maiúsculas/minúsculas e organizador de
+                  listas.
+                </p>
+                <a
+                  href="https://www.invertexto.com/"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Mapeamento de Dúvidas e Buscas de Clientes
+                  (AnswerThePublic)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Ferramenta que descobre as perguntas e termos exatos que as
+                  pessoas estão jogando no Google, ideal para você descobrir o
+                  que escrever nas descrições dos seus anúncios.
+                </p>
+                <a
+                  href="https://answerthepublic.com/pt"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Análise de Tendências e Volume de Pesquisas (Google
+                  Trends)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Plataforma oficial do Google para comparar termos de busca,
+                  descobrir sazonalidades de produtos e visualizar o que está em
+                  alta na internet.
+                </p>
+                <a
+                  href="https://trends.google.com.br/trends/"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Espionagem e Análise de Mercado no Mercado Livre
+                  (Avantpro)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Extensão para o Google Chrome que revela o faturamento,
+                  quantidade de vendas mensais e estratégias dos anúncios dos
+                  seus concorrentes diretamente dentro do Mercado Livre.
+                </p>
+                <a
+                  href="https://chromewebstore.google.com/detail/avantpro-ml/jdefnfmbnchmnjkcknaadaddgjbgephh?hl=pt-BR"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Cálculo de Lucro e Taxas de Marketplaces (Calculadora de
+                  Taxas)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Ferramenta essencial para simular o lucro real das suas
+                  vendas, já descontando as comissões e valores de frete de
+                  plataformas como Mercado Livre e Shopee.
+                </p>
+                <a
+                  href="https://www.calculadoradetaxas.com.br/"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Gerador Rápido de Links para WhatsApp (Wa.link)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Site focado na criação de links curtos do seu número de
+                  WhatsApp com mensagens pré-programadas, facilitando o contato
+                  de clientes e agilizando o seu atendimento.
+                </p>
+                <a
+                  href="https://criar.wa.link/"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Revisor Ortográfico e Gramatical com Inteligência Artificial
+                  (LanguageTool)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Corretor avançado que analisa os seus textos, ajusta o tom e
+                  evita erros de português na hora de redigir descrições,
+                  e-mails ou mensagens importantes.
+                </p>
+                <a
+                  href="https://languagetool.org/pt-BR"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Navegação Anônima e Troca de IP (Urban VPN)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Extensão de VPN gratuita para o navegador que permite alterar
+                  a sua localização virtual, protegendo seus dados e
+                  desbloqueando conteúdos restritos.
+                </p>
+                <a
+                  href="https://chromewebstore.google.com/detail/urban-vpn-proxy/eppiocemhmnlbhjplcgkofciiegomcon?hl=pt-BR"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Extensao Para Salvar Qualquer Imagem (Online Photo
+                  Tool)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Extensão prática focada para salvar imagens diretamente pelo
+                  navegador, sem precisar instalar programas pesados.
+                  <strong>Modo de Usar:</strong> Após instalar a extensão, vá
+                  até a imagem, clique com o botão direito do mouse, e selecione
+                  a opção: <strong>Save image as......</strong>
+                </p>
+                <a
+                  href="https://chromewebstore.google.com/detail/online-photo-tool-with-ba/aninmieokgdbdcgoiglchhhhbpnpolja"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo"
+                  >Bloqueador de Anúncios e Pop-ups (AdBlock)</span
+                >
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Extensão clássica e indispensável para limpar a sua tela de
+                  navegação, bloqueando propagandas invasivas, banners e vídeos
+                  automáticos nos sites.
+                </p>
+                <a
+                  href="https://chromewebstore.google.com/detail/adblock-%E2%80%94-block-ads-acros/gighmmpiobklfepjocnamgkkbiglidom?hl=pt-BR"
+                  target="_blank"
+                  class="link-ajuda"
+                  >Acessar plataforma ➔</a
+                >
+              </div>
+            </div>
+          </div>
+         
+
+          <!-- ══════════ SEÇÃO: GUIA DOS MÓDULOS ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Guia dos Módulos
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Precificação e Margem</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  É o módulo central para calcular o preço de venda dos seus
+                  produtos. Você informa o custo, o frete, as taxas da plataforma
+                  e a margem desejada (em <strong>%</strong> ou em
+                  <strong>R$</strong>), e o sistema calcula o preço final e o
+                  lucro real de cada venda.
+                </p>
+                <p>
+                  Serve para você parar de vender no prejuízo sem perceber:
+                  descontando comissões e frete, ele mostra quanto sobra de fato
+                  em cada produto.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Kits e Variações</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Permite montar combos e variações a partir dos seus produtos.
+                  Um kit multiplica o custo pela quantidade de itens e pode ter
+                  frete e taxas próprios.
+                </p>
+                <p>
+                  A finalidade é precificar vendas em conjunto (por exemplo, um
+                  kit com 3 unidades) de forma independente do produto unitário,
+                  mantendo o lucro sob controle.
+                </p>
+                <p>
+                  Na ficha do produto, todos os kits ficam dentro do quadro
+                  "Kits do Produto", que mostra quantos há.
+                </p>
+                <p>
+                  Produto composto (botão "Criar Kit" na lista de produtos):
+                  o custo é a soma dos itens. Quando o custo de um item muda —
+                  pela ficha dele ou pelas Ações em Massa —, os compostos da
+                  mesma plataforma que usam esse item são atualizados sozinhos:
+                  custo, preço final, kits e Preços Extras na margem. Vale
+                  também para um composto que usa outro composto.
+                </p>
+                <p>
+                  Mesmo SKU em outro produto da mesma plataforma (o mesmo item
+                  em outro anúncio): ao salvar um novo Preço de Custo na ficha,
+                  ele recebe o custo novo e é recalculado com a margem e as
+                  taxas dele. Os outros campos de cada anúncio continuam como
+                  estão; para mudá-los em todos de uma vez, use as Ações em
+                  Massa.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Preços Extras</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Na ficha do produto, três preços de referência: mínimo,
+                  ideal e máximo. Em cada um você escolhe como ele é dado:
+                  <strong>Preço</strong> — digita o preço de venda e vê quanto
+                  sobra de lucro; <strong>Margem %</strong> ou
+                  <strong>Margem R$</strong> — digita quanto quer ganhar e o
+                  sistema calcula o preço, com as taxas, comissões e impostos.
+                </p>
+                <p>
+                  No Mercado Livre, cada nível tem o Premium e o Clássico; na
+                  margem, os dois preços saem da mesma margem, cada um com a
+                  sua comissão. Cada kit tem os próprios níveis, com o valor do
+                  kit inteiro (a Margem R$ do kit é o lucro do kit todo).
+                  Trocar entre Preço e margem não muda o preço que está na tela.
+                </p>
+                <p>
+                  Os Preços Extras não mudam a precificação da ficha. Na margem,
+                  o preço acompanha o custo e as taxas: muda junto quando eles
+                  mudam, também pelas Ações em Massa.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Produtos</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  É o cadastro central dos seus itens. Aqui você registra nome,
+                  custo, foto e as informações de cada produto, que ficam
+                  disponíveis para a precificação e os demais módulos.
+                </p>
+                <p>
+                  Serve como a base de dados do sistema: mantendo os produtos
+                  organizados e atualizados, os cálculos e relatórios refletem a
+                  sua operação real.
+                </p>
+                <p>
+                  Para cadastrar vários produtos de uma vez, use
+                  <strong>Opções Em Massa › Adicionar pela Planilha</strong>, na
+                  lista de produtos de uma plataforma. Ela lê a planilha de
+                  produtos do <strong>Bling</strong>, a de anúncios do
+                  <strong>Mercado Livre</strong> (baixada com a opção SKU
+                  marcada) ou a de <strong>qualquer outra plataforma</strong>
+                  (Amazon, Shopee, Magalu, uma planilha sua…) e traz o nome (em
+                  maiúsculas), o SKU, o EAN/GTIN (no ID do Produto), o preço de
+                  custo, o peso (em kg vira gramas) e as medidas (em mm ou metros
+                  viram cm). Você confere os campos e os produtos antes de
+                  cadastrar e escolhe as plataformas que recebem; SKU que já está
+                  cadastrado na plataforma é pulado.
+                </p>
+                <p>
+                  Na planilha de outra plataforma, o Bapell procura os títulos
+                  das colunas e marca o que reconheceu com certeza; o resto fica
+                  desmarcado, para você conferir. Em qualquer uma você digita a
+                  célula de um campo (ex.: C2, ou só a letra da coluna) e, em
+                  <strong>Adicionar Campo</strong>, inclui qualquer outro campo do
+                  Bapell — custos, impostos, taxas, margem, Preços Extras, campos
+                  personalizados ou um campo de texto novo —, escolhendo a célula
+                  inicial e, se quiser, a final (ex.: o Preço de Custo de F2 até
+                  F500). O <strong>preço de venda</strong> da planilha entra
+                  desmarcado: marcado, o Bapell calcula a margem (em % ou em R$)
+                  que dá aquele preço com o custo e as taxas do produto. A
+                  configuração pode ser salva para a próxima vez.
+                </p>
+                <p>
+                  Para levar os produtos para outro sistema, use
+                  <strong>Opções Em Massa › Exportar para Planilha</strong>.
+                  Anexe a planilha que vai recebê-los — a do
+                  <strong>Bling</strong>, a do <strong>Mercado Livre</strong> ou
+                  a de qualquer outra plataforma — e o Bapell reconhece as
+                  colunas pelos títulos. Em <strong>Adicionar Campo</strong> você
+                  escolhe qualquer outro campo do produto e a célula inicial (e,
+                  se quiser, a final) onde ele vai. O arquivo gerado é a mesma
+                  planilha, com a formatação dela, preenchida com os produtos; se
+                  ela já tiver produtos, você escolhe entre atualizar as linhas
+                  pelo SKU, substituir as linhas antigas ou escrever por cima. A
+                  configuração pode ser salva para a próxima vez.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Plataformas</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Onde você configura os canais de venda que utiliza (Mercado
+                  Livre, Shopee, Amazon, Magalu e outros), com suas taxas,
+                  comissões e regras de frete.
+                </p>
+                <p>
+                  A finalidade é que a precificação use as taxas corretas de cada
+                  marketplace, para o preço de venda considerar o custo real de
+                  vender em cada canal.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Empresas</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Guarda os dados cadastrais das suas empresas (CNPJ, razão
+                  social, endereço, inscrições, sócios, logo e documentos). Você
+                  pode cadastrar mais de uma empresa e alternar entre elas.
+                </p>
+                <p>
+                  Serve para centralizar as informações usadas em notas, no
+                  controle financeiro e nos demais módulos que trabalham por
+                  empresa.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Usuários e Senhas</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Fica em Dados da Empresa › Usuários e Senhas. Ali você
+                  cadastra os usuários (quem aparece como responsável dos
+                  lançamentos), cria as senhas do Administrador e do
+                  Colaborador e escolhe os módulos que pedem senha ao abrir.
+                  Na linha "Senha atual" de cada uma há Mostrar, Copiar e
+                  Remover.
+                </p>
+                <p>
+                  O primeiro usuário da lista é o <strong>Master</strong>, o
+                  administrador principal. Em Editar, você troca o nome que
+                  aparece (por exemplo, "Carlos" no lugar de
+                  "Administrador"). Ele continua sendo o administrador: a
+                  senha dele é a do Administrador, ele não pode ser excluído e
+                  nenhum outro usuário pode ter o mesmo nome. O nome aparece no
+                  campo Responsável dos lançamentos e na janela "Usuário e
+                  senha" dos botões protegidos.
+                </p>
+                <p>
+                  Junto da senha do Administrador, responda pelo menos 3 das
+                  5 perguntas de segurança. Se a senha for esquecida, clique
+                  em "Esqueci a senha do Administrador" na tela de senha,
+                  escolha uma das perguntas, responda e crie uma senha nova —
+                  tudo no próprio computador, sem internet. Maiúsculas,
+                  minúsculas e acentos não fazem diferença na resposta.
+                </p>
+                <p>
+                  Em "Senha nos botões", escolha tela a tela os botões que
+                  pedem usuário e senha antes de agir (o Salvar dos Produtos,
+                  o Excluir de um lançamento...). Quem clicar escolhe o
+                  próprio nome e digita a própria senha. Os atalhos pedem
+                  junto: com o Salvar dos Produtos marcado, a ficha deixa de
+                  salvar sozinha a cada 30 segundos; em Dados da Empresa,
+                  trocar ou adicionar empresa com alterações pede a senha do
+                  Salvar; e o Enter do Gerador de EAN pede a do Gerar EAN.
+                  Botões que abrem e fecham (Opções Em Massa, Lojas Ocultas,
+                  Reordenar...) só pedem ao abrir.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">DRE (Controle Financeiro)</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  O Demonstrativo de Resultado organiza entradas e saídas por
+                  empresa, mostrando receitas, custos e o resultado do período em
+                  tabelas e gráficos.
+                </p>
+                <p>
+                  Os indicadores comparam o período com o anterior; os insights
+                  apontam o que pede atenção (margem, ponto de equilíbrio, taxas
+                  dos canais); o DRE do período detalha da receita bruta ao
+                  resultado; e o desempenho por canal mostra quanto cada canal
+                  deixa com você depois das taxas. O extrato pode ser baixado em
+                  planilha, e o relatório completo, em PDF.
+                </p>
+                <p>
+                  O prejuízo das devoluções lançado pelo Gestor de Devoluções
+                  entra como saída na categoria <strong>DEVOLUÇÃO</strong>, com
+                  linha própria (Devoluções) dentro das despesas operacionais
+                  do DRE.
+                </p>
+                <p>
+                  No Registrar Entrada, os campos Taxa Canal/Cartão e Custo
+                  Frete começam ocultos. Para usá-los, abra Configurar Campos ›
+                  Registrar Entrada e clique em Mostrar — a escolha fica salva.
+                </p>
+                <p>
+                  A finalidade é dar uma visão financeira do negócio: entender
+                  para onde vai o dinheiro e se a operação está no lucro ou no
+                  prejuízo.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Registro de Vendas</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Onde você lança as vendas realizadas, acompanhando quantidades,
+                  valores e o desempenho ao longo do tempo.
+                </p>
+                <p>
+                  Serve para manter um histórico das suas vendas e alimentar a
+                  leitura de resultados do negócio.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Gestor de Devoluções</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Registra cada produto devolvido: empresa, loja, SKU, valor,
+                  quantidade, número da venda (na plataforma e no ERP), estado
+                  do produto e data de chegada. A busca pela SKU sugere os
+                  produtos e kits da loja enquanto você digita, e o valor vem
+                  preenchido com o preço atual naquela loja — no Mercado Livre,
+                  você escolhe entre Premium e Clássico. O valor pode ser
+                  alterado.
+                </p>
+                <p>
+                  Se a devolução <strong>gerou imposto</strong>, ele é
+                  calculado com a porcentagem de imposto por nota da empresa
+                  (Dados da Empresa) sobre valor × quantidade. Sem reembolso da
+                  plataforma, o prejuízo é esse imposto. Com reembolso, o
+                  imposto não conta: ele fica só registrado. Ao responder
+                  <strong>Sim</strong> em "Plataforma reembolsou?", aparece ao
+                  lado o campo <strong>Valor reembolsado</strong>: informe quanto a
+                  plataforma devolveu de fato (o valor da venda menos as
+                  taxas). É esse valor que entra no total de reembolsos; o
+                  imposto continua calculado sobre o valor cheio da venda. Se
+                  a plataforma ainda não decidiu, escolha
+                  <strong>Aguardando</strong>: até a resposta, a devolução
+                  conta como sem reembolso (o imposto entra no prejuízo), e o
+                  filtro "Plataforma reembolsou" mostra só essas.
+                </p>
+                <p>
+                  Se você pagou algo a mais pela devolução — o frete, por
+                  exemplo —, informe em <strong>Valor extra</strong>, ao lado
+                  das observações, e escreva o motivo no campo embaixo dele (no
+                  lançamento, o valor e o motivo vão juntos). O valor extra
+                  entra sempre no prejuízo, com ou sem reembolso da plataforma:
+                  sem reembolso, o prejuízo é o imposto mais o valor extra; com
+                  reembolso, é só o valor extra. Ele aparece na conta da janela,
+                  na lista (embaixo do prejuízo) e na descrição do lançamento no
+                  Controle Financeiro. Vale também para as devoluções futuras:
+                  o valor extra registrado vai junto quando a devolução é
+                  lançada.
+                </p>
+                <p>
+                  Os indicadores (total, produtos mais devolvidos, loja com mais
+                  devoluções, prejuízo e reembolsos) e a lista acompanham os
+                  filtros, que se combinam. O prejuízo pode ser lançado no
+                  Controle Financeiro como saída na categoria
+                  <strong>DEVOLUÇÃO</strong>, uma devolução por vez ou todas as
+                  pendentes de uma vez. Faz parte dos módulos Plus (planos Pro e
+                  Platinum).
+                </p>
+                <p>
+                  Cada lançamento tem um <strong>responsável</strong>, escolhido
+                  entre os usuários de Dados da Empresa › Usuários e Senhas
+                  (quem tem senha confirma digitando a dele). As perguntas sobre
+                  imposto, reputação, reembolso e estado do produto são listas
+                  de opções.
+                </p>
+                <p>
+                  Devoluções que ainda estão a caminho podem ser anotadas em
+                  <strong>Registrar futuras devoluções</strong> (menu lateral),
+                  com o que já se sabe: só a empresa, a loja, o produto ou o
+                  número da venda e o responsável são obrigatórios, e a
+                  previsão de chegada ajuda a acompanhar. Em
+                  <strong>Acompanhar devoluções</strong> ficam as que aguardam
+                  chegada (as atrasadas aparecem marcadas). Quando o produto
+                  chega, o botão de lançar abre o lançamento já preenchido; ao
+                  salvar, ela passa para <strong>Já lançadas</strong> e não é
+                  lançada duas vezes. O sino da linha cria um lembrete na tela
+                  <strong>Lembretes</strong> com os dados da devolução. O menu
+                  lateral também tem atalhos para Lembretes e para o Controle
+                  Financeiro.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Lembretes</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Uma agenda de avisos com data e hora. Você cria lembretes para
+                  compromissos, pagamentos e tarefas, e o sistema avisa quando a
+                  data chega.
+                </p>
+                <p>
+                  A finalidade é não perder prazos importantes — inclusive o
+                  <strong>vencimento da sua licença</strong>, que é registrado
+                  aqui automaticamente quando a chave tem prazo.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Notas Fiscais</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Espaço para organizar e guardar as notas fiscais por empresa,
+                  mantendo os documentos reunidos e fáceis de localizar.
+                </p>
+                <p>
+                  Serve para arquivar e consultar as notas do seu negócio dentro
+                  do próprio sistema, junto com os demais dados da empresa.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Central de Cálculos</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Reúne calculadoras auxiliares para o dia a dia — cálculos de
+                  custos, impostos, operações comerciais e financeiras.
+                </p>
+                <p>
+                  A finalidade é ter ferramentas de apoio à mão para simulações
+                  rápidas. Os resultados são estimativos e dependem dos dados que
+                  você informa; para questões fiscais, confira sempre com um
+                  profissional habilitado.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Gerador de EAN</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Gera códigos de barras no padrão <strong>EAN-13</strong> para
+                  os seus produtos.
+                </p>
+                <p>
+                  Serve para quando você precisa de um código de barras válido no
+                  cadastro de itens e anúncios, sem depender de ferramentas
+                  externas.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Ajuda</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  É esta central. Reúne tutoriais, links úteis, os serviços
+                  oferecidos, a validade da sua licença, o backup dos dados, o
+                  diagnóstico de problemas e este guia dos módulos.
+                </p>
+                <p>
+                  Serve como ponto de apoio para tirar dúvidas e acessar recursos
+                  importantes do sistema em um só lugar.
+                </p>
+              </div>
+            </div>
+
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Backup</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Permite <strong>exportar</strong> os seus dados em um
+                  arquivo — você escolhe o que vai nele — e
+                  <strong>importar</strong> em outro computador. Na
+                  importação, itens repetidos são ignorados automaticamente.
+                </p>
+                <p>
+                  Marcando <strong>Imagens dos Produtos</strong>, o backup sai
+                  em <strong>.zip</strong>: os dados e as fotos dos produtos em
+                  arquivos de imagem. Na importação, as fotos voltam ligadas
+                  aos mesmos produtos.
+                </p>
+                <p>
+                  Como os dados ficam salvos apenas neste computador, o backup é
+                  a forma de proteger suas informações e levá-las para outro
+                  aparelho com segurança.
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+           <!-- ══════════ SEÇÃO: SUPORTE ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Suporte
+            </div>
+            <div class="ajuda-artigo">
+              <div class="ajuda-artigo-header">
+                <span class="ajuda-artigo-titulo">Precisa de Ajuda?</span>
+                <span class="ajuda-artigo-seta">▼</span>
+              </div>
+              <div class="ajuda-artigo-corpo">
+                <p>
+                  Em caso de instabilidade ou falha no sistema, por favor, envie
+                  um e-mail contendo o arquivo <strong>TXT</strong> gerado na
+                  área de <strong>"Diagnóstico de Problemas"</strong> para:
+                  <strong
+                    ><a
+                      class="ativ-email"
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=bapellgestorpro@gmail.com&su=Suporte%20Bapell%20Gestor%20Pro"
+                      target="_blank"
+                      rel="noopener"
+                      >bapellgestorpro@gmail.com</a
+                    ></strong
+                  >.
+                </p>
+                <br />
+                <p
+                  style="
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: var(--clr-text-2);
+                    margin: 0 0 16px;
+                    padding-left: 20px;
+                  "
+                >
+                  <strong>Avisos Importantes sobre o Atendimento:</strong>
+                </p>
+                <ul
+                  style="
+                    font-size: 13.5px;
+                    line-height: 1.6;
+                    color: var(--clr-text-2);
+                    margin: 0 0 16px;
+                    padding-left: 20px;
+                  "
+                >
+                  <li>
+                    <strong>Fila de Espera:</strong> Nossos chamados são
+                    respondidos por rigorosa ordem de recebimento e, no momento,
+                    não há um prazo de retorno predefinido.
+                  </li>
+                  <li>
+                    <strong>Procedimento:</strong> Para otimizar o fluxo de
+                    suporte e evitar duplicidade, solicitamos que envie apenas
+                    um e-mail relatando a ocorrência e aguarde.
+                  </li>
+                  <li>
+                    <strong>Acompanhamento:</strong> Fique atento à sua caixa de
+                    entrada para verificar as atualizações e o status da sua
+                    solicitação de suporte.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════ SEÇÃO: BACKUP ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Backup e Transferência de
+              Dados
+            </div>
+            <div class="ajuda-artigo" style="padding: 18px">
+              <p
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                  margin: 0 0 16px;
+                "
+              >
+                Seus dados ficam salvos apenas neste computador. Para levar seus
+                dados para outro PC,
+                <strong>exporte</strong> um arquivo de backup aqui e
+                <strong>importe</strong> no outro aparelho. Na importação, itens
+                repetidos (mesmos produtos ou empresas) são ignorados
+                automaticamente.
+              </p>
+              <p
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                  margin: 0 0 16px;
+                "
+              >
+                Com <strong>Imagens dos Produtos</strong> marcado, o backup
+                sai em um arquivo <strong>.zip</strong> com os dados e as
+                fotos dos produtos em arquivos de imagem (pasta
+                <em>imagens</em>); sem essa opção, sai em
+                <strong>.json</strong>, como antes. Para restaurar,
+                importe o arquivo inteiro — não é preciso descompactar. As
+                fotos voltam ligadas aos mesmos produtos.
+              </p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                <button
+                  type="button"
+                  class="btn-primary"
+                  id="btnExportarBackup"
+                  style="
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Exportar Banco de Dados
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="btnImportarBackup"
+                  style="
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Importar Banco de Dados
+                </button>
+                <input
+                  type="file"
+                  id="inputImportarBackup"
+                  accept=".zip,application/zip,application/json,.json"
+                  style="display: none"
+                />
+              </div>
+            </div>
+          </div>
+         
+
+
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Armazenamento
+            </div>
+            <div class="ajuda-artigo" style="padding: 18px">
+              <p
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                  margin: 0 0 6px;
+                "
+              >
+                Seus dados (produtos, fotos e notas fiscais) ficam salvos
+                localmente neste computador e crescem conforme o espaço livre do
+                disco.
+              </p>
+              <div
+                id="storageResumo"
+                style="
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: var(--clr-text);
+                  margin-top: 6px;
+                "
+              >
+                Calculando uso de armazenamento…
+              </div>
+              <div
+                id="storageBarWrap"
+                style="
+                  margin-top: 10px;
+                  height: 8px;
+                  background: var(--clr-surface-alt);
+                  border: 1px solid var(--clr-border);
+                  border-radius: 999px;
+                  overflow: hidden;
+                  display: none;
+                "
+              >
+                <div
+                  id="storageBar"
+                  style="
+                    height: 100%;
+                    width: 0%;
+                    background: var(--clr-primary);
+                    transition: width 0.3s ease;
+                  "
+                ></div>
+              </div>
+              <div
+                id="storagePersist"
+                style="
+                  font-size: 12px;
+                  color: var(--clr-text-3);
+                  margin-top: 8px;
+                "
+              ></div>
+              <div
+                id="storageExtra"
+                style="
+                  font-size: 12px;
+                  color: var(--clr-text-3);
+                  margin-top: 4px;
+                "
+              ></div>
+            </div>
+          </div>
+
+
+         
+
+
+           <!-- ══════════ SEÇÃO: DIAGNÓSTICO ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Diagnóstico de Problemas
+            </div>
+            <div class="ajuda-artigo" style="padding: 18px">
+              <p
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                  margin: 0 0 16px;
+                "
+              >
+                Se o aplicativo apresentar algum comportamento estranho, exporte
+                o relatório de erros e envie para o suporte. Ele contém apenas
+                informações técnicas sobre falhas — nenhum dado dos seus
+                produtos ou empresas.
+                <span
+                  id="erroResumo"
+                  style="display: block; margin-top: 8px; font-weight: 600"
+                ></span>
+              </p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="btnExportarErros"
+                  style="
+                    padding: 10px 20px;
+                    font-size: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    ></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                  </svg>
+                  Exportar relatório de erros
+                </button>
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  id="btnLimparErros"
+                  style="padding: 10px 20px; font-size: 14px"
+                >
+                  Limpar histórico
+                </button>
+              </div>
+            </div>
+          </div>
+
+           <!-- ══════════ SEÇÃO: VALIDADE DA CHAVE ══════════ -->
+          <div class="ajuda-secao">
+            <div class="ajuda-secao-titulo">
+              <span class="card-title-dot"></span> Validade da Licença
+            </div>
+            <div class="ajuda-artigo" style="padding: 18px">
+              <p
+                style="
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: var(--clr-text-2);
+                  margin: 0 0 14px;
+                "
+              >
+                Consulte o tipo e a validade da chave atualmente instalada neste
+                computador. As informações são lidas diretamente da licença ativa.
+                Em <strong>Alterar minha chave</strong> você vê o seu plano, faz o
+                upgrade ou insere uma chave nova. No upgrade, o valor que você pagou
+                pela licença ativa é descontado do preço do novo plano, e o valor a
+                pagar aparece em cada plano. Licença vencida e período de teste não
+                geram desconto. Se você ativar uma chave de teste por cima de uma
+                licença paga ativa, a licença paga fica guardada e volta a valer
+                quando o teste terminar.
+              </p>
+
+              <!-- Resumo preenchido pelo botão abaixo -->
+              <div
+                id="licValidadeBox"
+                style="
+                  display: none;
+                  background: var(--clr-surface-alt);
+                  border: 1px solid var(--clr-border);
+                  border-radius: 12px;
+                  padding: 16px 18px;
+                  margin-bottom: 14px;
+                "
+              >
+                <div style="margin-bottom: 10px">
+                  <div
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      text-transform: uppercase;
+                      letter-spacing: 0.6px;
+                      color: var(--clr-text-3);
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Tipo de licença
+                  </div>
+                  <div
+                    id="licValidadeTipo"
+                    style="font-size: 16px; font-weight: 700; color: var(--clr-text)"
+                  >
+                    —
+                  </div>
+                </div>
+                <div id="licValidadeVencWrap" style="margin-bottom: 10px">
+                  <div
+                    id="licValidadeVencLabel"
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      text-transform: uppercase;
+                      letter-spacing: 0.6px;
+                      color: var(--clr-text-3);
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Vencimento
+                  </div>
+                  <div
+                    id="licValidadeVenc"
+                    style="font-size: 16px; font-weight: 700; color: var(--clr-text)"
+                  >
+                    —
+                  </div>
+                </div>
+                <div id="licValidadeDiasWrap">
+                  <div
+                    style="
+                      font-size: 11px;
+                      font-weight: 700;
+                      text-transform: uppercase;
+                      letter-spacing: 0.6px;
+                      color: var(--clr-text-3);
+                      margin-bottom: 3px;
+                    "
+                  >
+                    Dias restantes
+                  </div>
+                  <div
+                    id="licValidadeDias"
+                    style="font-size: 16px; font-weight: 700; color: var(--clr-text)"
+                  >
+                    —
+                  </div>
+                </div>
+                <!-- Durante a nova chave de teste: a licença paga guardada -->
+                <div
+                  id="licValidadeNota"
+                  style="display: none; margin-top: 10px; font-size: 13px; line-height: 1.55; color: var(--clr-text-2)"
+                ></div>
+              </div>
+
+              <div
+                id="licValidadeMsg"
+                style="
+                  display: none;
+                  font-size: 13px;
+                  color: var(--clr-text-2);
+                  margin-bottom: 14px;
+                "
+              ></div>
+
+              <!-- Ver a validade e, ao lado, trocar a chave (renovar ou subir
+                   de plano). -->
+              <div style="display: flex; flex-wrap: wrap; gap: 10px">
+              <button
+                type="button"
+                class="btn-primary"
+                id="btnVerValidade"
+                style="
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                "
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Ver validade da chave
+              </button>
+              <button
+                type="button"
+                class="btn-secondary"
+                id="btnAlterarChave"
+                title="Veja o seu plano, faça o upgrade ou insira uma chave nova"
+                style="
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                "
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="7.5" cy="15.5" r="4.5"></circle>
+                  <path d="M10.7 12.3 21 2"></path>
+                  <path d="m16 7 3 3"></path>
+                  <path d="m19 4 2 2"></path>
+                </svg>
+                Alterar minha chave
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- Modal de seleção de exportação -->
+    <div class="modal-overlay" id="modalBackup" style="display: none">
+      <div
+        class="modal"
+        style="
+          max-width: 480px;
+          width: 90%;
+          max-height: 88vh;
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <div
+          class="modal-title"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <span id="modalBackupTitulo">Exportar Banco de Dados</span>
+          <button
+            type="button"
+            id="backupFecharX"
+            style="
+              background: transparent;
+              border: none;
+              color: var(--clr-text-3);
+              font-size: 22px;
+              cursor: pointer;
+              line-height: 1;
+            "
+          >
+            ✕
+          </button>
+        </div>
+        <div
+          class="modal-subtitle"
+          style="margin-bottom: var(--sp-sm)"
+          id="modalBackupSub"
+        >
+          Selecionar dados para exportar:
+        </div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: var(--sp-sm);
+            padding-bottom: var(--sp-sm);
+            border-bottom: 1px solid var(--clr-border);
+          "
+        >
+          <label class="backup-check" style="font-weight: 600"
+            ><input type="checkbox" id="backupTodos" checked />
+            <span>Todos</span></label
+          >
+        </div>
+        <div
+          id="backupListaExportar"
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: var(--sp-lg);
+            overflow-y: auto;
+            flex: 1;
+          "
+        >
+          <!-- checkboxes de módulos gerados por ajuda.js -->
+        </div>
+        <p
+          id="backupNotaFormato"
+          style="
+            margin: 0 0 var(--sp-md);
+            font-size: 12.5px;
+            line-height: 1.5;
+            color: var(--clr-text-3);
+          "
+        >
+          Com <strong>Imagens dos Produtos</strong> marcado, o arquivo sai em
+          .zip, com as fotos em arquivos de imagem junto com os dados. Sem
+          ela, sai em .json, como antes.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="backupCancelar">Cancelar</button>
+          <button
+            class="btn-primary"
+            id="backupConfirmar"
+            style="padding: 10px var(--sp-lg); font-size: 14px"
+          >
+            Exportar arquivo
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="JS/licenca-ui.js"></script>
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/imagestore.js"></script>
+    <script src="JS/jszip.min.js"></script>
+    <script src="JS/backup.js"></script>
+    <script src="JS/theme.js"></script>
+    <!-- SCRIPT ESPECÍFICO DESTA PÁGINA -->
+    <script src="JS/ajuda.js"></script>
+    <!-- Monta a URL dos formulários (Bling, Desenvolvimento, etc.) com a chave
+         de ativação atual. Vale para qualquer link com data-form-base/entry. -->
+    <script>
+      (function () {
+        var botoes = document.querySelectorAll("a[data-form-base][data-form-entry]");
+        if (!botoes.length) return;
+        botoes.forEach(function (btn) {
+          btn.addEventListener("click", async function (e) {
+            e.preventDefault();
+            var base = btn.getAttribute("data-form-base") || "";
+            var entry = btn.getAttribute("data-form-entry") || "";
+            var url = base + "?usp=pp_url";
+            try {
+              // Reutiliza a MESMA fonte da licença já ativa no sistema. Não cria,
+              // não fixa e não pede a chave; apenas lê o que já existe.
+              var chave = "";
+              if (window.licencaAPI && typeof window.licencaAPI.chaveAtual === "function") {
+                chave = (await window.licencaAPI.chaveAtual()) || "";
+              }
+              if (chave && entry) {
+                url += "&" + entry + "=" + encodeURIComponent(chave);
+              }
+            } catch (err) {
+              // Se algo falhar, abre o formulário mesmo assim, com o campo vazio.
+            }
+            // Abre em nova aba/janela, como os demais links externos do sistema.
+            try { window.open(url, "_blank"); } catch (e2) { window.location.href = url; }
+          });
+        });
+      })();
+    </script>
+
+    <!-- Ver validade da chave: lê licencaAPI.status() (licença instalada). -->
+    <script>
+      (function () {
+        var btn = document.getElementById("btnVerValidade");
+        if (!btn) return;
+
+        function p(n) { return String(n).padStart(2, "0"); }
+        function dataBR(ts) {
+          var d = new Date(ts * 1000);
+          if (isNaN(d.getTime())) return "—";
+          return p(d.getDate()) + "/" + p(d.getMonth() + 1) + "/" + d.getFullYear();
+        }
+
+        function mostrarMsg(txt) {
+          var box = document.getElementById("licValidadeBox");
+          var msg = document.getElementById("licValidadeMsg");
+          if (box) box.style.display = "none";
+          if (msg) { msg.textContent = txt; msg.style.display = "block"; }
+        }
+
+        function mostrar(s) {
+          var box = document.getElementById("licValidadeBox");
+          var msg = document.getElementById("licValidadeMsg");
+          var elTipo = document.getElementById("licValidadeTipo");
+          var vencWrap = document.getElementById("licValidadeVencWrap");
+          var vencLabel = document.getElementById("licValidadeVencLabel");
+          var elVenc = document.getElementById("licValidadeVenc");
+          var diasWrap = document.getElementById("licValidadeDiasWrap");
+          var elDias = document.getElementById("licValidadeDias");
+
+          if (msg) msg.style.display = "none";
+
+          // Sem licença ativa: não há o que exibir.
+          if (!s || s.estado === "sem-licenca" || (!s.ativa && !s.expirada && !s.rotuloTipo)) {
+            mostrarMsg("Nenhuma licença ativa foi encontrada neste computador.");
+            return;
+          }
+
+          // O nome do plano (Licença Anual, Pro…); sem ele, o tipo da chave.
+          elTipo.textContent = s.rotuloPlano || s.rotuloTipo || "—";
+
+          var elNota = document.getElementById("licValidadeNota");
+          if (elNota) {
+            var g = s.pagaGuardada;
+            if (g && g.rotuloPlano) {
+              elNota.textContent =
+                "Sua licença paga (" + g.rotuloPlano +
+                ") está guardada e volta a valer quando o teste terminar.";
+              elNota.style.display = "block";
+            } else {
+              elNota.textContent = "";
+              elNota.style.display = "none";
+            }
+          }
+
+          var expira = Number(s.expira) || 0;
+          if (!expira) {
+            // Vitalícia: sem vencimento nem contagem regressiva.
+            if (vencLabel) vencLabel.textContent = "Validade";
+            elVenc.textContent = "Nunca expira";
+            if (diasWrap) diasWrap.style.display = "none";
+          } else {
+            if (vencLabel) vencLabel.textContent = "Vencimento";
+            elVenc.textContent = dataBR(expira);
+            if (vencWrap) vencWrap.style.display = "";
+            if (diasWrap) diasWrap.style.display = "";
+
+            var dias =
+              typeof s.diasRestantes === "number" && isFinite(s.diasRestantes)
+                ? s.diasRestantes
+                : Math.ceil((expira - Math.floor(Date.now() / 1000)) / 86400);
+
+            if (s.expirada || dias < 0) {
+              elDias.textContent = "Expirada";
+              elDias.style.color = "var(--clr-danger)";
+            } else {
+              elDias.textContent = dias + (dias === 1 ? " dia" : " dias");
+              elDias.style.color = "var(--clr-text)";
+            }
+          }
+
+          if (box) box.style.display = "block";
+        }
+
+        btn.addEventListener("click", function () {
+          if (!window.licencaAPI || typeof window.licencaAPI.status !== "function") {
+            mostrarMsg("Informações de licença indisponíveis neste ambiente.");
+            return;
+          }
+          Promise.resolve(window.licencaAPI.status())
+            .then(mostrar)
+            .catch(function () {
+              mostrarMsg("Não foi possível consultar a validade agora.");
+            });
+        });
+
+        // Alterar minha chave: mostra o plano atual e o upgrade possível
+        // (JS/licenca-ui.js — LicencaGuarda.alterarChave).
+        var btnTroca = document.getElementById("btnAlterarChave");
+        if (btnTroca) {
+          btnTroca.addEventListener("click", function () {
+            if (!window.LicencaGuarda || typeof window.LicencaGuarda.alterarChave !== "function") {
+              mostrarMsg("Informações de licença indisponíveis neste ambiente.");
+              return;
+            }
+            window.LicencaGuarda.alterarChave();
+          });
+        }
+      })();
+    </script>
+
+    <!-- Tutorial interativo: controlador central (lista na Central de Ajuda) -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+  </body>
+</html>

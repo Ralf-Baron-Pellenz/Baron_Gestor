@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+  <title>Bapell Gestor Pro — Plataforma</title>
+  
+  <!-- CORREÇÃO 2: Padronizado para letras minúsculas (css/) -->
+  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="CSS/fonts.css" />
+  <link rel="stylesheet" href="CSS/tutorial.css" />
+  <!-- Adicionar pela Planilha (JS/importar-produtos.js) -->
+  <link rel="stylesheet" href="CSS/importar-produtos.css" />
+  <!-- Exportar para Planilha (JS/exportar-produtos.js) -->
+  <link rel="stylesheet" href="CSS/exportar-produtos.css" />
+  
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('precifiq_theme');
+        var temas = ['light', 'dark', 'midnight'];
+        document.documentElement.setAttribute(
+          'data-theme',
+          temas.indexOf(saved) >= 0 ? saved : 'dark'
+        );
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <!-- Senha nos botões (Usuários e Senhas): os botões escolhidos pedem
+       usuário e senha antes de agir. Sem data-modulo: esta tela não é um
+       módulo bloqueado, o arquivo só traz a proteção dos botões. -->
+  <script src="JS/senhas.js"></script>
+</head>
+<body class="plataforma-page">
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="main-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+      </a>
+      <div class="header-meta">
+        <span class="header-label" id="platformBreadcrumb">Plataforma</span>
+        <span class="header-dot"></span>
+        <span class="header-label" id="currentDate"></span>
+      </div>
+
+      <!-- SELETOR DE TEMA -->
+      <div class="theme-switcher-fixed" id="themeSwitcher">
+        <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ APP LAYOUT ═══ -->
+  <div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-section">
+        <button class="btn-home" onclick="window.location.href='index.html'">
+          ⌂ &nbsp;Voltar ao Início
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Plataformas</p>
+        <ul class="sidebar-nav" id="sidebarNav">
+          <!-- Preenchido via JS -->
+        </ul>
+      </div>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label" style="font-size:11px; color: var(--clr-text-3);">
+          Precificador v1.0
+        </p>
+      </div>
+
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header" id="pageHeader">
+        <div class="page-header-left">
+          <div class="page-platform-logo" id="platformLogoWrap">
+            <!-- CORREÇÃO 1: Adicionado um pixel transparente no src para evitar o erro de loop do navegador -->
+            <img id="platformLogoImg" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Logo Plataforma" />
+          </div>
+          <div>
+            <h1 class="page-title" id="pageTitle">Carregando…</h1>
+            <p class="page-subtitle" id="pageSubtitle">0 produtos cadastrados</p>
+          </div>
+        </div>
+
+        <!-- Gerenciar Imagens: no canto direito do cabeçalho da lista. Abre o
+             gerenciador com todas as imagens salvas no Bapell
+             (JS/gerenciador-imagens.js). -->
+        <button
+          type="button"
+          class="btn-secondary btn-gerenciar-imagens"
+          id="btnGerenciarImagens"
+          title="Ver, buscar, renomear e excluir as imagens salvas no Bapell"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          Gerenciar Imagens
+        </button>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input
+            type="text"
+            class="search-input"
+            id="searchInput"
+            placeholder="Buscar por nome, SKU ou ID…"
+            autocomplete="off"
+          />
+          <button id="btnClearSearch" class="search-clear" title="Limpar busca" style="display:none;">✕</button>
+        </div>
+
+        <!-- Botões lado a lado -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="btn-primary" id="btnNovoProduto">
+            + &nbsp;Criar Produto
+          </button>
+          <button class="btn-accent" id="btnCriarKit">
+            + &nbsp;Criar Kit
+          </button>
+          <!-- Opções Em Massa: mesma estrutura de menu do "Filtrar",
+               para os dois abrirem igual. -->
+          <div class="dropdown-wrap" id="massaDropdownWrap">
+            <button class="btn-secondary" id="btnClonarMassaTop" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Opções Em Massa
+            </button>
+            <div class="dropdown-menu" id="massaMenu" style="display:none;">
+              <div class="dropdown-title">Ações em massa</div>
+              <div class="ordenar-options" id="massaOptions">
+                <button class="ordenar-option" data-massa="clonar">Clonar em Massa</button>
+                <button class="ordenar-option" data-massa="duplicar">Duplicar em Massa</button>
+                <button class="ordenar-option massa-perigo" data-massa="excluir">Excluir em Massa</button>
+              </div>
+              <!-- Cadastro em massa pela planilha do Bling, do Mercado
+                   Livre ou de qualquer outra plataforma
+                   (JS/importar-produtos.js). Fica fora do
+                   #massaOptions: não entra no modo de seleção. -->
+              <div class="dropdown-sep"></div>
+              <div class="dropdown-title">Adicionar em massa</div>
+              <div class="ordenar-options">
+                <button class="ordenar-option" id="btnImportarPlanilha" type="button">Adicionar pela Planilha</button>
+              </div>
+              <!-- Os produtos desta plataforma numa planilha de qualquer sistema
+                   (JS/exportar-produtos.js). Também fora do #massaOptions. -->
+              <div class="dropdown-sep"></div>
+              <div class="dropdown-title">Exportar</div>
+              <div class="ordenar-options">
+                <button class="ordenar-option" id="btnExportarPlanilha" type="button">Exportar para Planilha</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botão Filtrar (dropdown) — agora inclui também a ordenação -->
+          <div class="dropdown-wrap" id="filtrarDropdownWrap">
+            <button class="btn-secondary" id="btnFiltrar" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              Filtrar
+            </button>
+            <div class="dropdown-menu" id="filtrarMenu" style="display:none;">
+              <!-- Tipos: dá para marcar mais de um, junto com a ordenação.
+                   O que ficar escolhido vira o padrão das listas. -->
+              <div class="dropdown-title">Tipo de produto</div>
+              <div class="dropdown-dica">Marque um ou mais tipos</div>
+              <div class="filter-chips" id="filterChips">
+                <button class="filter-chip active" data-filter="all" aria-pressed="true">Todos</button>
+                <button class="filter-chip" data-filter="simples" aria-pressed="false">Simples</button>
+                <button class="filter-chip" data-filter="kits" aria-pressed="false">Com Kits</button>
+                <button class="filter-chip" data-filter="compostos" aria-pressed="false">Compostos</button>
+              </div>
+              <!-- Divisória entre os filtros e a ordenação -->
+              <div class="dropdown-sep"></div>
+              <div class="dropdown-title">Ordenar por</div>
+              <div class="ordenar-options" id="ordenarOptions">
+                <button class="ordenar-option" data-sort="name_asc">Nome A→Z</button>
+                <button class="ordenar-option" data-sort="name_desc">Nome Z→A</button>
+                <button class="ordenar-option" data-sort="price_desc">Maior preço</button>
+                <button class="ordenar-option" data-sort="price_asc">Menor preço</button>
+                <button class="ordenar-option" data-sort="recent">Mais recente</button>
+                <button class="ordenar-option" data-sort="oldest">Mais antigos</button>
+              </div>
+              <div class="dropdown-sep"></div>
+              <button type="button" class="filtro-limpar" id="btnLimparFiltros">Limpar filtros</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Select oculto: mantém a lógica de ordenação existente -->
+      <select id="sortSelect" style="display:none;">
+        <option value="name_asc">Nome A→Z</option>
+        <option value="name_desc">Nome Z→A</option>
+        <option value="price_desc">Maior preço</option>
+        <option value="price_asc">Menor preço</option>
+        <option value="recent">Mais recente</option>
+        <option value="oldest">Mais antigos</option>
+      </select>
+
+      <!-- Product List -->
+<div class="selecao-massa-bar" id="selecaoMassaBar" style="display:none;">
+        <label class="selecao-massa-todos">
+          <input type="checkbox" id="selecaoTodos">
+          <span>Selecionar todos</span>
+        </label>
+        <span class="selecao-massa-conta" id="selecaoConta">0 selecionados</span>
+        <span class="selecao-massa-acoes">
+          <button class="btn-secondary" id="btnCancelarSelecao" type="button">Cancelar</button>
+          <button class="btn-primary" id="btnClonarSelecionados" type="button" disabled>Clonar selecionados</button>
+          <button class="btn-primary" id="btnDuplicarSelecionados" type="button" disabled style="display:none;">Duplicar selecionados</button>
+          <button class="btn-danger" id="btnExcluirSelecionados" type="button" disabled style="display:none;">Excluir selecionados</button>
+        </span>
+      </div>
+            <div class="product-list" id="productList">
+        <!-- Preenchido via JS -->
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- CORREÇÃO 2: Padronizado para letras minúsculas (js/) -->
+
+  <script src="JS/licenca-ui.js"></script>
+  <script src="JS/error-handler.js"></script>
+  <script src="JS/utils.js"></script>
+  <script src="JS/theme.js"></script>
+  <script src="JS/imagestore.js"></script>
+  <!-- A lista recalcula o preço Premium/Clássico do Mercado Livre com a
+       MESMA função da tela de cadastro. Sem este script, os dois preços
+       não aparecem (a lista cai no preço único, sem quebrar nada). -->
+  <script src="JS/calculadora.js"></script>
+  <script src="JS/plataforma.js"></script>
+  <script src="JS/paginacao.js"></script>
+  <!-- Gerenciar Imagens (botão no cabeçalho da lista) -->
+  <script src="JS/gerenciador-imagens.js"></script>
+  <!-- Adicionar pela Planilha (menu Opções Em Massa) -->
+  <script src="JS/importar-produtos.js"></script>
+  <!-- Exportar para Planilha (menu Opções Em Massa; usa as funções do importar-produtos.js) -->
+  <script src="JS/exportar-produtos.js"></script>
+
+  <!-- Tutorial interativo: controlador central + passos desta tela -->
+  <script src="JS/tutoriais/tutorial_core.js"></script>
+  <script src="JS/tutoriais/tutorial_plataforma.js"></script>
+</body>
+</html>

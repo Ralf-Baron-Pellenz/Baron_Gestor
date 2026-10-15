@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme") || "dark";
+          document.documentElement.setAttribute("data-theme", saved);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <!-- Senhas: a casca abre UMA vez por abertura do app — é aqui que a
+         senha do colaborador é renovada, quando essa opção está ligada. -->
+    <script src="JS/senhas.js"></script>
+    <style>
+      html, body { margin: 0; height: 100vh; overflow: hidden; }
+      body {
+        display: flex;
+        flex-direction: column;
+        background: var(--clr-bg, #0f1420);
+        font-family: "DM Sans", system-ui, sans-serif;
+      }
+
+      .tabbar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+        height: 42px;
+        padding: 0 8px;
+        background: var(--clr-surface-alt, #161b26);
+        border-bottom: 1px solid var(--clr-border, #262d3a);
+      }
+      /* Como no Chrome/Edge: as abas crescem para a direita e o botão "+"
+         vem logo depois da última. A faixa só ocupa o que as abas precisam
+         (flex 0 1 auto); faltando espaço, as abas encolhem por igual até a
+         largura mínima e, dali em diante, a faixa rola (roda do mouse),
+         com o "+" sempre visível no fim. */
+      .tabs {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        flex: 0 1 auto;
+        min-width: 0;
+        height: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      .tabs::-webkit-scrollbar { height: 0; }
+
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 1 auto;
+        width: 220px;
+        height: 30px;
+        max-width: 220px;
+        min-width: 118px;
+        padding: 0 6px 0 12px;
+        background: var(--clr-surface, #1b2130);
+        border: 1px solid var(--clr-border, #262d3a);
+        border-radius: 9px;
+        cursor: pointer;
+        color: var(--clr-text-2, #aeb6c6);
+        font-size: 12.5px;
+        user-select: none;
+        transition: background 0.12s ease, color 0.12s ease;
+      }
+      .tab:hover { background: var(--clr-surface-2, #212838); }
+      .tab.active {
+        background: var(--clr-primary, #3b82f6);
+        border-color: var(--clr-primary, #3b82f6);
+        color: #fff;
+      }
+      .tab-pin { display: none; align-items: center; flex-shrink: 0; opacity: 0.85; }
+      .tab-pin svg { width: 12px; height: 12px; }
+      .tab.fixada { flex: 0 0 auto; width: auto; min-width: 0; max-width: 150px; padding: 0 12px; }
+      .tab.fixada .tab-pin { display: flex; }
+      .tab.fixada .tab-close { display: none; }
+
+      .tab-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .tab-close {
+        display: flex; align-items: center; justify-content: center;
+        width: 18px; height: 18px; border-radius: 6px; flex-shrink: 0; opacity: 0.7;
+      }
+      .tab-close:hover { background: rgba(255, 255, 255, 0.22); opacity: 1; }
+      .tab-close svg { width: 11px; height: 11px; }
+
+      .tab-add {
+        display: flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px; flex-shrink: 0;
+        background: transparent; border: none; border-radius: 8px;
+        color: var(--clr-text-2, #aeb6c6); cursor: pointer; font-size: 20px; line-height: 1;
+      }
+      .tab-add:hover { background: var(--clr-surface, #1b2130); color: var(--clr-text, #fff); }
+
+      .views { flex: 1; position: relative; background: var(--clr-bg, #0f1420); }
+      .views iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: none; }
+      .views iframe.ativa { display: block; }
+
+      .ctxmenu {
+        position: fixed; z-index: 9999; min-width: 178px;
+        background: var(--clr-surface, #1b2130);
+        border: 1px solid var(--clr-border, #262d3a);
+        border-radius: 10px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        padding: 5px; display: none;
+      }
+      .ctxmenu.aberto { display: block; }
+      .ctxmenu button {
+        display: block; width: 100%; text-align: left; background: transparent; border: none;
+        color: var(--clr-text, #e6eaf2); font-family: inherit; font-size: 13px;
+        padding: 8px 11px; border-radius: 7px; cursor: pointer;
+      }
+      .ctxmenu button:hover { background: var(--clr-surface-alt, #161b26); }
+      .ctxmenu button.danger:hover { color: var(--clr-danger, #ef4444); }
+      .ctxmenu .sep { height: 1px; background: var(--clr-border, #262d3a); margin: 4px 2px; }
+    </style>
+  </head>
+  <body>
+    <div class="tabbar">
+      <div class="tabs" id="tabs"></div>
+      <button class="tab-add" id="tabAdd" title="Nova aba (Dashboard)">+</button>
+    </div>
+    <div class="views" id="views"></div>
+
+    <!-- Menu do botão direito nas ABAS -->
+    <div class="ctxmenu" id="ctxTab">
+      <button data-a="fixar">Fixar aba</button>
+      <button data-a="duplicar">Duplicar</button>
+      <button data-a="fechar">Fechar</button>
+      <div class="sep"></div>
+      <button data-a="fechar-outras" class="danger">Fechar as outras</button>
+    </div>
+
+    <!-- Menu do botão direito nos ITENS DO ASIDE -->
+    <div class="ctxmenu" id="ctxAside">
+      <button data-a="nova">Abrir em nova aba</button>
+      <button data-a="nova-fixa">Abrir em nova aba fixada</button>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var PADRAO = "index.html";
+        var LS_FIX = "precifiq_abas_fixadas";
+        var tabs = [];
+        var ativa = null;
+        var seq = 0;
+        var ctxTabAlvo = null;
+        var ctxAsideUrl = null;
+
+        var elTabs = document.getElementById("tabs");
+        var elViews = document.getElementById("views");
+        var elCtxTab = document.getElementById("ctxTab");
+        var elCtxAside = document.getElementById("ctxAside");
+
+        function svgX() {
+          return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
+        }
+        function svgPin() {
+          return '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 4v5l2 3v2h-4v5l-1 1-1-1v-5H6v-2l2-3V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1z"/></svg>';
+        }
+
+        // ── Tema da moldura (barra de abas) ──
+        // A barra vive aqui no shell; as telas vivem em iframes. Ao trocar o
+        // tema dentro de uma tela, a moldura não mudava sozinha. Estas duas
+        // funções mantêm a barra coerente com o tema escolhido.
+        function temaSalvo() {
+          try { return localStorage.getItem("precifiq_theme") || "dark"; }
+          catch (e) { return "dark"; }
+        }
+        function sincronizarTema() {
+          document.documentElement.setAttribute("data-theme", temaSalvo());
+        }
+        // Troca de tema numa aba dispara o evento "storage" nas OUTRAS janelas
+        // (incluindo esta moldura). É o que faz a barra mudar na hora, sem
+        // precisar recarregar nada.
+        window.addEventListener("storage", function (e) {
+          if (e.key === "precifiq_theme") sincronizarTema();
+        });
+        // Rede de segurança: se o evento "storage" não vier do iframe (o
+        // comportamento varia entre navegadores), uma verificação leve a cada
+        // segundo garante que a barra reflita a troca de tema quase de imediato,
+        // sem precisar trocar de aba. Só toca no DOM quando o tema realmente muda.
+        var _temaAtual = temaSalvo();
+        setInterval(function () {
+          var t = temaSalvo();
+          if (t !== _temaAtual) { _temaAtual = t; sincronizarTema(); }
+        }, 1000);
+
+        function tituloDeUrl(url) {
+          var base = (url || "").split("?")[0].split("/").pop();
+          var mapa = {
+            "index.html": "Dashboard", "acoes-massa.html": "Ações em Massa",
+            "empresa.html": "Dados da Empresa", "vendas.html": "Informações de Venda",
+            "financeiro.html": "Controle Financeiro", "nf.html": "Notas Fiscais",
+            "ean.html": "Gerador de EAN", "lembretes.html": "Lembretes",
+            "ajuda.html": "Ajuda", "plataforma.html": "Plataforma", "produto.html": "Produto",
+            "registro-vendas.html": "Registro de Vendas", "clientes.html": "Clientes",
+            "calculos.html": "Central de Cálculos", "usuarios.html": "Usuários e Senhas",
+            "devolucoes.html": "Gestor de Devoluções",
+          };
+          return mapa[base] || "Bapell";
+        }
+        function encurtar(t) {
+          if (!t) return "";
+          var i = t.indexOf("—");
+          return (i >= 0 ? t.slice(i + 1) : t).trim();
+        }
+        function nomeArquivo(reg) {
+          try {
+            var loc = reg.iframe.contentWindow.location;
+            var busca = loc.search || "";
+            // Os parâmetros de passagem — abrir a ficha de um lembrete (ver),
+            // voltar para a aba de origem (aba) — não ficam guardados com a
+            // aba fixada: no próximo início eles não valem mais.
+            if (busca) {
+              var p = new URLSearchParams(busca);
+              p.delete("ver");
+              p.delete("aba");
+              busca = p.toString() ? "?" + p.toString() : "";
+            }
+            return loc.pathname.split("/").pop() + busca;
+          } catch (e) { return reg.url; }
+        }
+
+        function salvarFixadas() {
+          var urls = tabs.filter(function (t) { return t.fixada; }).map(nomeArquivo);
+          try { localStorage.setItem(LS_FIX, JSON.stringify(urls)); } catch (e) {}
+        }
+
+        function reordenar() {
+          var fix = tabs.filter(function (t) { return t.fixada; });
+          var rest = tabs.filter(function (t) { return !t.fixada; });
+          tabs = fix.concat(rest);
+          tabs.forEach(function (t) { elTabs.appendChild(t.tabEl); });
+        }
+
+        function novaAba(url, ativarAgora, fixar) {
+          url = url || PADRAO;
+          var id = "t" + ++seq;
+
+          var iframe = document.createElement("iframe");
+          iframe.src = url;
+          iframe.dataset.id = id;
+          elViews.appendChild(iframe);
+
+          var tabEl = document.createElement("div");
+          tabEl.className = "tab" + (fixar ? " fixada" : "");
+          tabEl.dataset.id = id;
+          var pinEl = document.createElement("span");
+          pinEl.className = "tab-pin";
+          pinEl.innerHTML = svgPin();
+          var titleEl = document.createElement("span");
+          titleEl.className = "tab-title";
+          titleEl.textContent = tituloDeUrl(url);
+          var closeEl = document.createElement("span");
+          closeEl.className = "tab-close";
+          closeEl.innerHTML = svgX();
+          tabEl.appendChild(pinEl);
+          tabEl.appendChild(titleEl);
+          tabEl.appendChild(closeEl);
+          elTabs.appendChild(tabEl);
+
+          var reg = { id: id, url: url, fixada: !!fixar, tabEl: tabEl, titleEl: titleEl, iframe: iframe, carregada: false };
+          tabs.push(reg);
+
+          iframe.addEventListener("load", function () {
+            reg.carregada = true;
+            // A aba ativa recebe o foco só agora: focar o iframe enquanto
+            // ele ainda está no documento vazio inicial impedia o preload de
+            // rodar na tela (licencaAPI, lembretesAPI… ficavam undefined).
+            if (ativa === reg.id) { try { iframe.contentWindow.focus(); } catch (e) {} }
+            try {
+              var t = encurtar(iframe.contentDocument.title);
+              reg.url = iframe.contentWindow.location.href;
+              titleEl.textContent = t || tituloDeUrl(reg.url);
+              tabEl.title = titleEl.textContent;
+              injetarAside(iframe);
+              // A moldura (barra de abas) precisa acompanhar o tema escolhido
+              // dentro das telas. Cada aba que carrega reaplica o tema salvo na
+              // moldura, então trocar o tema numa tela e abrir/recarregar
+              // qualquer aba já deixa a barra coerente.
+              sincronizarTema();
+            } catch (e) {
+              titleEl.textContent = tituloDeUrl(reg.url);
+            }
+            if (reg.fixada) salvarFixadas();
+          });
+
+          tabEl.addEventListener("mousedown", function (e) {
+            if (e.button === 1) { e.preventDefault(); if (!reg.fixada) fechar(id); return; }
+            if (e.target.closest(".tab-close")) return;
+            if (e.button === 0) ativar(id);
+          });
+          closeEl.addEventListener("click", function (e) { e.stopPropagation(); fechar(id); });
+          tabEl.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+            abrirCtxTab(id, e.clientX, e.clientY);
+          });
+
+          if (fixar) reordenar();
+          if (ativarAgora !== false) ativar(id);
+          return id;
+        }
+
+        function ativar(id) {
+          ativa = id;
+          tabs.forEach(function (r) {
+            var on = r.id === id;
+            r.tabEl.classList.toggle("active", on);
+            r.iframe.classList.toggle("ativa", on);
+            // Ainda carregando: o foco vem no "load" (ver novaAba).
+            if (on && r.carregada) { try { r.iframe.contentWindow.focus(); } catch (e) {} }
+            if (on) mostrarAba(r.tabEl);
+          });
+          // Reforço: o evento "storage" nem sempre chega do iframe para a
+          // moldura (varia por navegador). Ao trocar de aba relemos o tema,
+          // garantindo que a barra fique coerente mesmo se o evento falhou.
+          sincronizarTema();
+        }
+
+        function fechar(id) {
+          var idx = tabs.findIndex(function (r) { return r.id === id; });
+          if (idx < 0) return;
+          var reg = tabs[idx];
+          var eraFixada = reg.fixada;
+          reg.tabEl.remove();
+          reg.iframe.remove();
+          tabs.splice(idx, 1);
+          if (eraFixada) salvarFixadas();
+          if (!tabs.length) { novaAba(PADRAO); return; }
+          if (ativa === id) ativar(tabs[Math.min(idx, tabs.length - 1)].id);
+        }
+
+        function duplicar(id) {
+          var reg = tabs.find(function (r) { return r.id === id; });
+          if (!reg) return;
+          var url = reg.url;
+          try { url = reg.iframe.contentWindow.location.href; } catch (e) {}
+          novaAba(url, true, false);
+        }
+
+        function fecharOutras(id) {
+          tabs.slice().forEach(function (r) {
+            if (r.id !== id && !r.fixada) fechar(r.id);
+          });
+          ativar(id);
+        }
+
+        function alternarFixar(id) {
+          var reg = tabs.find(function (r) { return r.id === id; });
+          if (!reg) return;
+          reg.fixada = !reg.fixada;
+          reg.tabEl.classList.toggle("fixada", reg.fixada);
+          reg.tabEl.title = reg.titleEl.textContent;
+          reordenar();
+          salvarFixadas();
+        }
+
+        // ── Menus de contexto ──
+        function abrirCtxTab(id, x, y) {
+          fecharCtx();
+          ctxTabAlvo = id;
+          var reg = tabs.find(function (r) { return r.id === id; });
+          elCtxTab.querySelector('[data-a="fixar"]').textContent = (reg && reg.fixada) ? "Desafixar aba" : "Fixar aba";
+          posCtx(elCtxTab, x, y);
+        }
+        function abrirCtxAside(url, x, y) {
+          fecharCtx();
+          ctxAsideUrl = url;
+          posCtx(elCtxAside, x, y);
+        }
+        function posCtx(el, x, y) {
+          el.style.left = Math.min(x, window.innerWidth - 190) + "px";
+          el.style.top = Math.min(y, window.innerHeight - 120) + "px";
+          el.classList.add("aberto");
+        }
+        function fecharCtx() {
+          elCtxTab.classList.remove("aberto");
+          elCtxAside.classList.remove("aberto");
+          ctxTabAlvo = null; ctxAsideUrl = null;
+        }
+
+        elCtxTab.addEventListener("click", function (e) {
+          var b = e.target.closest("button"); if (!b || !ctxTabAlvo) return;
+          var a = b.dataset.a, alvo = ctxTabAlvo;
+          fecharCtx();
+          if (a === "fixar") alternarFixar(alvo);
+          else if (a === "duplicar") duplicar(alvo);
+          else if (a === "fechar") fechar(alvo);
+          else if (a === "fechar-outras") fecharOutras(alvo);
+        });
+        elCtxAside.addEventListener("click", function (e) {
+          var b = e.target.closest("button"); if (!b || !ctxAsideUrl) return;
+          var a = b.dataset.a, url = ctxAsideUrl;
+          fecharCtx();
+          if (a === "nova") novaAba(url, false, false);
+          else if (a === "nova-fixa") novaAba(url, false, true);
+        });
+        document.addEventListener("click", function (e) { if (!e.target.closest(".ctxmenu")) fecharCtx(); });
+        window.addEventListener("blur", fecharCtx);
+
+        document.getElementById("tabAdd").addEventListener("click", function () { novaAba(PADRAO, true, false); });
+
+        // Com muitas abas a faixa rola: a aba ativa sempre fica à vista…
+        function mostrarAba(tabEl) {
+          try {
+            var faixa = elTabs.getBoundingClientRect();
+            var aba = tabEl.getBoundingClientRect();
+            if (aba.left < faixa.left) elTabs.scrollLeft -= (faixa.left - aba.left) + 6;
+            else if (aba.right > faixa.right) elTabs.scrollLeft += (aba.right - faixa.right) + 6;
+          } catch (e) {}
+        }
+        // …e a roda do mouse sobre as abas rola para os lados.
+        elTabs.addEventListener("wheel", function (e) {
+          if (elTabs.scrollWidth <= elTabs.clientWidth) return;
+          var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          if (!d) return;
+          e.preventDefault();
+          elTabs.scrollLeft += d;
+        }, { passive: false });
+
+        // ── Itens do ASIDE (menu lateral) das telas: abrir em nova aba ──
+        //
+        // Igual a um navegador, em todos os módulos e plataformas:
+        //   · botão direito      → menu "Abrir em nova aba" / "… fixada";
+        //   · botão do meio      → nova aba em segundo plano;
+        //   · Ctrl + clique      → nova aba em segundo plano;
+        //   · Shift junto        → a aba nova já abre na frente.
+        // O clique normal não é tocado: continua abrindo na mesma aba.
+        //
+        // ── POR DELEGAÇÃO ──────────────────────────────────────────────
+        // Antes, cada botão .sidebar-item-btn recebia seus ouvintes quando a
+        // aba carregava. Ficavam de fora: os links das plataformas (que são
+        // <a class="sidebar-item">), tudo que o JS monta depois do
+        // carregamento e o Ctrl+Clique. Agora um ouvinte só, no documento da
+        // aba (fase de captura), descobre na hora qual item está sob o
+        // ponteiro — vale para o que existir no menu, quando existir.
+        var SELETOR_ASIDE = "aside, .sidebar, #sidebar";
+
+        // Endereço de destino de um item. Aceita, nesta ordem: data-href,
+        // <a href="….html"> e onclick="window.location.href='….html'".
+        // Item sem endereço (Recolher menu, Adicionar Seção, lista de
+        // empresas…) não troca de tela e fica com o comportamento de sempre.
+        function urlDoItem(el) {
+          if (!el || !el.getAttribute) return null;
+          var dh = el.getAttribute("data-href");
+          if (dh && /\.html/.test(dh)) return dh;
+          var a = (el.tagName === "A") ? el : el.closest("a");
+          if (a && a.getAttribute("href")) {
+            var h = a.getAttribute("href");
+            if (/\.html/.test(h) && !/^(https?:|mailto:|javascript:)/i.test(h)) return h;
+          }
+          var oc = el.getAttribute("onclick") || "";
+          var m = oc.match(/location\.href\s*=\s*['"]([^'"]+\.html[^'"]*)['"]/);
+          return m ? m[1] : null;
+        }
+
+        // O item navegável do menu lateral sob o ponteiro (ou null).
+        function itemDoAside(alvo, doc) {
+          if (!alvo || !alvo.closest) return null;
+          var aside = alvo.closest(SELETOR_ASIDE);
+          if (!aside) return null;
+          var el = alvo.closest("[data-href], a[href], [onclick]");
+          if (!el || !aside.contains(el)) return null;
+          var url = urlDoItem(el);
+          if (!url) return null;
+          // Endereço completo, resolvido a partir da própria tela.
+          try { url = new URL(url, doc.baseURI).href; } catch (e) {}
+          return { el: el, url: url };
+        }
+
+        function injetarAside(iframe) {
+          var doc = iframe.contentDocument;
+          if (!doc) return;
+          // Fecha o menu de contexto quando a pessoa clica em qualquer lugar
+          // DENTRO da tela do módulo (o iframe). Sem isto, o menu só fechava ao
+          // clicar na barra de abas (que é do shell); cliques na tela do módulo
+          // não chegam ao document do shell e o menu ficava preso aberto.
+          if (!doc.__fechaCtx) {
+            doc.__fechaCtx = true;
+            doc.addEventListener("mousedown", function (e) {
+              // Botão direito é quem ABRE o menu; não deve fechá-lo no mesmo gesto.
+              if (e.button === 2) return;
+              fecharCtx();
+            });
+            // Esc e rolagem dentro da tela também fecham, como no navegador.
+            doc.addEventListener("keydown", function (e) { if (e.key === "Escape") fecharCtx(); });
+            doc.addEventListener("scroll", function () { fecharCtx(); }, true);
+          }
+          if (doc.__abasAside) return;
+          doc.__abasAside = true;
+
+          // Botão do meio: sem isto, o navegador liga a rolagem automática.
+          doc.addEventListener("mousedown", function (e) {
+            if (e.button === 1 && itemDoAside(e.target, doc)) e.preventDefault();
+          }, true);
+
+          // Botão do meio → nova aba.
+          doc.addEventListener("auxclick", function (e) {
+            if (e.button !== 1) return;
+            var it = itemDoAside(e.target, doc);
+            if (!it) return;
+            e.preventDefault();
+            e.stopPropagation();
+            novaAba(it.url, !!e.shiftKey, false);
+          }, true);
+
+          // Ctrl + clique (⌘ no Mac) e Shift + clique → nova aba. Na captura,
+          // antes do onclick do item: parar aqui impede a tela atual de
+          // navegar junto.
+          doc.addEventListener("click", function (e) {
+            if (e.button !== 0 || !(e.ctrlKey || e.metaKey || e.shiftKey)) return;
+            var it = itemDoAside(e.target, doc);
+            if (!it) return;
+            e.preventDefault();
+            e.stopPropagation();
+            novaAba(it.url, !!e.shiftKey, false);
+          }, true);
+
+          // Botão direito → menu "Abrir em nova aba".
+          doc.addEventListener("contextmenu", function (e) {
+            var it = itemDoAside(e.target, doc);
+            if (!it) { fecharCtx(); return; }
+            e.preventDefault();
+            e.stopPropagation();
+            var r = iframe.getBoundingClientRect();
+            abrirCtxAside(it.url, e.clientX + r.left, e.clientY + r.top);
+          }, true);
+        }
+
+        // ── Para as telas abrirem e fecharem abas ──
+        // Uma tela que manda cadastrar um usuário abre o cadastro numa aba
+        // nova (o formulário dela continua preenchido); o "Voltar" do
+        // cadastro fecha a aba nova e volta para a de origem.
+        window.BapellAbas = {
+          abrir: function (url) { return novaAba(url, true, false); },
+          existe: function (id) { return tabs.some(function (r) { return r.id === id; }); },
+          ativar: function (id) { if (tabs.some(function (r) { return r.id === id; })) ativar(id); },
+          idDe: function (janela) {
+            var reg = tabs.find(function (r) {
+              try { return r.iframe.contentWindow === janela; } catch (e) { return false; }
+            });
+            return reg ? reg.id : null;
+          },
+          fechar: function (id, ativarDepois) {
+            var volta = ativarDepois && tabs.some(function (r) { return r.id === ativarDepois; }) ? ativarDepois : null;
+            if (id) fechar(id);
+            if (volta) ativar(volta);
+          },
+        };
+
+        // Notificação de lembrete → abre/foca a aba de Lembretes. Pode vir
+        // com ?ver=<id>: aí abre também a ficha daquele lembrete — na aba que
+        // já estiver aberta (sem recarregar) ou numa aba nova.
+        if (window.shellAPI && window.shellAPI.onAbrirAba) {
+          window.shellAPI.onAbrirAba(function (url) {
+            var base = String(url || "").split("?")[0];
+            var verId = "";
+            try { verId = new URLSearchParams(String(url || "").split("?")[1] || "").get("ver") || ""; } catch (e) {}
+            var existente = tabs.find(function (r) {
+              try { return r.iframe.contentWindow.location.pathname.endsWith(base); } catch (e) { return false; }
+            });
+            if (!existente) { novaAba(url, true, false); return; }
+            ativar(existente.id);
+            if (!verId) return;
+            try {
+              var tela = existente.iframe.contentWindow;
+              if (tela.BapellLembretes && typeof tela.BapellLembretes.abrir === "function") {
+                tela.BapellLembretes.abrir(verId);
+                return;
+              }
+            } catch (e) {}
+            existente.iframe.src = url;
+          });
+        }
+
+        // ── Dica de fixar na barra de tarefas (primeira execução) ──
+        // Uma janela do próprio app, no tema dele, no lugar da caixa de
+        // mensagem do Windows. O processo principal diz se é a primeira vez.
+        function mostrarDicaFixar() {
+          if (document.getElementById("dicaFixar")) return;
+          var fundo = document.createElement("div");
+          fundo.className = "modal-overlay bm-overlay";
+          fundo.id = "dicaFixar";
+          fundo.setAttribute("role", "dialog");
+          fundo.setAttribute("aria-modal", "true");
+          fundo.setAttribute("aria-labelledby", "dicaFixarTitulo");
+          fundo.innerHTML =
+            '<div class="modal bm-modal bm-modal--info">' +
+              '<div class="bm-topo">' +
+                '<span class="bm-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 4v5l2 3v2h-4v5l-1 1-1-1v-5H6v-2l2-3V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1z"/></svg></span>' +
+                '<div class="modal-title bm-titulo" id="dicaFixarTitulo">Deixe o Bapell sempre à mão</div>' +
+              "</div>" +
+              '<div class="modal-subtitle bm-texto">' +
+                "<p><strong>Quer abrir o Bapell Gestor Pro com um clique?</strong> Deixe o atalho fixo na barra de tarefas do Windows:</p>" +
+                "<p>1. Localize o ícone do Bapell na barra de tarefas (embaixo).<br>" +
+                "2. Clique nele com o botão direito.<br>" +
+                "3. Escolha <strong>Fixar na barra de tarefas</strong>.</p>" +
+                "<p>Pronto! O ícone fica fixo mesmo depois de fechar o programa.</p>" +
+              "</div>" +
+              '<div class="modal-actions bm-acoes"><button type="button" class="btn-primary" id="dicaFixarOk">Entendi</button></div>' +
+            "</div>";
+          document.body.appendChild(fundo);
+          function fechar() {
+            document.removeEventListener("keydown", tecla, true);
+            fundo.remove();
+            try { window.shellAPI.dicaFixarVista(); } catch (e) {}
+          }
+          function tecla(e) { if (e.key === "Escape" || e.key === "Enter") { e.preventDefault(); fechar(); } }
+          document.addEventListener("keydown", tecla, true);
+          fundo.querySelector("#dicaFixarOk").addEventListener("click", fechar);
+          setTimeout(function () { try { fundo.querySelector("#dicaFixarOk").focus(); } catch (e) {} }, 40);
+        }
+        if (window.shellAPI && typeof window.shellAPI.dicaFixar === "function") {
+          Promise.resolve(window.shellAPI.dicaFixar()).then(function (mostrar) {
+            // Um pequeno atraso para a janela e o ícone já estarem visíveis.
+            if (mostrar) setTimeout(mostrarDicaFixar, 1500);
+          }, function () {});
+        }
+
+        // ── Início: restaura abas fixadas, senão abre Dashboard ──
+        (function iniciar() {
+          // Senha do colaborador: com a opção "gerar a cada abertura" ligada,
+          // uma nova é criada aqui — ANTES das abas, para todas já nascerem
+          // com ela. O senhas.js garante uma vez só por abertura do app.
+          try {
+            if (window.BapellSenhas && typeof window.BapellSenhas.renovarAoAbrir === "function") {
+              window.BapellSenhas.renovarAoAbrir();
+            }
+          } catch (e) {}
+
+          var fix = [];
+          try { fix = JSON.parse(localStorage.getItem(LS_FIX)) || []; } catch (e) {}
+          fix.forEach(function (u) { if (u) novaAba(u, false, true); });
+          if (!tabs.length) novaAba(PADRAO, true, false);
+          else ativar(tabs[0].id);
+        })();
+      })();
+    </script>
+  </body>
+</html>

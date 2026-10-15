@@ -1,0 +1,229 @@
+/* ═══════════════════════════════════════════
+   Precificador — Gerador de EAN
+   Usa as variáveis de tema do style.css
+   ═══════════════════════════════════════════ */
+
+/* ── Empresas no menu lateral ── */
+.empresa-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px !important;
+  width: 100%;
+  padding: 8px 10px !important;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  /* CORREÇÃO: Transições apenas de cor. Dimensões travadas para evitar pulos verticais */
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  flex-wrap: nowrap !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+}
+.empresa-item-btn:hover {
+  background: var(--clr-surface-alt);
+  border-color: var(--clr-border);
+}
+.empresa-item-btn.ativa {
+  background: var(--clr-primary-lt);
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+}
+.empresa-item-nome {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Menu colapsado: só a logo, centralizada */
+.sidebar-colapsada .empresa-item-btn {
+  justify-content: center !important;
+  padding: 8px 0 !important;
+  gap: 0 !important;
+}
+/* Esconde o texto da empresa ao recolher para não descer os elementos */
+.sidebar-colapsada .empresa-item-btn .empresa-item-nome {
+  display: none !important;
+}
+
+/* ── Formulário de geração ── */
+.ean-form {
+  display: grid;
+  grid-template-columns: 1.5fr 1.2fr auto;
+  gap: 12px;
+  align-items: end;
+}
+.ean-form .btn-primary {
+  height: 44px;
+  padding: 0 20px;
+  white-space: nowrap;
+}
+.ean-form input[readonly] {
+  background: var(--clr-surface-alt);
+  color: var(--clr-text-2);
+  cursor: not-allowed;
+}
+@media (max-width: 900px) {
+  .ean-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Avisos ── */
+.ean-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 13px;
+  border-radius: var(--r-sm);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.ean-aviso svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ean-aviso-info {
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-2);
+}
+.ean-aviso-erro {
+  background: var(--clr-danger-lt);
+  border: 1px solid var(--clr-danger);
+  color: var(--clr-text);
+  margin-bottom: 14px;
+}
+
+/* ── Tabela de códigos ── */
+.ean-table-wrap {
+  overflow-x: auto;
+}
+.ean-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ean-table th,
+.ean-table td {
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--clr-border);
+  font-size: 13px;
+  color: var(--clr-text);
+}
+.ean-table th {
+  color: var(--clr-text-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.ean-table tbody tr:hover {
+  background: var(--clr-surface-alt);
+}
+.ean-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Botão copiar ── */
+.btn-copiar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-2);
+  border-radius: var(--r-sm);
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.btn-copiar:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+
+/* ── Menu de 3 pontinhos ── */
+.ean-menu-btn {
+  background: transparent;
+  border: none;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+.ean-menu-btn:hover {
+  background: var(--clr-surface-alt);
+  color: var(--clr-primary);
+}
+/* Menu suspenso: position fixed (o JS calcula a posição).
+   Absoluto seria recortado pelo overflow da tabela e do modal. */
+.ean-menu-drop {
+  position: fixed;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10050; /* acima dos modais (10002) */
+  min-width: 150px;
+  overflow: hidden;
+}
+.ean-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--clr-text);
+  cursor: pointer;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.ean-menu-item:hover {
+  background: var(--clr-surface-alt);
+}
+.ean-menu-item.danger {
+  color: var(--clr-danger);
+}
+
+/* ── Linhas do modal de ocultos ── */
+.oculto-linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
+}
+.oculto-linha:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Voltar e Ajuda centralizados quando o menu está aberto ── */
+.sidebar-voltar-sep .sidebar-item-btn,
+.sidebar-footer-index .sidebar-item-btn {
+  justify-content: center;
+}

@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Registro de Vendas</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/registro-vendas.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <!-- Datepicker embutido: o calendário fica bonito E escondido até clicar,
+         independente de o arquivo CSS/datepicker.css estar presente -->
+    <style>
+      .dtp-wrap { position: relative; display: inline-block; }
+      .dtp-field {
+        display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
+        text-align: left; cursor: pointer; font-family: inherit;
+        background: var(--clr-bg, rgba(0,0,0,0.15)); border: 1px solid var(--clr-border);
+        color: var(--clr-text); border-radius: var(--r-sm, 8px); padding: 9px 11px; font-size: 14px;
+      }
+      .dtp-field .dtp-label { flex: 1; white-space: nowrap; }
+      .dtp-field .dtp-label.vazio { color: var(--clr-text-3); }
+      .dtp-field svg { color: var(--clr-text-3); flex-shrink: 0; }
+      .dtp-field:hover { border-color: var(--clr-primary); }
+      .rv-filters .dtp-wrap, .rv-filters .dtp-field { width: 100%; }
+      .rv-field .dtp-wrap { width: 100%; display: block; }
+      .rv-field .dtp-field { width: 100%; }
+      .dtp-pop {
+        position: absolute; top: calc(100% + 6px); left: 0; z-index: 200; width: 268px;
+        background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: 14px;
+        box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45); padding: 14px; display: none;
+      }
+      .dtp-pop.aberto { display: block; }
+      .dtp-pop.acima { top: auto; bottom: calc(100% + 6px); }
+      .dtp-pop.direita { left: auto; right: 0; }
+      .dtp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+      .dtp-tit { font-family: "Sora", sans-serif; font-size: 14px; font-weight: 700; color: var(--clr-text); text-transform: capitalize; }
+      .dtp-nav { width: 30px; height: 30px; border-radius: 8px; background: var(--clr-surface-alt); border: 1px solid var(--clr-border); color: var(--clr-text-2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+      .dtp-nav:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
+      .dtp-dows { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 4px; }
+      .dtp-dows span { text-align: center; font-size: 10.5px; font-weight: 700; color: var(--clr-text-3); padding: 4px 0; }
+      .dtp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+      .dtp-day { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--clr-text-2); font-family: inherit; font-size: 13px; border-radius: 8px; cursor: pointer; }
+      .dtp-day:hover { background: var(--clr-surface-alt); }
+      .dtp-day.vazio { visibility: hidden; cursor: default; }
+      .dtp-day.hoje { outline: 1px solid var(--clr-primary); outline-offset: -1px; color: var(--clr-primary); font-weight: 700; }
+      .dtp-day.sel { background: var(--clr-primary); color: #fff; font-weight: 700; }
+      .dtp-foot { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--clr-border); }
+      .dtp-foot button { flex: 1; background: var(--clr-surface-alt); border: 1px solid var(--clr-border); color: var(--clr-text-2); font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 10px; border-radius: 8px; cursor: pointer; }
+      .dtp-foot button:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
+    </style>
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute("data-theme", temas.indexOf(saved) >= 0 ? saved : "dark");
+        } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+      })();
+    </script>
+    <!-- Senha de acesso (Administrador ou Colaborador), se este módulo
+         estiver bloqueado em Dados da Empresa › Usuários e Senhas. No
+         <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-modulo="registro-vendas"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Registro de Vendas</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button class="sidebar-item-btn" onclick="window.location.href='index.html'" title="Voltar">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section" style="flex:1; display:flex; flex-direction:column; gap:8px;">
+          <button class="sidebar-item-btn" onclick="window.location.href='produto.html'" title="Produtos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></span>
+            <span class="sidebar-label-txt">Produtos</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='vendas.html'" title="Informações de Venda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></span>
+            <span class="sidebar-label-txt">Informações de Venda</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='financeiro.html'" title="Controle Financeiro">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span>
+            <span class="sidebar-label-txt">Controle Financeiro</span>
+          </button>
+          <button class="sidebar-item-btn" onclick="window.location.href='clientes.html'" title="Clientes">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+            <span class="sidebar-label-txt">Clientes</span>
+          </button>
+        </div>
+
+        <div class="sidebar-footer-index">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+        <div class="sidebar-toggle-footer">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+            <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="rv-wrap">
+
+          <!-- Cabeçalho: título centralizado + subtítulo -->
+          <div style="position: relative; min-height: 40px; display: flex; align-items: center; justify-content: center;">
+            <h1 class="page-title" style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap;">Registro de Vendas</h1>
+          </div>
+          <p class="page-subtitle" style="margin: 0 0 24px; text-align: center;">
+            Monte a venda, gere orçamento em PDF e lance no financeiro
+          </p>
+
+          <!-- ═══ MONTAR VENDA (blocos) ═══ -->
+          <section class="rv-card">
+            <div class="rv-card__head">
+              <div class="rv-card__title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                Nova Venda
+              </div>
+            </div>
+
+            <div class="rv-bloco" id="blocoCliente">
+              <div class="rv-bloco__num">1</div>
+              <div class="rv-bloco__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+              <div class="rv-bloco__body">
+                <div class="rv-bloco__label">Comprador</div>
+                <div class="rv-bloco__resumo" id="clienteResumo"><span class="rv-bloco-placeholder">Clique para localizar ou cadastrar o comprador</span></div>
+              </div>
+              <div class="rv-bloco__arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+            </div>
+
+            <div class="rv-bloco" id="blocoEmpresa">
+              <div class="rv-bloco__num">2</div>
+              <div class="rv-bloco__icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"></path></svg></div>
+              <div class="rv-bloco__body">
+                <div class="rv-bloco__label">Empresa</div>
+                <div class="rv-bloco__resumo" id="empresaResumo"><span class="rv-bloco-placeholder">Clique para selecionar a empresa</span></div>
+              </div>
+              <div class="rv-bloco__arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+            </div>
+
+            <div class="rv-produtos-bloco">
+              <div class="rv-produtos-head">
+                <div class="rv-bloco__label" style="display:flex;align-items:center;gap:8px;"><span class="rv-bloco__num" style="position:static;">3</span> Produtos <span class="rv-itens-badge">(<span id="itensCount">0</span>)</span></div>
+                <button class="btn-primary" id="btnAddProduto" type="button" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  Adicionar produto
+                </button>
+              </div>
+
+              <div id="carrinhoLista" class="rv-carrinho"></div>
+              <div id="carrinhoVazio" class="rv-carrinho-vazio">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <p>Nenhum produto adicionado. Clique em "Adicionar produto".</p>
+              </div>
+
+              <div class="rv-totais">
+                <div class="rv-totais__linha rv-totais__total"><span>Total da venda</span><span id="totalVenda">R$ 0,00</span></div>
+              </div>
+            </div>
+
+            <div class="rv-form-actions">
+              <button class="btn-secondary" id="btnLimparVenda" type="button">Limpar</button>
+              <button class="btn-secondary" id="btnGerarPDF" type="button" style="display:inline-flex;align-items:center;gap:6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                Gerar PDF (orçamento)
+              </button>
+              <button class="btn-primary" id="btnSalvarVenda" type="button">Salvar venda</button>
+            </div>
+          </section>
+
+          <!-- ═══ VENDAS LANÇADAS (filtros + lista em cards) ═══ -->
+          <section class="rv-card">
+            <div class="rv-card__head">
+              <div class="rv-card__title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                Vendas Lançadas
+              </div>
+            </div>
+
+            <div class="rv-kpis">
+              <div class="rv-kpi"><div class="rv-kpi__label">Total de Vendas</div><div class="rv-kpi__value" id="kpiCount">0</div></div>
+              <div class="rv-kpi"><div class="rv-kpi__label">Valor Total</div><div class="rv-kpi__value" id="kpiTotal">R$ 0,00</div></div>
+              <div class="rv-kpi"><div class="rv-kpi__label">Itens Vendidos</div><div class="rv-kpi__value" id="kpiItens">0</div></div>
+              <div class="rv-kpi"><div class="rv-kpi__label">Ticket Médio</div><div class="rv-kpi__value" id="kpiTicket">R$ 0,00</div></div>
+            </div>
+
+            <div class="rv-filters">
+              <input type="text" id="fSearch" class="rv-filters__search" placeholder="🔎 Pesquisar por qualquer informação (cliente, produto, nº pedido...)" />
+              <input type="date" id="fDe" title="Período de" />
+              <input type="date" id="fAte" title="Período até" />
+              <input type="text" id="fCliente" placeholder="Cliente" />
+              <input type="text" id="fDoc" placeholder="CPF/CNPJ" />
+              <input type="text" id="fEmpresa" placeholder="Empresa" />
+              <input type="text" id="fPlataforma" placeholder="Plataforma" />
+              <select id="fPagamento"><option value="">Pagamento (todos)</option><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option><option>Boleto</option><option>Transferência</option><option>Outro</option></select>
+              <select id="fStatus"><option value="">Status (todos)</option><option>Pendente</option><option>Pago</option><option>Parcial</option><option>Cancelado</option><option>Estornado</option></select>
+              <input type="text" id="fResponsavel" placeholder="Responsável" />
+              <button class="btn-secondary" id="btnLimparFiltros" type="button">Limpar filtros</button>
+            </div>
+
+            <div id="rvLista" class="rv-vendas-lista"></div>
+            <div class="rv-empty" id="rvEmpty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <h3>Nenhuma venda lançada ainda</h3>
+              <p>Monte a venda no topo e clique em Salvar venda.</p>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ═══════════ MODAIS ═══════════ -->
+
+    <!-- Modal Cliente -->
+    <div class="rv-modal" id="modalCliente" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <button class="rv-modal__close" data-rv-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title">Comprador</h2>
+        <p class="rv-modal__sub">Localize um cliente já salvo pelo CPF/CNPJ, ou preencha para cadastrar um novo.</p>
+
+        <div class="rv-field rv-field--full" style="margin-bottom:16px;">
+          <label>Localizar cliente (CPF/CNPJ ou nome)</label>
+          <div class="rv-sku-box">
+            <input id="mcBuscaCpf" placeholder="Digite o CPF/CNPJ ou o nome" autocomplete="off">
+            <div class="rv-sku-suggest" id="mcBuscaSuggest"></div>
+          </div>
+        </div>
+
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--full"><label>Nome completo <span class="req">*</span></label><input id="mcNome" placeholder="Nome do comprador"></div>
+          <div class="rv-field rv-field--2"><label>CPF ou CNPJ <span class="req">*</span></label><input id="mcDoc" placeholder="CPF ou CNPJ" autocomplete="off"></div>
+          <div class="rv-field rv-field--2"><label>Telefone</label><input id="mcTelefone" placeholder="(00) 00000-0000" inputmode="tel"></div>
+          <div class="rv-field rv-field--2"><label>CEP</label><input id="mcCep" placeholder="00000-000" inputmode="numeric"></div>
+          <div class="rv-field rv-field--2"><label>E-mail</label><input id="mcEmail" type="email" placeholder="cliente@email.com"></div>
+          <!-- Endereço em campos separados. O campo único antigo (mcEndereco)
+               continua existindo como hidden: o registro-vendas.js o monta a
+               partir dos campos abaixo, para que vendas e orçamentos já salvos
+               (que leem cliente.endereco) continuem funcionando. -->
+          <div class="rv-field rv-field--full"><label>Rua / Avenida / Logradouro</label><input id="mcRua" placeholder="Rua Exemplo"></div>
+          <div class="rv-field rv-field--2"><label>Número</label><input id="mcNumero" placeholder="123"></div>
+          <div class="rv-field rv-field--2"><label>Bairro</label><input id="mcBairro" placeholder="Centro"></div>
+          <div class="rv-field rv-field--2"><label>Cidade</label><input id="mcCidade" placeholder="Curitiba"></div>
+          <div class="rv-field rv-field--2"><label>Estado</label><select id="mcEstado"><option value="">Selecione...</option><option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option><option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option><option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option><option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option><option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option><option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option><option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option></select></div>
+          <input type="hidden" id="mcEndereco">
+          <div class="rv-field rv-field--full"><label>Complemento</label><input id="mcComplemento" placeholder="Apto, bloco, ponto de referência..."></div>
+        </div>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-rv-close type="button">Cancelar</button>
+          <button class="btn-primary" id="mcSalvar" type="button">Salvar comprador</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Empresa -->
+    <div class="rv-modal" id="modalEmpresa" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <button class="rv-modal__close" data-rv-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title">Selecione a Empresa</h2>
+        <p class="rv-modal__sub">Os valores desta venda vêm da <strong>Loja Física</strong>. Escolha a empresa que receberá o lançamento no financeiro.</p>
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--full">
+            <label>Empresa</label>
+            <div class="rv-select-logo">
+              <div id="meEmpresaLogo" class="rv-select-logo__img"></div>
+              <select id="meEmpresa"></select>
+            </div>
+          </div>
+          <div class="rv-field rv-field--full" id="meSemEmpresaAviso" style="display:none;">
+            <p style="font-size:13px;color:var(--clr-text-2);background:var(--clr-surface-alt);border:1px solid var(--clr-border);border-radius:8px;padding:11px 13px;line-height:1.5;margin:0;">
+              Nenhuma empresa cadastrada ainda. Cadastre uma na tela Dados da Empresa para poder registrar a venda.
+            </p>
+          </div>
+        </div>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-rv-close type="button">Cancelar</button>
+          <button class="btn-secondary" id="meCadastrarEmpresa" type="button" style="display:none;">Cadastrar nova empresa</button>
+          <button class="btn-primary" id="meSalvar" type="button">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Adicionar Produto -->
+    <div class="rv-modal" id="modalProduto" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <button class="rv-modal__close" data-rv-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title">Adicionar Produto</h2>
+        <p class="rv-modal__sub">Loja Física: informe o produto e o preço manualmente.</p>
+        <div id="mpAvisoLivre" style="display:none;padding:10px 12px;background:var(--clr-primary-lt);border:1px solid var(--clr-border);border-radius:8px;font-size:13px;color:var(--clr-text-2);margin-bottom:14px;">Venda pela Loja Física: preencha o nome, o preço e a quantidade do produto.</div>
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--full">
+            <label>SKU</label>
+            <div class="rv-sku-box"><input id="mpSku" placeholder="Digite o SKU" autocomplete="off"><div class="rv-sku-suggest" id="mpSuggest"></div></div>
+          </div>
+          <div class="rv-field rv-field--full"><label>Nome do produto</label><input id="mpNome" placeholder="Nome"></div>
+          <div class="rv-field rv-field--2"><label>Preço de venda (un.)</label><div class="rv-addon"><span class="rv-addon__tag">R$</span><input id="mpPreco" class="money-input" inputmode="decimal" placeholder="0,00"></div></div>
+          <div class="rv-field rv-field--2"><label>Quantidade</label><input id="mpQtd" type="number" min="1" value="1"></div>
+        </div>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-rv-close type="button">Cancelar</button>
+          <button class="btn-primary" id="mpAdd" type="button">Adicionar ao carrinho</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Finalizar Venda -->
+    <div class="rv-modal" id="modalFinalizar" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card">
+        <button class="rv-modal__close" data-rv-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title">Finalizar Venda</h2>
+        <div class="rv-fin-resumo">
+          <div><span>Cliente</span><strong id="mfResumoCliente">—</strong></div>
+          <div><span>Empresa</span><strong id="mfResumoEmpresa">—</strong></div>
+          <div><span>Total</span><strong id="mfResumoTotal">R$ 0,00</strong></div>
+        </div>
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--2"><label for="mfResponsavel">Responsável pelo lançamento <span class="req">*</span></label><select id="mfResponsavel" title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"></select></div>
+          <div class="rv-field"><label>Nº Pedido</label><input id="mfNumero" placeholder="Opcional"></div>
+          <div class="rv-field"><label>Data da venda</label><input type="date" id="mfData"></div>
+          <div class="rv-field"><label>Pagamento</label><select id="mfPagamento"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option><option>Boleto</option><option>Transferência</option><option>Outro</option></select></div>
+          <div class="rv-field"><label>Parcelas</label><input type="number" id="mfParcelas" min="1" value="1"></div>
+          <div class="rv-field rv-field--2"><label>Status</label><select id="mfStatus"><option>Pendente</option><option>Pago</option><option>Parcial</option><option>Cancelado</option><option>Estornado</option></select></div>
+          <div class="rv-field rv-field--full"><label>Observações</label><textarea id="mfObs" placeholder="Opcional"></textarea></div>
+        </div>
+        <div class="rv-dre-toggle" id="mfDreWrap" style="margin-top:14px;">
+          <label class="rv-switch"><input type="checkbox" id="mfDreAuto" checked><span class="rv-switch__slider"></span></label>
+          <div class="rv-dre-toggle__text"><strong>Lançar esta venda no DRE</strong><small>Gera a receita no Controle Financeiro da empresa selecionada.</small></div>
+        </div>
+        <div id="mfDreAviso" style="display:none;padding:10px 12px;background:var(--clr-primary-lt);border:1px solid var(--clr-border);border-radius:8px;font-size:13px;color:var(--clr-text-2);margin-top:10px;">Sem empresa selecionada — a venda será salva, mas não lançada no DRE.</div>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-rv-close type="button">Voltar</button>
+          <button class="btn-primary" id="mfConfirmar" type="button">Confirmar e salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Editar Venda Lançada (clique no card da venda) -->
+    <div class="rv-modal" id="modalEditarVenda" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card">
+        <button class="rv-modal__close" data-rv-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title" id="evTitulo">Editar venda</h2>
+
+        <div class="rv-fin-resumo">
+          <div><span>Cliente</span><strong id="evCliente">—</strong></div>
+          <div><span>Empresa</span><strong id="evEmpresa">—</strong></div>
+        </div>
+
+        <!-- Produtos da venda -->
+        <div class="rv-bloco__label" style="margin:16px 0 8px;">Produtos</div>
+        <div id="evItens" class="rv-carrinho"></div>
+        <div id="evItensVazio" class="rv-carrinho-vazio" style="display:none;">
+          <p>Nenhum produto nesta venda. Adicione ao menos um.</p>
+        </div>
+
+        <div class="rv-field rv-field--full" style="margin-top:10px;">
+          <label>Adicionar produto (SKU ou nome)</label>
+          <div class="rv-sku-box">
+            <input id="evSku" placeholder="Digite o SKU ou o nome do produto" autocomplete="off">
+            <div class="rv-sku-suggest" id="evSuggest"></div>
+          </div>
+        </div>
+
+        <div class="rv-totais" style="margin-top:12px;">
+          <div class="rv-totais__linha rv-totais__total"><span>Total da venda</span><span id="evTotal">R$ 0,00</span></div>
+        </div>
+
+        <!-- Dados do pedido -->
+        <div class="rv-bloco__label" style="margin:18px 0 8px;">Dados do pedido</div>
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--2"><label for="evResponsavel">Responsável <span class="req">*</span></label><select id="evResponsavel" title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"></select></div>
+          <div class="rv-field"><label>Nº Pedido</label><input id="evNumero" placeholder="Opcional"></div>
+          <div class="rv-field"><label>Data da venda</label><input type="date" id="evData"></div>
+          <div class="rv-field"><label>Pagamento</label><select id="evPagamento"><option>Pix</option><option>Dinheiro</option><option>Débito</option><option>Crédito</option><option>Boleto</option><option>Transferência</option><option>Outro</option></select></div>
+          <div class="rv-field"><label>Parcelas</label><input type="number" id="evParcelas" min="1" value="1"></div>
+          <div class="rv-field rv-field--2"><label>Status</label><select id="evStatus"><option>Pendente</option><option>Pago</option><option>Parcial</option><option>Cancelado</option><option>Estornado</option></select></div>
+          <div class="rv-field rv-field--full"><label>Observações</label><textarea id="evObs" placeholder="Opcional"></textarea></div>
+        </div>
+
+        <div class="rv-dre-toggle" id="evDreWrap" style="margin-top:14px;">
+          <label class="rv-switch"><input type="checkbox" id="evDreAuto"><span class="rv-switch__slider"></span></label>
+          <div class="rv-dre-toggle__text"><strong>Lançar esta venda no DRE</strong><small>Ao salvar, o lançamento no Controle Financeiro é atualizado com os novos valores.</small></div>
+        </div>
+        <div id="evDreAviso" style="display:none;padding:10px 12px;background:var(--clr-primary-lt);border:1px solid var(--clr-border);border-radius:8px;font-size:13px;color:var(--clr-text-2);margin-top:10px;">Esta venda não tem empresa vinculada, então não pode ser lançada no DRE.</div>
+
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-rv-close type="button">Cancelar</button>
+          <button class="btn-primary" id="evSalvar" type="button">Salvar alterações</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Editar Item do carrinho (edição rápida ao clicar na linha) -->
+    <div class="rv-modal" id="modalEditarItem" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <button class="rv-modal__close" data-rv-close aria-label="Fechar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+        <h2 class="rv-modal__title">Editar item</h2>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <div id="meiFoto"></div>
+          <div style="min-width:0;">
+            <div id="meiNome" style="font-size:14.5px; font-weight:700; color:var(--clr-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+            <div id="meiSku" style="font-size:12px; color:var(--clr-text-3);"></div>
+          </div>
+        </div>
+        <div class="rv-form-grid">
+          <div class="rv-field rv-field--2"><label>Quantidade</label><input type="number" id="meiQtd" min="1" value="1"></div>
+          <div class="rv-field rv-field--2"><label>Preço unitário</label><div class="rv-addon"><span class="rv-addon__tag">R$</span><input id="meiPreco" class="money-input" inputmode="decimal" placeholder="0,00"></div></div>
+        </div>
+        <div class="rv-totais" style="margin-top:12px;">
+          <div class="rv-totais__linha rv-totais__total"><span>Subtotal do item</span><span id="meiSubtotal">R$ 0,00</span></div>
+        </div>
+        <div class="rv-modal__actions" style="justify-content:space-between;">
+          <button class="btn-secondary" id="meiRemover" type="button" style="color:var(--clr-danger,#ef4444); border-color:var(--clr-danger,#ef4444);">Remover item</button>
+          <span style="display:flex; gap:8px;">
+            <button class="btn-secondary" data-rv-close type="button">Cancelar</button>
+            <button class="btn-primary" id="meiSalvar" type="button">Salvar</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Excluir Venda -->
+    <div class="rv-modal" id="modalExcluirVenda" hidden>
+      <div class="rv-modal__backdrop" data-rv-close></div>
+      <div class="rv-modal__card rv-modal__card--sm">
+        <h2 class="rv-modal__title">Excluir venda?</h2>
+        <p class="rv-modal__sub" id="mdvTexto">Esta ação não pode ser desfeita.</p>
+        <div class="rv-modal__actions">
+          <button class="btn-secondary" data-rv-close type="button">Cancelar</button>
+          <button class="btn-primary" id="mdvConfirmar" type="button" style="background:var(--clr-danger,#ef4444);">Excluir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <script src="JS/licenca-ui.js"></script>
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/imagestore.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/datepicker.js"></script>
+    <script src="JS/registro-vendas.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_registro_vendas.js"></script>
+  </body>
+</html>

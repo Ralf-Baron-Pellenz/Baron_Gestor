@@ -1,0 +1,100 @@
+/* ═══════════════════════════════════════════
+   Precificador — Notas Fiscais
+   Reaproveita .empresa-item-btn do ean.css
+   ═══════════════════════════════════════════ */
+
+/* ── Cabeçalho da empresa ── */
+.nf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+/* Nome e CNPJ na mesma linha, mesma fonte */
+.nf-header .card-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Tabela de notas ── */
+.nf-table-wrap {
+  overflow-x: auto;
+}
+.nf-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.nf-table th,
+.nf-table td {
+  padding: 11px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--clr-border);
+  font-size: 13px;
+  color: var(--clr-text);
+  vertical-align: middle;
+}
+.nf-table th {
+  color: var(--clr-text-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.nf-table tbody tr:hover {
+  background: var(--clr-surface-alt);
+}
+.nf-table tbody tr:last-child td {
+  border-bottom: none;
+}
+/* Coluna do nome não deve empurrar as demais */
+.nf-table td:first-child {
+  max-width: 320px;
+}
+
+/* ── Botões de ação da linha ── */
+.nf-acao-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-2);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  margin-left: 5px;
+}
+.nf-acao-btn:first-child {
+  margin-left: 0;
+}
+.nf-acao-btn:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+.nf-acao-btn.danger:hover {
+  border-color: var(--clr-danger);
+  color: var(--clr-danger);
+  background: var(--clr-danger-lt);
+}
+
+/* ── Bloco de info do arquivo no modal ── */
+.nf-arquivo-info {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  margin-bottom: var(--sp-md);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+}

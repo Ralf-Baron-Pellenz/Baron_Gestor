@@ -1,0 +1,1126 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Bapell Gestor Pro — Importar Vendas
+
+   A tela responde a uma pergunta só: quanto realmente sobrou desta
+   importação. Tudo aqui serve a isso.
+
+   ── DECISÕES ────────────────────────────────────────────────────────
+   · A CONTA FICA VISÍVEL. O resultado não é um número solto: é uma
+     cadeia — vendeu, menos taxas, recebeu, menos custo, sobrou. Quem
+     confere uma planilha precisa ver de onde cada valor saiu.
+   · UM SÓ DESTAQUE. O valor final é o único elemento com peso visual.
+     O resto fica quieto para ele aparecer.
+   · O FORMULÁRIO É UMA SEQUÊNCIA. Os passos são numerados porque o
+     conteúdo é mesmo uma ordem — não como enfeite.
+   · NÚMEROS ALINHADOS. Toda cifra usa numerais tabulares: os dígitos
+     ficam na mesma coluna e dá para comparar valores de relance, que é
+     o trabalho de quem lê esta tela.
+   · Cores e fontes vêm das variáveis do style.css. A tela vive dentro
+     do Bapell e não pode parecer de outro produto.
+
+   Prefixo "vi-" em tudo: nenhuma classe colide com as demais telas.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.vi-wrap {
+  --vi-gap: 22px;
+  --vi-raio: 14px;
+  --vi-cifra: "Sora", ui-sans-serif, system-ui, sans-serif;
+
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--sp-lg) 0 72px;
+}
+
+/* ── Abas ───────────────────────────────────────────────────────────
+   Sem caixa nem fundo: só o texto e um traço sob a ativa. */
+.vi-tabs {
+  display: flex;
+  gap: 26px;
+  border-bottom: 1px solid var(--clr-border);
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+
+.vi-tab {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0 0 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.vi-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--clr-primary);
+  transform: scaleX(0);
+  transition: transform 0.18s ease;
+}
+.vi-tab:hover { color: var(--clr-text); }
+.vi-tab.ativa { color: var(--clr-text); }
+.vi-tab.ativa::after { transform: scaleX(1); }
+.vi-tab:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.vi-aba { display: none; }
+.vi-aba.ativa { display: block; }
+
+/* ── Painel ─────────────────────────────────────────────────────────
+   Um bloco por assunto, sem sombra: a separação vem da borda e do
+   espaço, não de camadas empilhadas. */
+.vi-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--vi-raio);
+  padding: 24px 26px;
+  margin-bottom: var(--vi-gap);
+}
+
+.vi-card-title {
+  font-family: "Sora", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--clr-text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+
+/* Número do passo. Existe porque o formulário é uma sequência real. */
+.vi-passo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--clr-primary);
+  color: var(--clr-primary);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.vi-hint {
+  color: var(--clr-text-3);
+  font-size: 13.5px;
+  line-height: 1.6;
+  max-width: 68ch;
+  margin: 0 0 18px;
+}
+
+.vi-sub {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--clr-text-3);
+}
+
+.vi-req { color: var(--clr-danger); }
+.vi-opc {
+  color: var(--clr-text-3);
+  font-weight: 400;
+  font-size: 11.5px;
+}
+
+.vi-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 18px;
+}
+
+/* ── Escolher a planilha ──────────────────────────────────────────── */
+.vi-upload {
+  border: 1.5px dashed var(--clr-border);
+  border-radius: var(--vi-raio);
+  padding: 30px 22px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--clr-text-3);
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+.vi-upload:hover,
+.vi-upload:focus-visible {
+  border-color: var(--clr-primary);
+  border-style: solid;
+  background: var(--clr-primary-lt);
+  color: var(--clr-primary);
+  outline: none;
+}
+.vi-upload svg { opacity: 0.75; }
+.vi-upload-txt {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--clr-text-2);
+  margin-top: 10px;
+}
+.vi-upload:hover .vi-upload-txt { color: var(--clr-primary); }
+.vi-upload-sub { font-size: 12.5px; margin-top: 4px; }
+
+.vi-planilha-info {
+  margin-top: 14px;
+  padding: 12px 15px;
+  border-radius: 10px;
+  background: var(--clr-surface-alt);
+  border-left: 2px solid var(--clr-primary);
+  font-size: 13px;
+  color: var(--clr-text-2);
+  line-height: 1.55;
+}
+
+/* ── Intervalos ─────────────────────────────────────────────────── */
+.vi-range-linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--clr-border);
+  flex-wrap: wrap;
+}
+.vi-range-linha:last-of-type { border-bottom: none; padding-bottom: 4px; }
+
+.vi-range-rot {
+  flex: 1 1 250px;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clr-text);
+}
+.vi-range-rot small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--clr-text-3);
+  margin-top: 4px;
+  line-height: 1.5;
+  max-width: 56ch;
+}
+
+/* Referência de célula: campo curto e monoespaçado — "H7" e "AN500"
+   são coordenadas, não texto corrido. */
+.vi-cel,
+.vi-cel-larga {
+  font-family: ui-monospace, "Consolas", "Menlo", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.vi-cel {
+  width: 88px;
+  flex: 0 0 88px;
+  text-align: center;
+}
+.vi-cel-larga {
+  width: 210px;
+  flex: 0 0 210px;
+  text-align: left;
+}
+.vi-ate {
+  color: var(--clr-text-3);
+  font-size: 12.5px;
+  flex: 0 0 auto;
+}
+
+.vi-modo-sel { flex: 0 0 320px; max-width: 100%; }
+@media (max-width: 620px) {
+  .vi-modo-sel { flex: 1 1 100%; }
+  .vi-cel-larga { flex: 1 1 100%; width: auto; }
+}
+
+.vi-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.vi-erro {
+  margin-top: 18px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: var(--clr-danger-lt, rgba(224, 98, 95, 0.1));
+  border-left: 3px solid var(--clr-danger);
+  color: var(--clr-danger);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   O RESULTADO — o único destaque da tela
+
+     vendeu  |  a plataforma pagou  |  custo  |  SOBROU PARA VOCÊ
+
+   Quatro blocos de mesma largura. Os dois primeiros são dinheiro que
+   entra; o custo é dinheiro que sai, e por isso tem cor própria. O
+   último é o resultado, e o único com peso visual.
+
+   As taxas da plataforma não aparecem — ficam só no histórico.
+
+   A versão anterior intercalava colunas "auto" com os operadores entre
+   os blocos. Bastava um texto mais longo para uma dessas colunas
+   esticar e desalinhar tudo. Três colunas iguais não têm esse problema.
+   ═══════════════════════════════════════════════════════════════════ */
+.vi-conta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 4px 0 18px;
+}
+
+.vi-etapa {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 20px;
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  background: var(--clr-surface-alt);
+  min-width: 0;
+}
+
+.vi-etapa-rot {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--clr-text-3);
+  line-height: 1.3;
+}
+
+.vi-etapa-val {
+  font-family: var(--vi-cifra);
+  font-variant-numeric: tabular-nums;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clr-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Legenda de um bloco. Quebra em duas linhas sem empurrar o número. */
+.vi-etapa-sub {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--clr-text-3);
+  white-space: normal;
+}
+.vi-etapa-sub:empty { display: none; }
+
+/* O custo: dinheiro que sai. Âmbar, o mesmo tom usado nos avisos desta
+   tela, para separar visualmente do que entrou. Borda discreta — ele
+   informa, mas não disputa atenção com o resultado. */
+.vi-etapa-custo {
+  border-color: rgba(224, 162, 61, 0.35);
+}
+.vi-etapa-custo .vi-etapa-val { color: var(--clr-warning); }
+
+/* O resultado. É o que a pessoa veio ver. */
+.vi-etapa-final {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+.vi-etapa-final .vi-etapa-rot { color: var(--clr-primary); font-weight: 600; }
+.vi-etapa-final .vi-etapa-val {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--clr-primary);
+}
+.vi-etapa-final .vi-etapa-sub { color: var(--clr-primary); opacity: 0.75; }
+
+/* Prejuízo é informação, não erro: muda de cor e nada mais. */
+.vi-etapa-final.negativo {
+  border-color: var(--clr-danger);
+  background: var(--clr-danger-lt, rgba(224, 98, 95, 0.1));
+}
+.vi-etapa-final.negativo .vi-etapa-rot,
+.vi-etapa-final.negativo .vi-etapa-val,
+.vi-etapa-final.negativo .vi-etapa-sub { color: var(--clr-danger); }
+
+/* Quatro colunas só cabem em tela larga. Abaixo disso o número seria
+   espremido: cai para duas, depois para uma. A ordem de leitura é a
+   mesma nos três casos. */
+@media (max-width: 1180px) {
+  .vi-conta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .vi-conta { grid-template-columns: 1fr; gap: 10px; }
+  .vi-etapa { padding: 16px 18px; }
+}
+
+.vi-resumo-linha {
+  margin: 0;
+  font-size: 13px;
+  color: var(--clr-text-3);
+}
+
+.vi-aviso {
+  margin-top: 18px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: var(--clr-warning-lt, rgba(224, 162, 61, 0.1));
+  border-left: 3px solid var(--clr-warning);
+  color: var(--clr-text-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.vi-aviso strong { color: var(--clr-text); }
+
+/* ── Tabelas ────────────────────────────────────────────────────────
+   Sem listras nem bordas verticais: o alinhamento dos números já
+   organiza a leitura. */
+.vi-tabela-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+}
+
+.vi-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 620px;
+}
+.vi-tabela th,
+.vi-tabela td {
+  padding: 11px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--clr-border);
+  white-space: nowrap;
+}
+.vi-tabela thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--clr-surface-alt);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--clr-text-3);
+}
+.vi-tabela tbody tr:last-child td { border-bottom: none; }
+.vi-tabela tbody tr { transition: background 0.12s ease; }
+.vi-tabela tbody tr:hover { background: var(--clr-surface-alt); }
+
+.vi-tabela .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.vi-tabela tfoot th {
+  background: var(--clr-surface-alt);
+  font-weight: 700;
+  color: var(--clr-text);
+  border-top: 1.5px solid var(--clr-border);
+  border-bottom: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.vi-pos { color: var(--clr-success); font-weight: 600; }
+.vi-neg { color: var(--clr-danger); font-weight: 600; }
+
+/* SKU sem produto cadastrado: entra com custo zero, então precisa ser
+   visível — o total fica maior do que o real enquanto faltar cadastro. */
+.vi-sem-produto td:first-child { box-shadow: inset 2px 0 0 var(--clr-warning); }
+.vi-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--clr-warning);
+  border: 1px solid rgba(224, 162, 61, 0.4);
+  border-radius: 20px;
+  padding: 1px 8px;
+  margin-left: 8px;
+  vertical-align: 1px;
+}
+
+/* ── Importações salvas ─────────────────────────────────────────── */
+.vi-filtro {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+@media (max-width: 700px) {
+  .vi-filtro { grid-template-columns: 1fr; }
+}
+
+.vi-hist-item {
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  background: var(--clr-surface-alt);
+  transition: border-color 0.15s ease;
+}
+.vi-hist-item:hover { border-color: var(--clr-text-3); }
+
+.vi-hist-topo {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  font-size: 14.5px;
+  color: var(--clr-text);
+}
+.vi-hist-data {
+  font-size: 12px;
+  color: var(--clr-text-3);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.vi-hist-nums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--clr-border);
+}
+.vi-hist-nums > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.vi-hist-nums span { font-size: 11.5px; color: var(--clr-text-3); }
+.vi-hist-nums strong {
+  font-family: var(--vi-cifra);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--clr-text);
+}
+
+.vi-hist-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+.vi-hist-acoes button { font-size: 12.5px; padding: 7px 14px; }
+.vi-hist-detalhe { margin-top: 14px; }
+
+.vi-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-3);
+  white-space: nowrap;
+}
+.vi-badge.ok {
+  color: var(--clr-success);
+  border-color: rgba(63, 184, 122, 0.45);
+}
+
+/* Vazio é convite, não aviso. */
+.vi-vazio {
+  text-align: center;
+  color: var(--clr-text-3);
+  font-size: 13.5px;
+  line-height: 1.6;
+  padding: 34px 18px;
+  border: 1px dashed var(--clr-border);
+  border-radius: 12px;
+}
+
+/* ── Aviso sobre os impostos ────────────────────────────────────── */
+.vi-legal {
+  margin-top: 22px;
+  padding: 15px 18px;
+  border-radius: 10px;
+  background: var(--clr-surface-alt);
+  border-left: 3px solid var(--clr-warning);
+  color: var(--clr-text-2);
+  font-size: 13px;
+  line-height: 1.65;
+  max-width: 72ch;
+}
+
+/* ── Métricas de imposto ─────────────────────────────────────────── */
+.vi-metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+.vi-metrica {
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.vi-metrica-rot {
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.vi-metrica-val {
+  font-family: var(--vi-cifra);
+  font-variant-numeric: tabular-nums;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--clr-text);
+}
+.vi-metrica-sub {
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+  margin-top: 5px;
+}
+.vi-m-imposto .vi-metrica-val { color: var(--clr-warning); }
+
+/* ── Ajustes locais ─────────────────────────────────────────────── */
+.vi-wrap .field-group { margin: 0; }
+
+/* Foco visível em tudo que recebe teclado. */
+.vi-wrap .input-field:focus-visible,
+.vi-wrap button:focus-visible,
+.vi-wrap select:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+}
+
+/* Quem pediu menos movimento não recebe nenhum. */
+@media (prefers-reduced-motion: reduce) {
+  .vi-tab::after,
+  .vi-tabela tbody tr,
+  .vi-upload,
+  .vi-hist-item { transition: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODAL DO RESULTADO
+
+   A conferência acontece sobre a tela e sai do caminho quando termina.
+   O formulário fica atrás, intacto: ajustar uma célula e processar de
+   novo não exige redigitar nada.
+
+   Três faixas: topo fixo (o que foi importado), corpo rolável (os
+   números e a tabela) e rodapé fixo (o que fazer com isso). Só o corpo
+   rola — as ações nunca somem de vista, mesmo com 200 SKUs na lista.
+   ═══════════════════════════════════════════════════════════════════ */
+.vi-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(2px);
+}
+
+.vi-modal-caixa {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1080px;
+  max-height: 90vh;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.vi-modal-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--clr-border);
+  flex-shrink: 0;
+}
+.vi-modal-titulo {
+  font-family: "Sora", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--clr-text);
+  margin: 0;
+}
+.vi-modal-sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--clr-text-3);
+}
+
+.vi-modal-fechar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.vi-modal-fechar:hover {
+  background: var(--clr-surface-alt);
+  color: var(--clr-text);
+}
+
+/* Só esta faixa rola. */
+.vi-modal-corpo {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 22px 26px;
+}
+.vi-modal-corpo .vi-conta { margin-top: 0; }
+
+.vi-modal-secao {
+  font-family: "Sora", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--clr-text);
+  margin: 26px 0 12px;
+}
+
+.vi-modal-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 26px;
+  border-top: 1px solid var(--clr-border);
+  background: var(--clr-surface-alt);
+  flex-shrink: 0;
+}
+.vi-rodape-dir {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .vi-modal { padding: 0; }
+  .vi-modal-caixa { max-height: 100vh; border-radius: 0; border: none; }
+  .vi-modal-rodape { justify-content: stretch; }
+  .vi-rodape-dir { flex: 1 1 100%; }
+  .vi-rodape-dir button { flex: 1 1 auto; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   AJUDA EM BALÃO
+
+   Texto longo que só interessa na dúvida não precisa ocupar a tela o
+   tempo todo. Abre no passar do mouse e também no foco do teclado —
+   sem o foco, quem navega por Tab nunca alcançaria a explicação.
+   ═══════════════════════════════════════════════════════════════════ */
+.vi-ajuda {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.vi-ajuda-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 4px;
+  border: none;
+  background: none;
+  color: var(--clr-primary);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: help;
+  border-radius: 5px;
+}
+.vi-ajuda-btn:hover { text-decoration: underline; }
+.vi-ajuda-btn:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 1px;
+}
+/* Só ícone: sem texto ao lado, vira um alvo redondo. */
+.vi-ajuda-icone .vi-ajuda-btn {
+  padding: 5px;
+  border-radius: 50%;
+  color: var(--clr-text-3);
+}
+.vi-ajuda-icone .vi-ajuda-btn:hover {
+  background: var(--clr-border);
+  color: var(--clr-text);
+  text-decoration: none;
+}
+
+.vi-ajuda-txt {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 0;
+  z-index: 5;
+  width: max-content;
+  max-width: 320px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+  color: var(--clr-text-2);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.55;
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(3px);
+  transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s;
+}
+/* Balão do rodapé: ancorado à direita, senão sairia da caixa. */
+.vi-ajuda-txt-esq { left: auto; right: 0; }
+
+.vi-ajuda:hover .vi-ajuda-txt,
+.vi-ajuda:focus-within .vi-ajuda-txt,
+.vi-ajuda-mini:hover .vi-ajuda-txt,
+.vi-ajuda-mini:focus .vi-ajuda-txt,
+.vi-ajuda-mini:focus-within .vi-ajuda-txt {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* ── Ícone de ajuda DENTRO de um botão ─────────────────────────────
+   O balão explica os dois botões do rodapé, então mora no primeiro
+   deles em vez de flutuar ao lado. Fica separado do texto por um
+   filete, para ler como um alvo próprio e não como parte do rótulo. */
+.vi-btn-com-ajuda {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vi-ajuda-mini {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 10px;
+  margin-left: 2px;
+  border-left: 1px solid rgba(255, 255, 255, 0.28);
+  color: inherit;
+  opacity: 0.75;
+  cursor: help;
+  transition: opacity 0.14s ease;
+}
+.vi-ajuda-mini:hover,
+.vi-ajuda-mini:focus { opacity: 1; outline: none; }
+.vi-ajuda-mini:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* O balão sai da cor do botão e volta ao fundo da tela: texto branco
+   sobre azul ficaria ilegível num parágrafo desse tamanho. */
+.vi-ajuda-mini .vi-ajuda-txt {
+  bottom: calc(100% + 12px);
+  color: var(--clr-text-2);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vi-ajuda-txt, .vi-modal-fechar, .vi-ajuda-mini { transition: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PERSONALIZAÇÃO DOS CÁLCULOS
+
+   Um construtor de regras dentro do passo 3. Cada regra é um cartão
+   numerado com os campos em linha, e uma prévia embaixo dizendo em
+   português o que vai acontecer:
+
+     ┌──────────────────────────────────────────────────────┐
+     │ ① [Nome da regra]                                 ✕  │
+     │ Alterar[▾] Operação[▾] Usando[▾] Tipo[▾] [Valor]     │
+     │ Valor Bruto − 5% → R$ 10.000,00 vira R$ 9.500,00     │
+     └──────────────────────────────────────────────────────┘
+
+   A prévia existe porque uma regra errada não avisa: ela só devolve
+   um número plausível. Ver o antes e o depois em texto é o que
+   permite perceber o engano antes de exportar para o financeiro.
+   ═══════════════════════════════════════════════════════════════════ */
+.vi-regras {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--clr-border);
+}
+
+.vi-regras-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.vi-regras-titulo {
+  font-family: "Sora", sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--clr-text);
+  margin-right: 8px;
+}
+
+.vi-btn-add-regra {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  padding: 8px 14px;
+}
+
+.vi-regras-vazio {
+  margin: 0;
+  padding: 16px 0 2px;
+  font-size: 13px;
+  color: var(--clr-text-3);
+}
+
+.vi-regra {
+  border: 1px solid var(--clr-border);
+  border-radius: 12px;
+  background: var(--clr-surface-alt);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.vi-regra-topo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+/* Número da regra: mostra a ORDEM de execução, que é o que define o
+   resultado quando uma regra usa o resultado da anterior. */
+.vi-regra-n {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--clr-primary-lt);
+  color: var(--clr-primary);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.vi-regra-nome {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 6px 10px;
+}
+
+.vi-regra-remover {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--clr-text-3);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+.vi-regra-remover:hover {
+  background: var(--clr-danger-lt, rgba(224, 98, 95, 0.12));
+  color: var(--clr-danger);
+}
+
+/* Os campos fluem numa linha e quebram sozinhos: uma regra com valor
+   manual tem cinco campos, uma com coluna tem quatro. */
+.vi-regra-corpo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.vi-regra-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 155px;
+  min-width: 0;
+}
+.vi-regra-campo > span {
+  font-size: 11px;
+  color: var(--clr-text-3);
+}
+.vi-regra-campo .input-field {
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.vi-regra-op { flex: 0 1 165px; }
+.vi-regra-col {
+  font-family: ui-monospace, "Consolas", "Menlo", monospace;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* A prévia em português. Cinza enquanto é só intenção; quando há um
+   resultado processado, ganha os números reais e fica em destaque. */
+.vi-regra-previa {
+  margin: 11px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--clr-border);
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+  line-height: 1.5;
+}
+.vi-regra-previa.ok {
+  color: var(--clr-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── O que as regras fizeram, dentro do modal ────────────────────── */
+.vi-ajustes {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--clr-border);
+  border-left: 3px solid var(--clr-primary);
+  border-radius: 10px;
+  background: var(--clr-surface-alt);
+}
+.vi-ajustes-titulo {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--clr-text);
+  margin-bottom: 9px;
+}
+.vi-ajustes-lista {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12.5px;
+  color: var(--clr-text-3);
+}
+.vi-ajustes-lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+  line-height: 1.5;
+}
+.vi-ajustes-lista strong {
+  color: var(--clr-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.vi-ajustes-rodape {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--clr-border);
+  font-size: 12px;
+  color: var(--clr-text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vi-regra-remover { transition: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ESCOLHA DO VALOR A EXPORTAR
+
+   Três opções com a cifra de cada uma à mostra. A escolha é feita
+   olhando o número, não decorando qual rótulo corresponde a quê — e
+   um lançamento errado no financeiro é caro de descobrir depois.
+   ═══════════════════════════════════════════════════════════════════ */
+.vi-esc-valor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vi-esc-opc {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border: 1px solid var(--clr-border);
+  border-radius: 10px;
+  background: var(--clr-surface-alt);
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+.vi-esc-opc:hover { border-color: var(--clr-text-3); }
+.vi-esc-opc:has(input:checked) {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+.vi-esc-opc input { flex-shrink: 0; margin: 0; accent-color: var(--clr-primary); }
+
+.vi-esc-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.vi-esc-rot {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clr-text);
+}
+.vi-esc-ajuda {
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+  line-height: 1.35;
+}
+.vi-esc-val {
+  flex-shrink: 0;
+  font-family: var(--vi-cifra, "Sora", sans-serif);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--clr-text);
+  white-space: nowrap;
+}
+.vi-esc-opc:has(input:checked) .vi-esc-val,
+.vi-esc-opc:has(input:checked) .vi-esc-rot { color: var(--clr-primary); }
+
+/* ── Exportações já feitas de uma importação salva ─────────────────
+   A mesma importação pode ir para o financeiro mais de uma vez. O
+   histórico mostra o que já foi lançado, para não repetir sem querer. */
+.vi-hist-exps {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--clr-border);
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vi-esc-opc { transition: none; }
+}

@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Dados da Empresa</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/acoes-massa.css" />
+    <link rel="stylesheet" href="CSS/datepicker.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark",
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+
+    <style>
+      /* ── Seções colapsáveis (mesmo botão da tela Informações de Venda) ── */
+      .field-section-title.secao-header-inline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .secao-chevron-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        flex-shrink: 0;
+        background: var(--clr-surface-alt);
+        color: var(--clr-text-3);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--r-md, 8px);
+        cursor: pointer;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .secao-chevron-btn:hover {
+        color: var(--clr-text);
+        border-color: var(--clr-text-3);
+      }
+      .secao-chevron {
+        transition: transform 0.2s ease;
+      }
+      .secao-colapsada .secao-chevron {
+        transform: rotate(-90deg);
+      }
+    </style>
+    <!-- Senhas do Administrador e do Colaborador: se "Dados da Empresa"
+         estiver bloqueado em Usuários e Senhas, pede a senha para entrar.
+         No <head>, para o conteúdo nem ser pintado antes. -->
+    <script src="JS/senhas.js" data-modulo="empresa"></script>
+  </head>
+  <body class="tem-barra-salvar">
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Dados da Empresa</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">
+            ⚪
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="dark"
+            title="Modo Padrão (Escuro)"
+          >
+            🔵
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="midnight"
+            title="Modo Dark Absoluto"
+          >
+            ⚫
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <!-- ── MENU LATERAL ── -->
+      <aside class="sidebar" id="sidebar">
+        <!-- Voltar (separado por linha, centralizado) -->
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button
+            class="sidebar-item-btn"
+            onclick="window.location.href = 'index.html'"
+            title="Voltar"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline></svg
+            ></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div
+          class="sidebar-section"
+          style="display: flex; flex-direction: column; gap: 8px"
+        >
+          <!-- Dropdown das empresas + caixa da empresa ativa -->
+          <div class="sidebar-empresa-box">
+            <div id="empresaAtivaBox" class="sidebar-empresa-ativa">
+              <span id="empresaAtivaLogo"></span>
+              <span id="empresaAtivaNome">—</span>
+              <button
+                type="button"
+                id="btnTrocarEmpresa"
+                title="Trocar empresa"
+                style="
+                  background: transparent;
+                  border: none;
+                  color: var(--clr-text-3);
+                  cursor: pointer;
+                  padding: 2px;
+                  display: inline-flex;
+                  align-items: center;
+                  border-radius: 4px;
+                  margin-left: auto;
+                  flex-shrink: 0;
+                "
+              >
+                <svg
+                  id="setaTrocarEmpresa"
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="transition: transform 0.18s ease"
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <button
+                type="button"
+                id="btnMenuEmpresa"
+                title="Opções da empresa"
+                style="
+                  background: transparent;
+                  border: none;
+                  color: var(--clr-text-3);
+                  cursor: pointer;
+                  padding: 2px;
+                  display: inline-flex;
+                  align-items: center;
+                  border-radius: 4px;
+                  flex-shrink: 0;
+                "
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <circle cx="12" cy="5" r="1.6"></circle>
+                  <circle cx="12" cy="12" r="1.6"></circle>
+                  <circle cx="12" cy="19" r="1.6"></circle>
+                </svg>
+              </button>
+
+              <!-- Lista de empresas (abre pela setinha) -->
+              <div
+                id="listaEmpresasDropdown"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: calc(100% + 4px);
+                  left: 0;
+                  right: 0;
+                  background: var(--clr-surface);
+                  border: 1px solid var(--clr-border);
+                  border-radius: var(--r-md);
+                  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                  z-index: 6001;
+                  max-height: 260px;
+                  overflow-y: auto;
+                "
+              ></div>
+
+              <!-- Opções (abre pelos 3 pontinhos) -->
+              <div
+                id="menuEmpresaDropdown"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: calc(100% + 4px);
+                  right: 0;
+                  background: var(--clr-surface);
+                  border: 1px solid var(--clr-border);
+                  border-radius: var(--r-md);
+                  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+                  z-index: 6000;
+                  min-width: 160px;
+                  overflow: hidden;
+                "
+              >
+                <button
+                  type="button"
+                  id="btnExcluirEmpresa"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    width: 100%;
+                    background: transparent;
+                    border: none;
+                    color: var(--clr-danger);
+                    cursor: pointer;
+                    padding: 10px 14px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    text-align: left;
+                  "
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    ></path>
+                  </svg>
+                  Excluir empresa
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Adicionar Empresa -->
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnAddEmpresa"
+            title="Adicionar Empresa"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line></svg
+            ></span>
+            <span class="sidebar-label-txt">Adicionar Empresa</span>
+          </button>
+
+          <!-- Documentos -->
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnDocumentos"
+            title="Documentos"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                ></path></svg
+            ></span>
+            <span class="sidebar-label-txt">Documentos</span>
+          </button>
+
+          <!-- Ordenar Posição -->
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnOrdenarSecoes"
+            title="Ordenar Posição"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line></svg
+            ></span>
+            <span class="sidebar-label-txt">Ordenar Posição</span>
+          </button>
+
+          <!-- Adicionar Seção -->
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnAddSecao"
+            title="Adicionar Seção"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line></svg
+            ></span>
+            <span class="sidebar-label-txt">Adicionar Seção</span>
+          </button>
+
+          <!-- Configurar Campos -->
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnConfigCampos"
+            title="Configurar Campos"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                ></path></svg
+            ></span>
+            <span class="sidebar-label-txt">Configurar Campos</span>
+          </button>
+
+          <!-- Usuários e Senhas: abre a tela dos usuários (os responsáveis
+               dos lançamentos) e das senhas de acesso aos módulos — o que
+               antes era o modal "Redefinir Senhas". -->
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnUsuariosSenhas"
+            onclick="window.location.href='usuarios.html'"
+            title="Usuários e Senhas"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="7.5" cy="15.5" r="4.5"></circle>
+                <path d="M10.7 12.3 21 2"></path>
+                <path d="m16 7 3 3"></path>
+                <path d="m19 4 2 2"></path></svg
+            ></span>
+            <span class="sidebar-label-txt">Usuários e Senhas</span>
+          </button>
+        </div>
+
+        <!-- Rodapé: Ajuda -->
+        <div class="sidebar-footer-index">
+          <a
+            href="ajuda.html"
+            class="sidebar-item-btn"
+            title="Central de Ajuda"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line></svg
+            ></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+
+        <!-- Rodapé: encolher menu -->
+        <div class="sidebar-toggle-footer">
+          <button
+            class="sidebar-toggle-btn"
+            onclick="toggleSidebar()"
+            title="Abrir/Fechar menu"
+          >
+            <svg
+              class="sidebar-toggle-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content" id="mainContent">
+        <!-- Cabeçalho da página -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            width: 100%;
+            position: relative;
+          "
+        >
+          <!-- H1 Centralizado Absoluto -->
+          <h1
+            style="
+              position: absolute;
+              left: 50%;
+              transform: translateX(-50%);
+              font-family: &quot;Sora&quot;, sans-serif;
+              font-size: 25px;
+              font-weight: 700;
+              color: var(--clr-text);
+              margin: 0;
+              white-space: nowrap;
+              text-align: center;
+            "
+          >
+            Identificação da Empresa
+          </h1>
+        </div>
+
+        <!-- Estado vazio: nenhuma empresa cadastrada -->
+        <div id="empresaEmptyState" class="empty-state" style="display: none">
+          <div class="empty-state-icon">🏢</div>
+          <div class="empty-state-title">Nenhuma empresa cadastrada</div>
+          <p class="empty-state-text">
+            Clique em <strong>Adicionar Empresa</strong> para cadastrar a
+            primeira empresa.
+          </p>
+          <button class="btn-primary" id="btnAddEmpresaEmpty">
+            + &nbsp;Adicionar Primeira Empresa
+          </button>
+        </div>
+
+        <div
+          id="empresaCard"
+          class="card mb-lg"
+          style="width: 100%; animation: fadeUp 0.4s ease both"
+        >
+          <!-- Seção de Logo (Maior, com botão de remover 'X' embutido) -->
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              margin-bottom: 32px;
+            "
+          >
+            <div style="position: relative; display: inline-block">
+              <div
+                class="product-img-wrapper"
+                id="empresaImgWrapper"
+                style="
+                  width: 250px;
+                  height: 200px;
+                  border-radius: var(--r-md);
+                  overflow: hidden;
+                  cursor: pointer;
+                  border: 2px dashed var(--clr-border);
+                  background: var(--clr-surface-alt);
+                "
+                title="Clique para enviar. A imagem deve ser quadrada"
+              >
+                <img
+                  id="empresaImgPreview"
+                  alt=""
+                  style="
+                    display: none;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                  "
+                />
+                <div
+                  class="product-img-placeholder"
+                  id="empresaImgPlaceholder"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <span
+                    style="font-size: 36px; display: block; margin-bottom: 6px"
+                    >🏢</span
+                  >
+                  <span style="font-size: 13px; color: var(--clr-text-3)"
+                    >Logo Quadrada</span
+                  >
+                </div>
+              </div>
+
+              <!-- Botão (X) de Excluir Logo -->
+              <button
+                id="btnRemoverLogo"
+                type="button"
+                title="Remover Logo"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: -10px;
+                  right: -10px;
+                  background: var(--clr-danger);
+                  color: #fff;
+                  border: none;
+                  border-radius: 50%;
+                  width: 30px;
+                  height: 30px;
+                  font-size: 14px;
+                  font-weight: bold;
+                  cursor: pointer;
+                  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+                  z-index: 10;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                ✕
+              </button>
+            </div>
+
+            <input
+              type="file"
+              id="empresaImgInput"
+              accept="image/*"
+              style="display: none"
+            />
+          </div>
+
+          <!-- Grid Dinâmico de Campos -->
+          <div class="empresa-grid" id="empresaFieldsContainer">
+            <!-- 1. Identificação Principal -->
+            <div class="field-section-title" data-group="identificacao">
+              Identificação Principal e Porte
+            </div>
+
+            <div class="field-group col-4">
+              <label>CNPJ</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="cnpj"
+                data-mask="cnpj"
+                placeholder="Ex: 00.000.000/0001-00"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Razão Social</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="razaoSocial"
+                placeholder="Nome jurídico legal"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Nome Fantasia</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="nomeFantasia"
+                placeholder="Nome comercial"
+              />
+            </div>
+
+            <div class="field-group col-3">
+              <label>Data de Abertura</label
+              ><input
+                type="date"
+                class="input-field"
+                data-emp-key="dataAbertura"
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>Tipo de Estabelecimento</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="tipoEstabelecimento"
+                placeholder="Ex: Matriz, Filial"
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>Natureza Jurídica</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="naturezaJuridica"
+                placeholder="Ex: LTDA, S.A, EI"
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>Porte da Empresa</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="porte"
+                placeholder="Ex: ME, EPP"
+              />
+            </div>
+
+            <div class="field-group col-4">
+              <label>Capital Social</label>
+              <div class="input-addon-wrap">
+                <span class="input-prefix">R$</span>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  class="input-field money-input"
+                  data-emp-key="capitalSocial"
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-identificacao"
+              style="display: contents"
+            ></div>
+
+            <!-- 2. Inscrições Fiscais -->
+            <div class="field-section-title" data-group="inscricoes">
+              Inscrições Fiscais e Registros
+            </div>
+            <div class="field-group col-4">
+              <label>Inscrição Estadual (IE)</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="ie"
+                placeholder="Obrigatório para ICMS"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Inscrição Municipal (IM)</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="im"
+                placeholder="Obrigatório para ISS"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>NIRE</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="nire"
+                placeholder="Registro Junta Comercial"
+              />
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-inscricoes"
+              style="display: contents"
+            ></div>
+
+            <!-- 3. Atividades -->
+            <div class="field-section-title" data-group="atividades">
+              Atividades Econômicas
+            </div>
+            <div class="field-group col-6">
+              <label>CNAE Principal</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="cnaePrincipal"
+                placeholder="Ex: 47.11-3-02 - Comércio Varejista"
+              />
+            </div>
+            <div class="field-group col-6">
+              <label>CNAEs Secundários</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="cnaeSecundario"
+                placeholder="Outros códigos de atividade"
+              />
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-atividades"
+              style="display: contents"
+            ></div>
+
+            <!-- 4. Endereço -->
+            <div class="field-section-title" data-group="endereco">
+              Endereço (Localização)
+            </div>
+            <div class="field-group col-3">
+              <label>CEP</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="cep"
+                data-mask="cep"
+                placeholder="00000-000"
+              />
+            </div>
+            <div class="field-group col-7">
+              <label>Logradouro</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="logradouro"
+                placeholder="Rua, Avenida..."
+              />
+            </div>
+            <div class="field-group col-2">
+              <label>Número</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="numero"
+                placeholder="123"
+              />
+            </div>
+
+            <div class="field-group col-4">
+              <label>Complemento</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="complemento"
+                placeholder="Sala, bloco..."
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>Bairro / Distrito</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="bairro"
+                placeholder="Centro"
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>Município</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="municipio"
+                placeholder="Cidade"
+              />
+            </div>
+            <div class="field-group col-2">
+              <label>UF</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="uf"
+                placeholder="Ex: SP, PR"
+              />
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-endereco"
+              style="display: contents"
+            ></div>
+
+            <!-- 5. Contato -->
+            <div class="field-section-title" data-group="contato">Contato</div>
+            <div class="field-group col-12">
+              <label>E-mail Corporativo</label
+              ><input
+                type="email"
+                class="input-field"
+                data-emp-key="email"
+                placeholder="contato@empresa.com"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Telefone FIXO</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="fixo"
+                data-mask="telefone"
+                placeholder="(00) 0000-0000"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Telefone Celular</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="celular"
+                data-mask="telefone"
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>WhatsApp</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="whatsapp"
+                data-mask="telefone"
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-contato"
+              style="display: contents"
+            ></div>
+
+            <!-- 6. Situação Cadastral -->
+            <div class="field-section-title" data-group="situacao">
+              Situação Cadastral e Regime Tributário
+            </div>
+            <div class="field-group col-4">
+              <label>Situação Cadastral</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="situacaoCadastral"
+                placeholder="Ativa, Baixada..."
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Data da Situação Cadastral</label
+              ><input
+                type="date"
+                class="input-field"
+                data-emp-key="dataSituacao"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>Motivo da Situação</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="motivoSituacao"
+                placeholder="Ex: Abertura"
+              />
+            </div>
+
+            <div class="field-group col-3">
+              <label>Simples Nacional?</label>
+              <select class="input-field" data-emp-key="simplesNacional">
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+            <div class="field-group col-3">
+              <label>Data de Opção (Simples)</label
+              ><input
+                type="date"
+                class="input-field"
+                data-emp-key="dataSimples"
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>SIMEI (MEI)?</label>
+              <select class="input-field" data-emp-key="simei">
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+            <div class="field-group col-3">
+              <label>Data de Opção (SIMEI)</label
+              ><input
+                type="date"
+                class="input-field"
+                data-emp-key="dataSimei"
+              />
+            </div>
+
+            <!-- Campo OBRIGATÓRIO: sem ele o botão Salvar recusa a gravação.
+                 A validação fica no _salvar() do empresa.js. O asterisco e o
+                 texto de apoio existem para o usuário saber disso ANTES de
+                 tentar salvar, e não só quando o aviso aparecer. -->
+            <div class="field-group col-3">
+              <label
+                >Sua porcentagem de imposto por nota
+                <span style="color: var(--clr-danger)">*</span></label
+              >
+              <div class="input-addon-wrap input-addon-wrap-suffix">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  class="input-field percent-input"
+                  data-emp-key="impostoPorNota"
+                  id="empImpostoPorNota"
+                  placeholder="0,00"
+                />
+                <span class="input-suffix">%</span>
+              </div>
+              <small
+                style="
+                  color: var(--clr-text-3);
+                  font-size: 11px;
+                  margin-top: 4px;
+                  display: block;
+                "
+                >Obrigatório. Percentual de imposto que incide sobre cada nota
+                emitida.</small
+              >
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-situacao"
+              style="display: contents"
+            ></div>
+
+            <!-- 7. QSA -->
+            <div class="field-section-title" data-group="qsa">
+              Quadro de Sócios e Administradores (QSA)
+            </div>
+            <div class="field-group col-5">
+              <label>Nome do Sócio / Administrador</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="qsaNome"
+                placeholder="Nome Completo"
+              />
+            </div>
+            <div class="field-group col-4">
+              <label>CPF ou CNPJ do Sócio</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="qsaDoc"
+                data-mask="cpfCnpj"
+                placeholder="CPF ou CNPJ"
+              />
+            </div>
+            <div class="field-group col-3">
+              <label>Qualificação do Sócio</label
+              ><input
+                type="text"
+                class="input-field"
+                data-emp-key="qsaQualificacao"
+                placeholder="Administrador, Diretor..."
+              />
+            </div>
+            <div
+              class="custom-fields-container"
+              id="custom-qsa"
+              style="display: contents"
+            ></div>
+
+            <!-- Sócios adicionais (adicionados dinamicamente) -->
+            <div id="qsa-socios-extras" style="display: contents"></div>
+
+            <!-- Botão Adicionar Sócio -->
+            <div class="field-group col-12" style="margin-top: 4px">
+              <button
+                type="button"
+                id="btnAddSocio"
+                class="btn-secondary"
+                style="font-size: 13px; width: fit-content"
+              >
+                + &nbsp;Adicionar Sócio
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seções personalizadas (criadas pelo usuário) -->
+        <div id="secoesCustomContainer"></div>
+
+      </main>
+    </div>
+
+    <!-- Salvar / Cancelar: fixos no canto inferior direito da tela.
+         "Cancelar" desfaz o que ainda não foi salvo na empresa aberta.
+         Sem empresa cadastrada, a barra some (JS/empresa.js). -->
+    <div id="empresaSaveBar" class="action-bar barra-salvar" role="region" aria-label="Salvar ou cancelar">
+      <span class="action-bar-info" id="empresaStatus"></span>
+      <div class="action-bar-btns">
+        <button type="button" class="btn-secondary" id="btnCancelarEmpresa">Cancelar</button>
+        <button type="button" class="btn-primary" id="btnSalvarEmpresa">✓ Salvar</button>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/datepicker.js"></script>
+    <script src="JS/empresa.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_empresa.js"></script>
+  </body>
+</html>

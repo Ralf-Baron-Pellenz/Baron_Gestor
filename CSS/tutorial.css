@@ -1,0 +1,840 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Bapell Gestor Pro — tutorial.css
+   Visual do tutorial interativo (tour guiado) e da lista de tutoriais
+   na Central de Ajuda.
+
+   Usa as variáveis de tema do style.css (--clr-*, --r-*): acompanha os
+   temas Claro, Padrão e Dark Absoluto sem regra repetida por tela. Só o
+   véu, o halo e a sombra da caixa mudam por tema, porque a mesma
+   opacidade que funciona no claro some no preto absoluto.
+
+   Prefixo btu- (livre no projeto): nada aqui altera estilos existentes.
+   Camada: z-index 2147483200 — acima de qualquer janela das telas e da
+   tela de bloqueio da licença, abaixo dos avisos de licença e dos toasts.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Variáveis por tema ─────────────────────────────────────────────── */
+:root {
+  --btu-veu: rgba(7, 11, 20, 0.68);
+  --btu-halo: rgba(76, 141, 246, 0.3);
+  --btu-pulso: rgba(76, 141, 246, 0.55);
+  --btu-fundo: var(--clr-surface, #1a2336);
+  --btu-borda: var(--clr-border, #38445e);
+  --btu-divisor: rgba(151, 163, 186, 0.16);
+  --btu-trilho: rgba(151, 163, 186, 0.18);
+  --btu-sombra: 0 30px 70px -20px rgba(0, 0, 0, 0.72), 0 12px 28px -14px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="light"] {
+  --btu-veu: rgba(15, 23, 42, 0.52);
+  --btu-halo: rgba(37, 99, 235, 0.24);
+  --btu-pulso: rgba(37, 99, 235, 0.5);
+  --btu-fundo: #ffffff;
+  --btu-borda: var(--clr-border, #c7d1e0);
+  --btu-divisor: rgba(67, 81, 106, 0.14);
+  --btu-trilho: rgba(67, 81, 106, 0.14);
+  --btu-sombra: 0 30px 64px -22px rgba(15, 23, 42, 0.5), 0 10px 24px -14px rgba(15, 23, 42, 0.28);
+}
+
+[data-theme="midnight"] {
+  --btu-veu: rgba(0, 0, 0, 0.78);
+  --btu-halo: rgba(91, 143, 224, 0.3);
+  --btu-pulso: rgba(91, 143, 224, 0.55);
+  --btu-fundo: var(--clr-surface-alt, #161619);
+  --btu-borda: var(--clr-border-soft, #38383f);
+  --btu-divisor: rgba(140, 144, 153, 0.16);
+  --btu-trilho: rgba(140, 144, 153, 0.18);
+  --btu-sombra: 0 30px 70px -18px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+/* Rolagem até o alvo desconta o cabeçalho fixo e as barras de rodapé.
+   Ativo só enquanto um tutorial está na tela. */
+html.btu-rolagem {
+  scroll-padding-top: var(--btu-topo, 80px);
+  scroll-padding-bottom: var(--btu-base, 16px);
+}
+
+/* ══════════════════════════════════════════
+   CAMADA
+   ══════════════════════════════════════════ */
+.btu-raiz {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483200;
+  pointer-events: none;
+  font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--clr-text);
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btu-raiz *,
+.btu-raiz *::before,
+.btu-raiz *::after {
+  box-sizing: border-box;
+}
+
+.btu-raiz.btu-raiz--visivel {
+  opacity: 1;
+}
+
+.btu-raiz.btu-raiz--saindo {
+  opacity: 0;
+  transition-duration: 0.24s;
+}
+
+/* Captura todo clique/toque da tela: nada por baixo responde. */
+.btu-bloqueio {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+  cursor: default;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ══════════════════════════════════════════
+   DESTAQUE — o "buraco" no véu
+   A sombra gigante é o véu; os dois primeiros anéis são o contorno.
+   ══════════════════════════════════════════ */
+.btu-foco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px var(--clr-primary),
+    0 0 0 7px var(--btu-halo),
+    0 0 0 200vmax var(--btu-veu);
+  transition:
+    transform 0.42s cubic-bezier(0.65, 0, 0.35, 1),
+    width 0.42s cubic-bezier(0.65, 0, 0.35, 1),
+    height 0.42s cubic-bezier(0.65, 0, 0.35, 1),
+    border-radius 0.42s ease,
+    box-shadow 0.3s ease;
+  will-change: transform, width, height;
+}
+
+.btu-foco.btu-foco--vazio {
+  box-shadow:
+    0 0 0 0 transparent,
+    0 0 0 0 transparent,
+    0 0 0 200vmax var(--btu-veu);
+}
+
+.btu-foco.btu-sem-transicao {
+  transition: none;
+}
+
+/* Pulso único ao chegar num elemento. */
+.btu-foco::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.btu-foco.btu-foco--pulso::after {
+  animation: btuPulso 1.15s cubic-bezier(0.2, 0.7, 0.3, 1) 1;
+}
+
+@keyframes btuPulso {
+  0% {
+    box-shadow: 0 0 0 0 var(--btu-pulso);
+  }
+  100% {
+    box-shadow: 0 0 0 16px transparent;
+  }
+}
+
+/* ══════════════════════════════════════════
+   CAIXA DE EXPLICAÇÃO
+   ══════════════════════════════════════════ */
+.btu-balao {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 352px;
+  max-width: calc(100vw - 28px);
+  max-height: calc(100vh - 28px);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px 16px;
+  background: var(--btu-fundo);
+  border: 1px solid var(--btu-borda);
+  border-radius: 16px;
+  box-shadow: var(--btu-sombra);
+  pointer-events: auto;
+  outline: none;
+  opacity: 0;
+  transform: translate(var(--btu-dx, 0px), var(--btu-dy, 6px)) scale(0.985);
+  /* Saída rápida (troca de passo); a entrada tem a própria transição. */
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+}
+
+.btu-balao.btu-balao--visivel {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* A caixa entra vindo do lado do elemento destacado. */
+.btu-balao[data-lado="abaixo"] {
+  --btu-dx: 0px;
+  --btu-dy: -7px;
+}
+.btu-balao[data-lado="acima"] {
+  --btu-dx: 0px;
+  --btu-dy: 7px;
+}
+.btu-balao[data-lado="direita"] {
+  --btu-dx: -7px;
+  --btu-dy: 0px;
+}
+.btu-balao[data-lado="esquerda"] {
+  --btu-dx: 7px;
+  --btu-dy: 0px;
+}
+.btu-balao[data-lado="centro"],
+.btu-balao[data-lado="sobre"] {
+  --btu-dx: 0px;
+  --btu-dy: 10px;
+}
+
+/* Clique fora da caixa: um toque discreto para chamar atenção. */
+.btu-balao.btu-balao--atencao {
+  animation: btuAtencao 0.5s cubic-bezier(0.3, 0.7, 0.4, 1) 1;
+}
+
+@keyframes btuAtencao {
+  0% {
+    scale: 1;
+  }
+  30% {
+    scale: 1.025;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/* Seta: um losango com a cor e a borda da caixa. */
+.btu-seta {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--btu-fundo);
+  border: 1px solid var(--btu-borda);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.btu-seta[hidden] {
+  display: none;
+}
+.btu-seta[data-lado="abaixo"] {
+  top: -7px;
+  margin-left: -6px;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 3px;
+}
+.btu-seta[data-lado="acima"] {
+  bottom: -7px;
+  margin-left: -6px;
+  border-left: 0;
+  border-top: 0;
+  border-bottom-right-radius: 3px;
+}
+.btu-seta[data-lado="direita"] {
+  left: -7px;
+  margin-top: -6px;
+  border-top: 0;
+  border-right: 0;
+  border-bottom-left-radius: 3px;
+}
+.btu-seta[data-lado="esquerda"] {
+  right: -7px;
+  margin-top: -6px;
+  border-bottom: 0;
+  border-left: 0;
+  border-top-right-radius: 3px;
+}
+
+/* Progresso: fio fino colado na borda de cima. */
+.btu-progresso {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--btu-trilho);
+  overflow: hidden;
+}
+.btu-progresso-barra {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--clr-primary);
+  border-radius: inherit;
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.btu-cabeca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 3px 0 9px;
+}
+
+.btu-rotulo {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--clr-primary);
+}
+
+.btu-contador {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--clr-text-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.btu-icone {
+  display: none;
+}
+
+.btu-titulo {
+  margin: 0 0 6px;
+  font-family: "Sora", "DM Sans", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--clr-text);
+}
+
+.btu-texto {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-size: 13.5px;
+  line-height: 1.62;
+  color: var(--clr-text-2);
+  scrollbar-width: thin;
+}
+
+.btu-texto p {
+  margin: 0 0 8px;
+}
+.btu-texto p:last-child {
+  margin-bottom: 0;
+}
+.btu-texto strong,
+.btu-texto b {
+  color: var(--clr-text);
+  font-weight: 600;
+}
+.btu-texto em {
+  font-style: normal;
+  color: var(--clr-text);
+}
+.btu-texto ul,
+.btu-texto ol {
+  margin: 6px 0 8px;
+  padding-left: 18px;
+}
+.btu-texto li {
+  margin: 3px 0;
+  padding-left: 2px;
+}
+.btu-texto li::marker {
+  color: var(--clr-primary);
+}
+
+.btu-texto kbd,
+.btu-dica kbd {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 6px;
+  border: 1px solid var(--btu-borda);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--clr-surface-alt);
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Observação curta dentro do texto (ex.: "Só no Mercado Livre"). */
+.btu-texto .btu-nota {
+  display: block;
+  margin-top: 10px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--btu-divisor);
+  background: var(--clr-surface-alt);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--clr-text-2);
+}
+[data-theme="midnight"] .btu-texto .btu-nota {
+  background: var(--clr-surface);
+}
+
+.btu-dica {
+  margin-top: 12px;
+  font-size: 11.5px;
+  color: var(--clr-text-3);
+}
+.btu-dica[hidden] {
+  display: none;
+}
+
+.btu-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--btu-divisor);
+}
+
+.btu-rodape-dir {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ── Botões ── */
+.btu-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  margin: 0;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: none;
+  transform: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.btu-btn[hidden] {
+  display: none;
+}
+.btu-btn:focus {
+  outline: none;
+}
+.btu-btn:focus-visible {
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 3px var(--btu-halo);
+}
+.btu-btn svg {
+  flex-shrink: 0;
+}
+
+.btu-btn--pri {
+  padding: 0 12px 0 15px;
+  background: var(--clr-primary);
+  border-color: var(--clr-primary);
+  color: var(--clr-text-inv);
+  box-shadow: 0 6px 16px -8px var(--clr-primary);
+}
+.btu-btn--pri:hover {
+  background: var(--clr-primary-h);
+  border-color: var(--clr-primary-h);
+}
+.btu-btn--pri:focus-visible {
+  box-shadow: 0 0 0 3px var(--btu-halo), 0 6px 16px -8px var(--clr-primary);
+}
+.btu-btn--pri:active {
+  box-shadow: none;
+}
+
+.btu-btn--sec {
+  border-color: var(--btu-borda);
+  color: var(--clr-text-2);
+}
+.btu-btn--sec:hover {
+  background: var(--clr-surface-alt);
+  border-color: var(--clr-border-soft);
+  color: var(--clr-text);
+}
+[data-theme="midnight"] .btu-btn--sec:hover {
+  background: var(--clr-surface);
+}
+
+.btu-btn--pular {
+  margin-left: -8px;
+  padding: 0 8px;
+  color: var(--clr-text-3);
+}
+.btu-btn--pular:hover {
+  color: var(--clr-text);
+  background: var(--clr-surface-alt);
+}
+[data-theme="midnight"] .btu-btn--pular:hover {
+  background: var(--clr-surface);
+}
+
+/* ── Caixa central (abertura, encerramento, passo sem elemento) ── */
+.btu-balao.btu-balao--centro {
+  width: 424px;
+  padding: 26px 26px 18px;
+  text-align: center;
+}
+.btu-balao--centro .btu-cabeca {
+  justify-content: center;
+  gap: 10px;
+}
+.btu-balao--centro .btu-rotulo {
+  flex: 0 1 auto;
+}
+.btu-balao--centro .btu-cabeca .btu-contador::before {
+  content: "·";
+  margin-right: 10px;
+  color: var(--clr-text-3);
+}
+.btu-balao--centro .btu-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  margin: 8px auto 14px;
+  border-radius: 16px;
+  color: var(--clr-primary);
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--btu-borda);
+  box-shadow: inset 0 0 0 4px var(--btu-halo);
+}
+[data-theme="midnight"] .btu-balao--centro .btu-icone {
+  background: var(--clr-surface);
+}
+.btu-balao--centro .btu-titulo {
+  font-size: 19px;
+  margin-bottom: 8px;
+}
+.btu-balao--centro .btu-texto {
+  font-size: 14px;
+}
+.btu-balao--centro .btu-texto ul,
+.btu-balao--centro .btu-texto ol {
+  display: inline-block;
+  text-align: left;
+}
+.btu-balao--centro .btu-texto .btu-nota {
+  text-align: left;
+}
+.btu-balao--centro .btu-rodape {
+  margin-top: 20px;
+}
+
+/* ── Movimento reduzido (preferência do sistema) ── */
+@media (prefers-reduced-motion: reduce) {
+  .btu-raiz,
+  .btu-foco,
+  .btu-balao,
+  .btu-progresso-barra {
+    transition: none !important;
+  }
+  .btu-foco::after,
+  .btu-balao {
+    animation: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   CENTRAL DE AJUDA — lista de tutoriais
+   ══════════════════════════════════════════ */
+/* A lista fica dentro de um artigo da Ajuda (.ajuda-artigo-corpo), que abre
+   e fecha como os outros; fonte, cor e espaçamento lateral vêm de lá.
+   O seletor duplo vence o "margin: 0 0 10px" que a Ajuda dá aos parágrafos. */
+.ajuda-artigo-corpo .btu-ajuda-intro {
+  margin: 0 0 16px;
+}
+
+.btu-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btu-painel-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btu-painel-progresso {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.btu-painel-numeros {
+  margin-bottom: 7px;
+  font-size: 13px;
+  color: var(--clr-text-2);
+}
+.btu-painel-numeros strong {
+  font-family: "Sora", "DM Sans", sans-serif;
+  font-size: 15px;
+  color: var(--clr-text);
+}
+
+.btu-painel-trilho {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  overflow: hidden;
+}
+.btu-painel-trilho span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--clr-success);
+  transition: width 0.4s ease;
+}
+
+.btu-painel-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid var(--clr-border);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.btu-painel-reset:hover {
+  background: var(--clr-surface-alt);
+  border-color: var(--clr-border-soft);
+  color: var(--clr-text);
+}
+.btu-painel-reset:focus-visible,
+.btu-cartao-btn:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+}
+
+.btu-painel-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  gap: 10px;
+}
+
+.btu-cartao {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 14px 12px;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md, 12px);
+  background: var(--clr-bg);
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.btu-cartao:hover {
+  border-color: var(--clr-border-soft);
+}
+[data-theme="light"] .btu-cartao {
+  background: var(--clr-surface-alt);
+}
+
+.btu-cartao-topo {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+}
+
+.btu-cartao-icone {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: var(--clr-primary);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+}
+
+.btu-cartao-textos {
+  min-width: 0;
+}
+
+.btu-cartao-nome {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--clr-text);
+}
+
+.btu-cartao-desc {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--clr-text-3);
+}
+
+.btu-cartao-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btu-selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--clr-text-3);
+  white-space: nowrap;
+}
+.btu-selo-ponto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--clr-text-3);
+  opacity: 0.6;
+}
+.btu-selo--concluido {
+  color: var(--clr-success);
+}
+.btu-selo--pulado {
+  color: var(--clr-warning);
+}
+.btu-selo--pulado .btu-selo-ponto {
+  background: var(--clr-warning);
+  opacity: 1;
+}
+
+.btu-cartao-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 8px 0 12px;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: var(--clr-surface);
+  color: var(--clr-text);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.btu-cartao-btn:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+}
+.btu-cartao[data-estado="novo"] .btu-cartao-btn {
+  background: var(--clr-primary);
+  border-color: var(--clr-primary);
+  color: var(--clr-text-inv);
+}
+.btu-cartao[data-estado="novo"] .btu-cartao-btn:hover {
+  background: var(--clr-primary-h);
+  border-color: var(--clr-primary-h);
+  color: var(--clr-text-inv);
+}
+
+/* Botão "Como usar" da Central de Cálculos (injetado pelo tutorial). */
+.btu-como-usar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--clr-text-2);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.btu-como-usar:hover {
+  border-color: var(--clr-primary);
+  color: var(--clr-primary);
+}
+.btu-como-usar:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
+}

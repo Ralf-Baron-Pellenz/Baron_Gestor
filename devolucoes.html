@@ -1,0 +1,1668 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Gestor de Devoluções</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <!-- As empresas do menu lateral usam o mesmo botão do Gerador de EAN e
+         das Notas Fiscais (.empresa-item-btn, no ean.css). -->
+    <link rel="stylesheet" href="CSS/ean.css" />
+    <link rel="stylesheet" href="CSS/datepicker.css" />
+    <link rel="stylesheet" href="CSS/devolucoes.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark",
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <!-- Senha de acesso (Administrador ou Colaborador), se este módulo
+         estiver bloqueado em Dados da Empresa › Usuários e Senhas. No
+         <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-modulo="devolucoes"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Gestor de Devoluções</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">
+            ⚪
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="dark"
+            title="Modo Padrão (Escuro)"
+          >
+            🔵
+          </button>
+          <button
+            class="theme-btn"
+            data-theme-value="midnight"
+            title="Modo Dark Absoluto"
+          >
+            ⚫
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <!-- ── MENU LATERAL ── -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button
+            class="sidebar-item-btn"
+            onclick="window.location.href = 'index.html'"
+            title="Voltar"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline></svg
+            ></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <!-- As três telas do Gestor e os atalhos para Lembretes e Controle
+             Financeiro (os atalhos trocam de tela como o resto do app). -->
+        <div class="sidebar-section dev-aside-nav">
+          <div class="sidebar-title sidebar-label-txt dev-aside-titulo">
+            DEVOLUÇÕES
+          </div>
+          <nav class="dev-nav" aria-label="Telas do Gestor de Devoluções">
+            <button
+              type="button"
+              class="sidebar-item-btn dev-nav-btn ativo"
+              data-vista="lancamento"
+              id="navLancamento"
+              title="Lançamento de devoluções"
+              aria-current="page"
+            >
+              <span class="sidebar-btn-icon"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="9 14 4 9 9 4"></polyline>
+                  <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg
+              ></span>
+              <span class="sidebar-label-txt">Lançamento de devoluções</span>
+            </button>
+            <button
+              type="button"
+              class="sidebar-item-btn dev-nav-btn"
+              data-vista="registrar"
+              id="navRegistrar"
+              title="Registrar futuras devoluções"
+            >
+              <span class="sidebar-btn-icon"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle></svg
+              ></span>
+              <span class="sidebar-label-txt"
+                >Registrar futuras devoluções</span
+              >
+            </button>
+            <button
+              type="button"
+              class="sidebar-item-btn dev-nav-btn"
+              data-vista="acompanhar"
+              id="navAcompanhar"
+              title="Acompanhar devoluções"
+            >
+              <span class="sidebar-btn-icon"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                  ></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                  <line x1="9" y1="12" x2="15" y2="12"></line>
+                  <line x1="9" y1="16" x2="13" y2="16"></line></svg
+                ><i
+                  class="dev-nav-contagem"
+                  id="navAcompanharContagem"
+                  hidden
+                ></i
+              ></span>
+              <span class="sidebar-label-txt">Acompanhar devoluções</span>
+            </button>
+          </nav>
+
+          <div
+            class="sidebar-title sidebar-label-txt dev-aside-titulo dev-aside-titulo--atalhos"
+          >
+            ATALHOS
+          </div>
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            data-atalho
+            id="navLembretes"
+            onclick="window.location.href = 'lembretes.html'"
+            title="Lembretes"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg
+            ></span>
+            <span class="sidebar-label-txt">Lembretes</span>
+          </button>
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            data-atalho
+            id="navFinanceiro"
+            onclick="window.location.href = 'financeiro.html'"
+            title="Controle Financeiro"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                <path d="M12 18V6"></path></svg
+            ></span>
+            <span class="sidebar-label-txt">Controle Financeiro</span>
+          </button>
+        </div>
+
+        <!-- Empresas: uma abaixo da outra, cada uma visível no próprio menu
+             (sem lista suspensa). Vêm do cadastro em Dados da Empresa. -->
+        <div
+          class="sidebar-section dev-aside-empresas"
+          style="flex: 1; overflow-y: auto"
+        >
+          <div
+            class="sidebar-title sidebar-label-txt"
+            style="
+              font-size: 10px;
+              font-weight: 700;
+              color: var(--clr-text-3);
+              margin-bottom: 8px;
+              letter-spacing: 1px;
+            "
+          >
+            EMPRESAS
+          </div>
+          <div id="listaEmpresas" class="dev-lista-empresas"></div>
+
+          <button
+            type="button"
+            class="sidebar-item-btn"
+            id="btnAddEmpresa"
+            title="Adicionar Empresa"
+            style="margin-top: 10px"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line></svg
+            ></span>
+            <span class="sidebar-label-txt">Adicionar Empresa</span>
+          </button>
+        </div>
+
+        <div class="sidebar-footer-index">
+          <a
+            href="ajuda.html"
+            class="sidebar-item-btn"
+            title="Central de Ajuda"
+          >
+            <span class="sidebar-btn-icon"
+              ><svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line></svg
+            ></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+
+        <div class="sidebar-toggle-footer">
+          <button
+            class="sidebar-toggle-btn"
+            onclick="toggleSidebar()"
+            title="Abrir/Fechar menu"
+          >
+            <svg
+              class="sidebar-toggle-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content dev-pagina">
+        <!-- ═══════════ TELA 1: LANÇAMENTO DE DEVOLUÇÕES ═══════════ -->
+        <section
+          class="dev-vista"
+          id="vistaLancamento"
+          data-vista="lancamento"
+          aria-label="Lançamento de devoluções"
+        >
+          <!-- Cabeçalho: título no centro, "Adicionar Devolução" à direita -->
+          <div class="dev-header-bar">
+            <div class="dev-header-lado" aria-hidden="true"></div>
+            <div class="dev-header-centro">
+              <h1 class="dev-titulo">Gestor de Devoluções</h1>
+              <p class="dev-subtitulo" id="devSubtitulo"></p>
+            </div>
+            <div class="dev-header-acoes">
+              <button
+                type="button"
+                class="btn-primary dev-btn-add"
+                id="btnAddDevolucao"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Adicionar Devolução
+              </button>
+            </div>
+          </div>
+
+          <!-- Sem nenhuma empresa no cadastro -->
+          <div id="devSemEmpresa" class="dev-sem-empresa" hidden>
+            <span class="dev-sem-empresa__ico" aria-hidden="true"
+              ><svg
+                width="30"
+                height="30"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 21h18"></path>
+                <path d="M5 21V7l8-4v18"></path>
+                <path d="M19 21V11l-6-4"></path>
+                <line x1="9" y1="9" x2="9" y2="9.01"></line>
+                <line x1="9" y1="12" x2="9" y2="12.01"></line>
+                <line x1="9" y1="15" x2="9" y2="15.01"></line></svg
+            ></span>
+            <h2>Nenhuma empresa cadastrada</h2>
+            <p>
+              As devoluções são registradas por empresa. Cadastre a sua em
+              <strong>Dados da Empresa</strong> — o imposto da devolução usa a
+              porcentagem de imposto por nota de lá.
+            </p>
+            <button type="button" class="btn-primary" id="btnIrEmpresa">
+              Cadastrar empresa
+            </button>
+          </div>
+
+          <div id="devConteudo">
+            <!-- ═══ DASHBOARD ═══ -->
+            <div class="dev-cards" id="devCards">
+              <div class="dev-card" data-tom="primario" id="cardTotal">
+                <div class="dev-card__titulo">
+                  <span class="dev-card__ico" aria-hidden="true"
+                    ><svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="9 14 4 9 9 4"></polyline>
+                      <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg
+                  ></span>
+                  <span>Total de devoluções</span>
+                </div>
+                <div class="dev-card__valor" id="kpiTotal">0</div>
+                <div class="dev-card__sub" id="kpiTotalSub">
+                  Nenhuma devolução registrada
+                </div>
+              </div>
+
+              <div class="dev-card" data-tom="neutro" id="cardProduto">
+                <div class="dev-card__titulo">
+                  <span class="dev-card__ico" aria-hidden="true"
+                    ><svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                      ></path>
+                      <polyline
+                        points="3.27 6.96 12 12.01 20.73 6.96"
+                      ></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line></svg
+                  ></span>
+                  <span>Produtos mais devolvidos</span>
+                </div>
+                <div
+                  class="dev-card__valor dev-card__valor--texto"
+                  id="kpiProduto"
+                >
+                  —
+                </div>
+                <div class="dev-card__sub" id="kpiProdutoSub"></div>
+                <!-- 2º e 3º lugares (o 1º é o nome em destaque acima) -->
+                <ol class="dev-card__ranking" id="kpiProdutoLista" hidden></ol>
+              </div>
+
+              <div class="dev-card" data-tom="aviso" id="cardLoja">
+                <div class="dev-card__titulo">
+                  <span class="dev-card__ico" aria-hidden="true"
+                    ><svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+                      ></path>
+                      <line x1="3" y1="6" x2="21" y2="6"></line>
+                      <path d="M16 10a4 4 0 0 1-8 0"></path></svg
+                  ></span>
+                  <span>Loja com mais devoluções</span>
+                </div>
+                <div
+                  class="dev-card__valor dev-card__valor--texto"
+                  id="kpiLoja"
+                >
+                  —
+                </div>
+                <div class="dev-card__sub" id="kpiLojaSub"></div>
+              </div>
+
+              <div class="dev-card" data-tom="perigo" id="cardPrejuizo">
+                <div class="dev-card__titulo">
+                  <span class="dev-card__ico" aria-hidden="true"
+                    ><svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                      <polyline points="17 18 23 18 23 12"></polyline></svg
+                  ></span>
+                  <span>Prejuízo total</span>
+                </div>
+                <div class="dev-card__valor" id="kpiPrejuizo">R$ 0,00</div>
+                <div class="dev-card__sub" id="kpiPrejuizoSub"></div>
+              </div>
+
+              <div class="dev-card" data-tom="sucesso" id="cardReembolsos">
+                <div class="dev-card__titulo">
+                  <span class="dev-card__ico" aria-hidden="true"
+                    ><svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="1 4 1 10 7 10"></polyline>
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg
+                  ></span>
+                  <span>Total de reembolsos</span>
+                </div>
+                <div class="dev-card__valor" id="kpiReembolsos">R$ 0,00</div>
+                <div class="dev-card__sub" id="kpiReembolsosSub"></div>
+              </div>
+            </div>
+            <p class="dev-cards-nota" id="devCardsNota"></p>
+
+            <!-- ═══ FILTROS ═══ -->
+            <section
+              class="card dev-filtros"
+              id="devFiltros"
+              aria-label="Filtros das devoluções"
+            >
+              <div class="dev-bloco-topo">
+                <div class="card-title dev-bloco-titulo">
+                  <span class="card-title-dot"></span> Filtros
+                  <span
+                    class="dev-filtros-contagem"
+                    id="filtrosAtivos"
+                    hidden
+                  ></span>
+                </div>
+                <button
+                  type="button"
+                  class="dev-btn-mini"
+                  id="btnLimparFiltros"
+                  disabled
+                >
+                  Limpar filtros
+                </button>
+              </div>
+              <div class="dev-filtros-grade">
+                <div class="dev-filtro dev-filtro--busca">
+                  <label for="fBusca">Buscar</label>
+                  <div class="dev-busca">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input
+                      type="text"
+                      id="fBusca"
+                      class="input-field"
+                      placeholder="SKU, produto, nº da venda ou do ERP, observações…"
+                      autocomplete="off"
+                    />
+                  </div>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fEmpresa">Empresa</label>
+                  <select id="fEmpresa" class="input-field">
+                    <option value="">Todas as empresas</option>
+                  </select>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fLoja">Loja</label>
+                  <select id="fLoja" class="input-field">
+                    <option value="">Todas as lojas</option>
+                  </select>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fEstado">Estado do produto</label>
+                  <select id="fEstado" class="input-field">
+                    <option value="">Todos os estados</option>
+                    <option value="avariado">Avariado</option>
+                    <option value="danificado">Danificado</option>
+                    <option value="bom">Bom estado</option>
+                    <option value="garantia">Garantia</option>
+                    <option value="outros">Outros</option>
+                  </select>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fReembolso">Plataforma reembolsou</label>
+                  <select id="fReembolso" class="input-field">
+                    <option value="">Sim e não</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                    <option value="aguardando">Aguardando</option>
+                  </select>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fImposto">Gerou imposto</label>
+                  <select id="fImposto" class="input-field">
+                    <option value="">Sim e não</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                  </select>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fReputacao">Afetou a reputação</label>
+                  <select id="fReputacao" class="input-field">
+                    <option value="">Sim e não</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                  </select>
+                </div>
+                <div class="dev-filtro">
+                  <label for="fFinanceiro">Controle Financeiro</label>
+                  <select id="fFinanceiro" class="input-field">
+                    <option value="">Todas</option>
+                    <option value="exportada">Exportadas</option>
+                    <option value="pendente">
+                      Com prejuízo, não exportadas
+                    </option>
+                    <option value="sem-prejuizo">Sem prejuízo</option>
+                  </select>
+                </div>
+                <div class="dev-filtro dev-filtro--periodo">
+                  <label for="fDe">Chegada do produto</label>
+                  <div class="dev-periodo">
+                    <input
+                      type="date"
+                      id="fDe"
+                      class="input-field"
+                      aria-label="Chegada a partir de"
+                    />
+                    <span>até</span>
+                    <input
+                      type="date"
+                      id="fAte"
+                      class="input-field"
+                      aria-label="Chegada até"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ═══ LISTAGEM ═══ -->
+            <section
+              class="card dev-lista"
+              id="devLista"
+              aria-label="Devoluções"
+            >
+              <div class="dev-bloco-topo">
+                <div class="card-title dev-bloco-titulo">
+                  <span class="card-title-dot"></span> Devoluções
+                  <span class="dev-lista-contagem" id="listaContagem"></span>
+                </div>
+                <div class="dev-bloco-acoes">
+                  <button
+                    type="button"
+                    class="dev-btn-mini dev-btn-mini--financeiro"
+                    id="btnExportarLote"
+                    title="Lança no Controle Financeiro, como saída DEVOLUÇÃO, as devoluções da lista que têm prejuízo e ainda não foram exportadas"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                      ></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Exportar para o Financeiro
+                  </button>
+                </div>
+              </div>
+
+              <div class="dev-tabela-wrap">
+                <table class="dev-tabela">
+                  <thead>
+                    <!-- Quantidade: embaixo do valor (2 × R$ …). Reembolso:
+                       embaixo do prejuízo. Assim a tabela cabe sem rolar. -->
+                    <tr>
+                      <th class="dev-td-prod">Produto</th>
+                      <th>Loja</th>
+                      <th class="dev-ordenavel" data-ordem="chegada">
+                        Chegada
+                      </th>
+                      <th>Estado</th>
+                      <th class="num dev-ordenavel" data-ordem="valor">
+                        Valor
+                      </th>
+                      <th class="num">Imposto</th>
+                      <th class="num dev-ordenavel" data-ordem="prejuizo">
+                        Prejuízo
+                      </th>
+                      <th class="dev-col-acoes">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="devCorpo"></tbody>
+                </table>
+              </div>
+
+              <div class="dev-vazio" id="devVazio" hidden>
+                <span class="dev-vazio__ico" aria-hidden="true"
+                  ><svg
+                    width="34"
+                    height="34"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="9 14 4 9 9 4"></polyline>
+                    <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg
+                ></span>
+                <div class="dev-vazio__titulo" id="devVazioTitulo">
+                  Nenhuma devolução registrada
+                </div>
+                <p class="dev-vazio__texto" id="devVazioTexto">
+                  Clique em <strong>Adicionar Devolução</strong> para registrar
+                  a primeira.
+                </p>
+              </div>
+
+              <div class="dev-mais" id="devMais" hidden>
+                <span id="devMaisContagem"></span>
+                <button
+                  type="button"
+                  class="btn-secondary dev-btn-mais"
+                  id="btnMostrarMais"
+                >
+                  Mostrar mais
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ═══════════ TELA 2: REGISTRAR FUTURAS DEVOLUÇÕES ═══════════
+             Devoluções que ainda estão a caminho, com os dados que já se
+             tem. O formulário é o mesmo da janela de lançamento: ele vem
+             para cá enquanto esta tela está aberta (ver devolucoes.js). -->
+        <section
+          class="dev-vista"
+          id="vistaRegistrar"
+          data-vista="registrar"
+          aria-label="Registrar futuras devoluções"
+          hidden
+        >
+          <div class="dev-header-bar">
+            <div class="dev-header-lado" aria-hidden="true"></div>
+            <div class="dev-header-centro">
+              <h1 class="dev-titulo">Registrar futuras devoluções</h1>
+              <p class="dev-subtitulo" id="fdSubtitulo"></p>
+            </div>
+            <div class="dev-header-acoes">
+              <button
+                type="button"
+                class="btn-secondary dev-btn-add"
+                id="fdIrAcompanhar"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                  ></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                Acompanhar devoluções
+              </button>
+            </div>
+          </div>
+
+          <section
+            class="card dev-fut-card"
+            id="fdCard"
+            aria-labelledby="fdCardTitulo"
+          >
+            <div class="dev-bloco-topo">
+              <div class="card-title dev-bloco-titulo" id="fdCardTitulo">
+                <span class="card-title-dot"></span>
+                <span id="fdCardTituloTxt">Nova devolução a caminho</span>
+              </div>
+              <span
+                class="dev-tag dev-fut-editando"
+                id="fdEditando"
+                hidden
+              ></span>
+            </div>
+            <p class="dev-fut-intro" id="fdIntro">
+              Registre a devolução assim que souber dela, com os dados que já
+              tiver. Só são obrigatórios a
+              <strong>empresa</strong>, a <strong>loja</strong>, o
+              <strong>produto ou o número da venda</strong> e o
+              <strong>responsável</strong>. Quando o produto chegar, lance-o em
+              <strong>Acompanhar devoluções</strong>.
+            </p>
+            <div class="dev-fut-form" id="fdFormHost"></div>
+            <div class="dev-rodape-form dev-fut-rodape">
+              <div class="dev-campo dev-resp-campo">
+                <label for="fdResponsavel"
+                  >Responsável pelo registro
+                  <span class="dev-obrig">*</span></label
+                >
+                <select
+                  id="fdResponsavel"
+                  class="input-field"
+                  title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"
+                ></select>
+              </div>
+              <div class="dev-rodape-botoes">
+                <button type="button" class="btn-secondary" id="fdCancelar">
+                  Limpar
+                </button>
+                <button type="button" class="btn-primary" id="fdSalvar">
+                  Registrar devolução futura
+                </button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- ═══════════ TELA 3: ACOMPANHAR DEVOLUÇÕES ═══════════
+             As devoluções futuras: as que aguardam a chegada (para lançar)
+             e as já lançadas. -->
+        <section
+          class="dev-vista"
+          id="vistaAcompanhar"
+          data-vista="acompanhar"
+          aria-label="Acompanhar devoluções"
+          hidden
+        >
+          <div class="dev-header-bar">
+            <div class="dev-header-lado" aria-hidden="true"></div>
+            <div class="dev-header-centro">
+              <h1 class="dev-titulo">Acompanhar devoluções</h1>
+              <p class="dev-subtitulo" id="dfSubtitulo"></p>
+            </div>
+            <div class="dev-header-acoes">
+              <button type="button" class="btn-primary dev-btn-add" id="dfNova">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Registrar futura devolução
+              </button>
+            </div>
+          </div>
+
+          <section
+            class="card dev-lista dev-fut-lista"
+            id="dfLista"
+            aria-label="Devoluções futuras"
+          >
+            <div class="dev-bloco-topo">
+              <div class="card-title dev-bloco-titulo">
+                <span class="card-title-dot"></span> Devoluções futuras
+                <span class="dev-lista-contagem" id="dfContagem"></span>
+              </div>
+              <div class="dev-bloco-acoes dev-fut-filtros">
+                <div class="dev-busca dev-fut-busca">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    type="text"
+                    id="dfBusca"
+                    class="input-field"
+                    placeholder="SKU, produto, nº da venda…"
+                    autocomplete="off"
+                    aria-label="Buscar nas devoluções futuras"
+                  />
+                </div>
+                <select
+                  id="dfSituacao"
+                  class="input-field"
+                  aria-label="Situação das devoluções futuras"
+                >
+                  <option value="aguardando">Aguardando chegada</option>
+                  <option value="lancada">Já lançadas</option>
+                  <option value="">Todas</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="dev-tabela-wrap" id="dfTabelaWrap">
+              <table class="dev-tabela dev-tabela--fut">
+                <thead>
+                  <tr>
+                    <th class="dev-td-prod">Produto</th>
+                    <th>Loja</th>
+                    <th>Previsão</th>
+                    <th class="num">Valor</th>
+                    <th>Responsável</th>
+                    <th>Situação</th>
+                    <th class="dev-col-acoes">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="dfCorpo"></tbody>
+              </table>
+            </div>
+
+            <div class="dev-vazio" id="dfVazio" hidden>
+              <span class="dev-vazio__ico" aria-hidden="true"
+                ><svg
+                  width="34"
+                  height="34"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle></svg
+              ></span>
+              <div class="dev-vazio__titulo" id="dfVazioTitulo">
+                Nenhuma devolução a caminho
+              </div>
+              <p class="dev-vazio__texto" id="dfVazioTexto">
+                Use <strong>Registrar futura devolução</strong> quando souber de
+                uma devolução que ainda não chegou.
+              </p>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <!-- ═══════════ MODAL: ADICIONAR / EDITAR DEVOLUÇÃO ═══════════ -->
+    <div
+      class="modal-overlay dev-overlay"
+      id="modalDevolucao"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mdTitulo"
+    >
+      <div class="modal dev-modal dev-modal--devolucao">
+        <div class="dev-modal__topo">
+          <div>
+            <div class="modal-title dev-modal__titulo" id="mdTitulo">
+              Adicionar Devolução
+            </div>
+            <div class="dev-modal__sub" id="mdSub">
+              Preencha os dados da devolução. Os campos com
+              <span class="dev-obrig">*</span> são obrigatórios.
+            </div>
+          </div>
+          <button
+            type="button"
+            class="dev-modal__fechar"
+            data-fechar
+            aria-label="Fechar"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- O corpo do formulário. A tela "Registrar futuras devoluções" usa
+             este mesmo corpo: ele vai para lá enquanto ela está aberta e
+             volta para cá quando esta janela abre (devolucoes.js). -->
+        <div class="dev-corpo-host" id="mdCorpoHost">
+          <div class="dev-corpo-form" id="mdCorpo">
+            <div class="dev-form dev-form--devolucao">
+              <!-- Linha 1: empresa e loja -->
+              <div class="dev-campo dev-c-10">
+                <label for="mdEmpresa"
+                  >Empresa <span class="dev-obrig">*</span></label
+                >
+                <div class="dev-select-logo">
+                  <span class="dev-select-logo__img" id="mdEmpresaLogo"></span>
+                  <select id="mdEmpresa" class="input-field"></select>
+                </div>
+              </div>
+              <div class="dev-campo dev-c-10">
+                <label for="mdLoja"
+                  >Loja <span class="dev-obrig">*</span></label
+                >
+                <div class="dev-select-logo">
+                  <span class="dev-select-logo__img" id="mdLojaLogo"></span>
+                  <select id="mdLoja" class="input-field"></select>
+                </div>
+              </div>
+
+              <!-- Linha 2: SKU (60%) e data de chegada (40%); o produto
+               escolhido aparece embaixo, na largura toda -->
+              <div class="dev-campo dev-c-12" id="mdSkuCampo">
+                <label for="mdSku"
+                  >SKU do produto
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <div class="dev-sku-box">
+                  <svg
+                    class="dev-sku-box__lupa"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    type="text"
+                    id="mdSku"
+                    class="input-field"
+                    placeholder="Digite a SKU — os produtos da loja aparecem enquanto você digita"
+                    autocomplete="off"
+                  />
+                  <div
+                    class="dev-sugestoes"
+                    id="mdSugestoes"
+                    hidden
+                    role="listbox"
+                    aria-label="Produtos encontrados"
+                  ></div>
+                </div>
+                <div class="dev-campo-dica" id="mdSkuDica"></div>
+              </div>
+              <div class="dev-campo dev-c-8" id="mdChegadaCampo">
+                <label for="mdChegada" id="mdChegadaRotulo"
+                  >Data de chegada do produto</label
+                >
+                <input type="date" id="mdChegada" class="input-field" />
+              </div>
+
+              <div
+                class="dev-campo dev-campo--cheio"
+                id="mdProdutoCampo"
+                hidden
+              >
+                <label
+                  >Produto
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <div class="dev-produto" id="mdProduto"></div>
+              </div>
+
+              <!-- Linha 3: valor, quantidade, número da venda e número no ERP -->
+              <div class="dev-campo dev-c-5">
+                <label for="mdValor"
+                  >Valor do produto
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    id="mdValor"
+                    class="input-field money-input"
+                    placeholder="0,00"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="dev-campo-dica" id="mdValorDica">
+                  Preço atual na loja; você pode mudar.
+                </div>
+              </div>
+              <div class="dev-campo dev-c-5">
+                <label for="mdQtd" id="mdQtdRotulo"
+                  >Quantidade devolvida
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <input
+                  type="number"
+                  id="mdQtd"
+                  class="input-field"
+                  min="1"
+                  step="1"
+                  value="1"
+                  inputmode="numeric"
+                />
+                <div class="dev-campo-dica" id="mdQtdDica"></div>
+              </div>
+              <div class="dev-campo dev-c-5">
+                <label for="mdVenda">Número da venda</label>
+                <input
+                  type="text"
+                  id="mdVenda"
+                  class="input-field"
+                  placeholder="Nº do pedido na plataforma"
+                  autocomplete="off"
+                  maxlength="80"
+                />
+              </div>
+              <div class="dev-campo dev-c-5">
+                <label for="mdErp">Número da venda no ERP</label>
+                <input
+                  type="text"
+                  id="mdErp"
+                  class="input-field"
+                  placeholder="Nº da venda no seu ERP"
+                  autocomplete="off"
+                  maxlength="80"
+                />
+              </div>
+
+              <!-- Linha 4: as quatro perguntas, cada uma numa lista de opções -->
+              <div class="dev-campo dev-c-5">
+                <label for="mdImposto" id="mdImpostoRotulo"
+                  >Gerou imposto fiscal?
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <select id="mdImposto" class="input-field dev-escolha">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+              <div class="dev-campo dev-c-5">
+                <label for="mdReputacao" id="mdReputacaoRotulo"
+                  >Afetou a reputação?
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <select id="mdReputacao" class="input-field dev-escolha">
+                  <option value="">Selecione</option>
+                  <option value="sim">Sim</option>
+                  <option value="nao">Não</option>
+                </select>
+              </div>
+              <div class="dev-campo dev-c-5">
+                <label for="mdReembolso" id="mdReembolsoRotulo"
+                  >Plataforma reembolsou?
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <!-- Com "Sim", a lista fica com 35% e, ao lado, o valor que a
+                 plataforma devolveu de fato (a venda menos as taxas), com
+                 65%. É esse valor que entra em Reembolsos. -->
+                <div class="dev-reemb-linha" id="mdReembLinha">
+                  <select id="mdReembolso" class="input-field dev-escolha">
+                    <option value="">Selecione</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
+                    <option value="aguardando">Aguardando</option>
+                  </select>
+                  <div class="dev-reemb-valor" id="mdValorReembCampo" hidden>
+                    <div class="input-addon-wrap">
+                      <span class="input-prefix">R$</span>
+                      <input
+                        type="text"
+                        inputmode="decimal"
+                        id="mdValorReemb"
+                        class="input-field money-input"
+                        placeholder="0,00"
+                        autocomplete="off"
+                        aria-label="Valor reembolsado"
+                        title="Valor reembolsado: quanto a plataforma devolveu (a venda menos as taxas)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="dev-campo dev-c-5">
+                <label for="mdEstado" id="mdEstadoRotulo"
+                  >Estado do produto
+                  <span class="dev-obrig dev-obrig--lancar">*</span></label
+                >
+                <!-- Em ordem alfabética -->
+                <select id="mdEstado" class="input-field dev-escolha">
+                  <option value="">Selecione</option>
+                  <option value="avariado">Avariado</option>
+                  <option value="bom">Bom estado</option>
+                  <option value="danificado">Danificado</option>
+                  <option value="garantia">Garantia</option>
+                  <option value="outros">Outros</option>
+                </select>
+              </div>
+              <div
+                class="dev-campo dev-campo--cheio dev-info-imposto"
+                id="mdImpostoInfo"
+                hidden
+              ></div>
+
+              <!-- Linha 5: observações (60%) e o valor extra (40%), com o motivo
+               dele embaixo. As colunas seguem as da linha 2 (SKU e data). -->
+              <div class="dev-campo dev-c-12 dev-campo--obs">
+                <label for="mdObs">Observações sobre o produto</label>
+                <textarea
+                  id="mdObs"
+                  class="input-field dev-textarea"
+                  rows="2"
+                  maxlength="1000"
+                  placeholder="Condições do produto, motivo da devolução, o que foi combinado com o comprador…"
+                ></textarea>
+              </div>
+              <div class="dev-campo dev-c-8 dev-campo--extra" id="mdExtraCampo">
+                <label for="mdExtra">Valor extra</label>
+                <div class="input-addon-wrap">
+                  <span class="input-prefix">R$</span>
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    id="mdExtra"
+                    class="input-field money-input"
+                    placeholder="0,00"
+                    autocomplete="off"
+                  />
+                </div>
+                <label for="mdExtraMotivo" class="dev-extra-motivo-rotulo"
+                  >Motivo do valor extra</label
+                >
+                <input
+                  type="text"
+                  id="mdExtraMotivo"
+                  class="input-field"
+                  maxlength="120"
+                  placeholder="Ex.: frete da devolução"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+
+            <!-- A conta da devolução, ao vivo -->
+            <div class="dev-resumo" id="mdResumo" aria-live="polite">
+              <div class="dev-resumo__item">
+                <span>Valor da devolução</span
+                ><strong id="mdResValor">R$ 0,00</strong
+                ><small id="mdResValorDet"></small>
+              </div>
+              <div class="dev-resumo__item">
+                <span>Imposto</span><strong id="mdResImposto">R$ 0,00</strong
+                ><small id="mdResImpostoDet"></small>
+              </div>
+              <div class="dev-resumo__item dev-resumo__item--extra">
+                <span>Valor extra</span><strong id="mdResExtra">R$ 0,00</strong
+                ><small id="mdResExtraDet"></small>
+              </div>
+              <div class="dev-resumo__item dev-resumo__item--prejuizo">
+                <span>Prejuízo</span><strong id="mdResPrejuizo">R$ 0,00</strong
+                ><small id="mdResPrejuizoDet"></small>
+              </div>
+              <div class="dev-resumo__item dev-resumo__item--reembolso">
+                <span>Reembolso</span
+                ><strong id="mdResReembolso">R$ 0,00</strong
+                ><small id="mdResReembolsoDet"></small>
+              </div>
+            </div>
+
+            <!-- Devolução já lançada no Financeiro: o que fazer com o lançamento -->
+            <div class="dev-aviso-fin" id="mdAvisoFin" hidden>
+              <div class="dev-aviso-fin__texto" id="mdAvisoFinTexto"></div>
+              <label class="dev-check"
+                ><input type="checkbox" id="mdAtualizarFin" checked />
+                <span id="mdAtualizarFinRotulo"
+                  >Atualizar também o lançamento no Controle Financeiro ao
+                  salvar</span
+                ></label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsável (um dos usuários de Usuários e Senhas) e os botões -->
+        <div
+          class="modal-actions dev-modal__acoes dev-rodape-form"
+          id="mdAcoes"
+        >
+          <div class="dev-campo dev-resp-campo">
+            <label for="mdResponsavel"
+              >Responsável pelo lançamento
+              <span class="dev-obrig">*</span></label
+            >
+            <select
+              id="mdResponsavel"
+              class="input-field"
+              title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"
+            ></select>
+          </div>
+          <div class="dev-rodape-botoes">
+            <button type="button" class="btn-secondary" data-fechar>
+              Cancelar
+            </button>
+            <button type="button" class="btn-primary" id="mdSalvar">
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ MODAL: EXPORTAR PARA O CONTROLE FINANCEIRO ═══════════ -->
+    <div
+      class="modal-overlay dev-overlay"
+      id="modalExportar"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="meTitulo"
+    >
+      <div class="modal dev-modal dev-modal--estreito">
+        <div class="dev-modal__topo">
+          <div>
+            <div class="modal-title dev-modal__titulo" id="meTitulo">
+              Exportar para o Controle Financeiro
+            </div>
+            <div class="dev-modal__sub" id="meSub">
+              A devolução entra como uma saída em
+              <strong>Registrar Saída</strong>, com a tag
+              <span class="dev-tag-fin">DEVOLUÇÃO</span>.
+            </div>
+          </div>
+          <button
+            type="button"
+            class="dev-modal__fechar"
+            data-fechar
+            aria-label="Fechar"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="dev-exp-resumo" id="meResumo"></div>
+
+        <div class="dev-form dev-form--uma">
+          <div class="dev-campo" id="meDescCampo">
+            <label for="meDescricao"
+              >Descrição do lançamento <span class="dev-obrig">*</span></label
+            >
+            <input
+              type="text"
+              id="meDescricao"
+              class="input-field"
+              maxlength="160"
+              autocomplete="off"
+            />
+          </div>
+          <div class="dev-campo" id="meDataCampo">
+            <label for="meData"
+              >Data do lançamento <span class="dev-obrig">*</span></label
+            >
+            <input type="date" id="meData" class="input-field" />
+          </div>
+          <div class="dev-campo" id="meDataLoteCampo" hidden>
+            <label id="meDataLoteRotulo"
+              >Data dos lançamentos <span class="dev-obrig">*</span></label
+            >
+            <div
+              class="dev-escolhas"
+              id="meDataLote"
+              role="radiogroup"
+              aria-labelledby="meDataLoteRotulo"
+            >
+              <button
+                type="button"
+                data-valor="chegada"
+                role="radio"
+                aria-checked="true"
+                class="ativo"
+              >
+                A chegada de cada devolução
+              </button>
+              <button
+                type="button"
+                data-valor="hoje"
+                role="radio"
+                aria-checked="false"
+              >
+                Hoje
+              </button>
+            </div>
+            <div class="dev-campo-dica">
+              Sem data de chegada, a devolução entra com a data de hoje.
+            </div>
+          </div>
+          <div class="dev-campo">
+            <label for="meResponsavel"
+              >Responsável pelo lançamento
+              <span class="dev-obrig">*</span></label
+            >
+            <select
+              id="meResponsavel"
+              class="input-field"
+              title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"
+            ></select>
+          </div>
+        </div>
+
+        <div class="modal-actions dev-modal__acoes">
+          <button type="button" class="btn-secondary" data-fechar>
+            Cancelar
+          </button>
+          <button type="button" class="btn-danger" id="meConfirmar">
+            Lançar saída
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ MODAL: ADICIONAR EMPRESA (escolher do cadastro) ═══════════ -->
+    <div
+      class="modal-overlay dev-overlay"
+      id="modalEmpresas"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mempTitulo"
+    >
+      <div class="modal dev-modal dev-modal--estreito">
+        <div class="dev-modal__topo">
+          <div>
+            <div class="modal-title dev-modal__titulo" id="mempTitulo">
+              Adicionar Empresa
+            </div>
+            <div class="dev-modal__sub">
+              As empresas vêm do cadastro central. Para criar uma nova, use a
+              tela <strong>Dados da Empresa</strong>.
+            </div>
+          </div>
+          <button
+            type="button"
+            class="dev-modal__fechar"
+            data-fechar
+            aria-label="Fechar"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="dev-emp-lista" id="mempLista"></div>
+        <div class="modal-actions dev-modal__acoes">
+          <button type="button" class="btn-secondary" data-fechar>
+            Cancelar
+          </button>
+          <button type="button" class="btn-primary" id="mempCadastrar">
+            Cadastrar nova empresa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ MODAL: CRIAR LEMBRETE (devolução futura) ═══════════
+         O lembrete é gravado no mesmo lugar e no mesmo formato da tela
+         Lembretes: aparece lá e avisa como qualquer outro. -->
+    <div
+      class="modal-overlay dev-overlay"
+      id="modalLembrete"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mlTitulo"
+    >
+      <div class="modal dev-modal dev-modal--estreito">
+        <div class="dev-modal__topo">
+          <div>
+            <div class="modal-title dev-modal__titulo" id="mlTitulo">
+              Criar lembrete
+            </div>
+            <div class="dev-modal__sub">
+              O lembrete vai para a tela <strong>Lembretes</strong> e avisa na
+              data e na hora escolhidas.
+            </div>
+          </div>
+          <button
+            type="button"
+            class="dev-modal__fechar"
+            data-fechar
+            aria-label="Fechar"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+            >
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="dev-exp-resumo" id="mlResumo"></div>
+
+        <div class="dev-form dev-form--lembrete">
+          <div class="dev-campo dev-campo--cheio">
+            <label for="mlTituloLembrete"
+              >Título do lembrete <span class="dev-obrig">*</span></label
+            >
+            <input
+              type="text"
+              id="mlTituloLembrete"
+              class="input-field"
+              maxlength="120"
+              autocomplete="off"
+            />
+          </div>
+          <div class="dev-campo">
+            <label for="mlData">Data <span class="dev-obrig">*</span></label>
+            <input type="date" id="mlData" class="input-field" />
+          </div>
+          <div class="dev-campo">
+            <label for="mlHora">Hora <span class="dev-obrig">*</span></label>
+            <div class="dev-hora">
+              <select
+                id="mlHora"
+                class="input-field"
+                aria-label="Hora"
+              ></select>
+              <span aria-hidden="true">:</span>
+              <select
+                id="mlMin"
+                class="input-field"
+                aria-label="Minutos"
+              ></select>
+            </div>
+          </div>
+          <div class="dev-campo dev-campo--cheio">
+            <label for="mlCriadoPor">Quem colocou</label>
+            <select
+              id="mlCriadoPor"
+              class="input-field"
+              title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"
+            ></select>
+          </div>
+          <div class="dev-campo dev-campo--cheio">
+            <label for="mlObs">Observações do lembrete</label>
+            <textarea
+              id="mlObs"
+              class="input-field dev-textarea"
+              rows="7"
+              maxlength="1000"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions dev-modal__acoes">
+          <button type="button" class="btn-secondary" data-fechar>
+            Cancelar
+          </button>
+          <button type="button" class="btn-primary" id="mlConfirmar">
+            Criar lembrete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/calculadora.js"></script>
+    <script src="JS/datepicker.js"></script>
+    <script src="JS/devolucoes.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_devolucoes.js"></script>
+  </body>
+</html>

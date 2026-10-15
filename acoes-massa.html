@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Precificador — Ações em Massa</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/acoes-massa.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme") || "dark";
+          document.documentElement.setAttribute("data-theme", saved);
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+
+    <style>
+      /* ── Itens de seleção de plataforma ───────────────────────────── */
+      .platform-select-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--clr-border);
+        border-radius: var(--r-md, 8px);
+        background: var(--clr-surface);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        user-select: none;
+      }
+
+      .platform-select-item:hover {
+        border-color: var(--clr-accent, #4f8ef7);
+        background: var(--clr-surface-alt);
+      }
+
+      .platform-select-item input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        accent-color: var(--clr-accent, #4f8ef7);
+        cursor: pointer;
+      }
+
+      /* Quando marcado, destaca a borda */
+      .platform-select-item:has(input:checked) {
+        border-color: var(--clr-accent, #4f8ef7);
+        background: var(--clr-surface-alt);
+      }
+
+      .platform-select-inner {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .platform-select-logo {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .platform-select-logo img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        border-radius: 4px;
+      }
+
+      .platform-select-fallback {
+        width: 28px;
+        height: 28px;
+        background: var(--clr-surface-alt);
+        border: 1px solid var(--clr-border);
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--clr-text-2);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .platform-select-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--clr-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* "Selecionar Todas" row */
+      .select-all-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--clr-text);
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .select-all-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--clr-accent, #4f8ef7);
+        cursor: pointer;
+      }
+
+      /* Botão de navegação transparente (mesmo visual do menu lateral) */
+      .btn-nav-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--r-md, 8px);
+        color: var(--clr-text-2);
+        font-family: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      }
+      .btn-nav-ghost:hover {
+        background: var(--clr-surface-alt);
+        border-color: var(--clr-border);
+        color: var(--clr-primary);
+      }
+
+        /* toggle R$/% do campo Margem */
+        .mass-margem-toggle { display: flex; gap: 6px; margin-bottom: 8px; }
+        .mass-toggle-btn {
+          flex: 1; padding: 7px 10px; font-size: 13px; font-weight: 600;
+          border: 1px solid var(--clr-border); background: var(--clr-surface);
+          color: var(--clr-text-2); border-radius: 8px; cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .mass-toggle-btn:hover { border-color: var(--clr-primary); }
+        .mass-toggle-btn.active { background: var(--clr-primary); border-color: var(--clr-primary); color: #fff; }
+        /* Campo com R$ (prefixo) ou % (sufixo) bem alinhado dentro da caixa */
+
+        /* Modal de confirmacao */
+        .mass-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .mass-modal[hidden] { display: none; }
+        .mass-modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: massFade 0.2s ease; }
+        .mass-modal__card { position: relative; width: 100%; max-width: 460px; background: var(--clr-surface); border: 1px solid var(--clr-border); border-radius: 16px; padding: 28px; box-shadow: 0 24px 60px rgba(0,0,0,0.4); animation: massIn 0.25s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes massFade { from { opacity: 0; } }
+        @keyframes massIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+        .mass-modal__icon { width: 52px; height: 52px; border-radius: 14px; background: var(--clr-primary-lt, rgba(76,141,246,0.15)); color: var(--clr-primary); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+        .mass-modal__title { font-size: 20px; font-weight: 700; color: var(--clr-text); margin: 0 0 8px 0; }
+        .mass-modal__sub { font-size: 14px; color: var(--clr-text-2); margin: 0 0 20px 0; line-height: 1.5; }
+        .mass-modal__list { list-style: none; margin: 0 0 22px 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+        .mass-modal__list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--clr-bg, rgba(0,0,0,0.15)); border: 1px solid var(--clr-border); border-radius: 10px; font-size: 14px; }
+        .mass-modal__list li span:first-child { color: var(--clr-text-2); }
+        .mass-modal__list li strong { color: var(--clr-text); font-weight: 600; }
+        .mass-modal__warn { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--clr-warning); background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); border-radius: 10px; padding: 10px 14px; margin-bottom: 22px; }
+        .mass-modal__warn svg { flex-shrink: 0; margin-top: 1px; }
+        /* Responsável pela aplicação (usuário cadastrado) */
+        .mass-modal__resp { margin: -6px 0 22px; }
+        .mass-modal__req { color: var(--clr-danger); }
+        .mass-modal__actions { display: flex; gap: 10px; }
+        .mass-modal__btn { flex: 1; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 10px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; }
+        .mass-modal__btn--cancel { background: var(--clr-surface); border-color: var(--clr-border); color: var(--clr-text-2); }
+        .mass-modal__btn--cancel:hover { border-color: var(--clr-text-3); color: var(--clr-text); }
+        .mass-modal__btn--confirm { background: var(--clr-primary); color: #fff; }
+        .mass-modal__btn--confirm:hover { filter: brightness(1.08); }
+
+        /* ── Processando ações em massa ──
+           Cobre a tela enquanto as alterações são aplicadas. A roda gira
+           por transform (não depende da página estar livre); a barra
+           mostra o andamento real — antes do primeiro número, uma faixa
+           corre na barra, sem porcentagem inventada. */
+        .mass-proc { z-index: 1100; cursor: progress; }
+        .mass-proc .mass-modal__backdrop { animation: none; }
+        .mass-proc__card { max-width: 420px; text-align: center; outline: none; }
+        .mass-proc__roda {
+          width: 46px; height: 46px; margin: 2px auto 18px; border-radius: 50%;
+          border: 4px solid var(--clr-border); border-top-color: var(--clr-primary);
+          animation: massGira 0.8s linear infinite;
+        }
+        @keyframes massGira { to { transform: rotate(360deg); } }
+        .mass-proc .mass-modal__title { margin-bottom: 6px; }
+        .mass-proc__etapa { margin: 0 0 18px; min-height: 21px; }
+        .mass-proc__barra {
+          position: relative; height: 8px; border-radius: 999px; overflow: hidden;
+          background: var(--clr-surface-alt, rgba(127,127,127,0.18)); border: 1px solid var(--clr-border);
+        }
+        .mass-proc__barra-fill {
+          display: block; height: 100%; width: 0%; border-radius: inherit;
+          background: var(--clr-primary); transition: width 0.2s ease;
+        }
+        .mass-proc__barra--espera .mass-proc__barra-fill {
+          width: 30% !important; animation: massCorre 1.1s ease-in-out infinite;
+        }
+        @keyframes massCorre { from { transform: translateX(-110%); } to { transform: translateX(360%); } }
+        .mass-proc__num {
+          margin-top: 10px; min-height: 18px; font-size: 12.5px; color: var(--clr-text-3);
+          font-variant-numeric: tabular-nums;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mass-proc__roda { animation-duration: 2.4s; }
+          .mass-proc__barra--espera .mass-proc__barra-fill { animation: none; width: 100% !important; opacity: 0.35; }
+          .mass-proc__barra-fill { transition: none; }
+        }
+    </style>
+    <!-- Senha de acesso (Administrador ou Colaborador), se este módulo
+         estiver bloqueado em Dados da Empresa › Usuários e Senhas. No
+         <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-modulo="acoes-massa"></script>
+  </head>
+  <body class="tem-barra-salvar">
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Ações em Massa</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+
+        <!-- SELETOR DE TEMA -->
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark"  title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <main class="main-content" style="margin-left: 0; max-width: 100%;">
+        <!-- Cabeçalho: Voltar + título (igual à tela de Ajuda) -->
+        <div style="max-width: 1100px; margin: 0 auto; width: 100%;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; position: relative;">
+            <button class="btn-nav-ghost" onclick="window.location.href='index.html'" title="Voltar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              Voltar
+            </button>
+            <h1 class="page-title" style="position: absolute; left: 50%; transform: translateX(-50%); margin: 0; white-space: nowrap;">Ações em Massa</h1>
+            <a href="ajuda.html" class="btn-nav-ghost" title="Central de Ajuda">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              Ajuda
+            </a>
+          </div>
+          <p class="page-subtitle" style="margin: 0 0 24px; text-align: center;">
+            Atualize campos de produtos em todas as plataformas de uma só vez
+          </p>
+        </div>
+
+        <!-- ── CARD 1: SKU + PLATAFORMAS ──────────────────────────── -->
+        <div class="card mass-card">
+
+          <!-- SKU -->
+          <div class="card-title"><span class="card-title-dot"></span> Produtos</div>
+          <div style="margin-bottom: 20px;">
+            <div id="skuArea">
+              <!-- O campo de SKU e a seleção global dividem a linha. -->
+              <div class="sku-linha">
+                <div class="input-addon-wrap">
+                  <input
+                    type="text"
+                    id="skuInput"
+                    class="input-field"
+                    placeholder="Digite o SKU e tecle Enter (pode adicionar vários)..."
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                </div>
+
+                <label class="sel-global" id="selGlobal">
+                <input type="checkbox" id="chkTodosProdutos" />
+                  <span>Seleção global — <strong>todos os produtos</strong></span>
+                </label>
+              </div>
+
+              <div id="skuChips" class="sku-chips"></div>
+              <div id="skuPreview" style="margin-top: 12px; display:none;"></div>
+            </div>
+          </div>
+
+          <!-- ── PLATAFORMAS DE DESTINO ───────────────────────────── -->
+          <div class="card-title" style="margin-top: 8px;">
+            <span class="card-title-dot"></span> Plataformas de Destino
+          </div>
+
+          <label class="select-all-row">
+            <input type="checkbox" id="chkSelectAll" checked />
+            Selecionar Todas
+          </label>
+
+          <!-- Preenchido dinamicamente por acoes-massa.js -->
+          <div
+            id="platformSelectionContainer"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px;"
+          ></div>
+        </div>
+
+        <!-- ── CARD 2: CAMPOS PARA ATUALIZAR (dois blocos lado a lado) ── -->
+        <div class="card mass-card" style="margin-top: var(--sp-lg);">
+          <div class="card-title"><span class="card-title-dot"></span> Campos para Atualizar</div>
+
+          <div class="mass-cols">
+            <!-- Coluna esquerda: Formação do Custo -->
+            <div class="mass-col">
+              <div style="background: var(--clr-surface-alt); padding: 16px; border-radius: 8px; border: 1px solid var(--clr-border);">
+                <h4 style="margin:0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--clr-text-2); display:flex; align-items:center; gap:8px;">
+                  <span class="card-title-dot"></span> Formação do Custo
+                </h4>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkCusto" class="mass-checkbox" /> <span>Preço de Custo</span></label>
+                  <div class="mass-input-wrapper" id="groupCusto">
+                    <div class="input-addon-wrap"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valCusto" class="input-field money-input" placeholder="0,00"></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkEtiqueta" class="mass-checkbox" /> <span>Etiqueta</span></label>
+                  <div class="mass-input-wrapper" id="groupEtiqueta">
+                    <div class="input-addon-wrap"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valEtiqueta" class="input-field money-input" placeholder="0,00"></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkEmbalagem" class="mass-checkbox" /> <span>Embalagem</span></label>
+                  <div class="mass-input-wrapper" id="groupEmbalagem">
+                    <div class="input-addon-wrap"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valEmbalagem" class="input-field money-input" placeholder="0,00"></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkFrete" class="mass-checkbox" /> <span>Frete Pago</span></label>
+                  <div class="mass-input-wrapper" id="groupFrete">
+                    <div class="input-addon-wrap"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valFrete" class="input-field money-input" placeholder="0,00"></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkIpi" class="mass-checkbox" /> <span>IPI (%)</span></label>
+                  <div class="mass-input-wrapper" id="groupIpi">
+                    <div class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valIpi" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkDifal" class="mass-checkbox" /> <span>DIFAL (%)</span></label>
+                  <div class="mass-input-wrapper" id="groupDifal">
+                    <div class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valDifal" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkSt" class="mass-checkbox" /> <span>ST (%)</span></label>
+                  <div class="mass-input-wrapper" id="groupSt">
+                    <div class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valSt" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkAliquota" class="mass-checkbox" /> <span>Alíquota (%)</span></label>
+                  <div class="mass-input-wrapper" id="groupAliquota">
+                    <div class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valAliquota" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coluna direita: Variáveis de Venda -->
+            <div class="mass-col">
+              <div style="background: var(--clr-surface-alt); padding: 16px; border-radius: 8px; border: 1px solid var(--clr-border);">
+                <h4 style="margin:0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--clr-text-2); display:flex; align-items:center; gap:8px;">
+                  <span class="card-title-dot"></span> Variáveis de Venda
+                </h4>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkFreteProduto" class="mass-checkbox" /> <span>Frete do Produto</span></label>
+                  <div class="mass-input-wrapper" id="groupFreteProduto">
+                    <div class="input-addon-wrap"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valFreteProduto" class="input-field money-input" placeholder="0,00"></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkTaxaFixa" class="mass-checkbox" /> <span>Taxa Fixa</span></label>
+                  <div class="mass-input-wrapper" id="groupTaxaFixa">
+                    <div class="input-addon-wrap"><span class="input-prefix">R$</span><input type="text" inputmode="decimal" id="valTaxaFixa" class="input-field money-input" placeholder="0,00"></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkTaxa" class="mass-checkbox" /> <span>Taxa Plataforma (%)</span></label>
+                                    <div class="mass-input-wrapper" id="groupTaxa">
+                    <div class="input-addon-wrap input-addon-wrap-suffix" id="taxaComumWrap"><input type="text" inputmode="decimal" id="valTaxa" class="input-field percent-input" placeholder="0" data-mascara-ativa="1"><span class="input-suffix">%</span></div>
+                    <div class="taxa-ml-massa" id="taxaMlWrap" style="display:none;">
+                      <span class="taxa-ml-massa__titulo">Taxa Mercado Livre</span>
+                      <label class="taxa-ml-massa__item">
+                        <span class="taxa-ml-massa__rot taxa-ml-massa__rot--premium">Premium</span>
+                        <span class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valTaxaPremium" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></span>
+                      </label>
+                      <label class="taxa-ml-massa__item">
+                        <span class="taxa-ml-massa__rot taxa-ml-massa__rot--classico">Clássico</span>
+                        <span class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valTaxaClassico" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkImposto" class="mass-checkbox" /> <span>Imposto NF (%)</span></label>
+                  <div class="mass-input-wrapper" id="groupImposto">
+                    <div class="input-addon-wrap input-addon-wrap-suffix"><input type="text" inputmode="decimal" id="valImposto" class="input-field percent-input" placeholder="0"><span class="input-suffix">%</span></div>
+                  </div>
+                </div>
+
+                <div class="mass-field-row">
+                  <label class="mass-checkbox-label"><input type="checkbox" id="chkMargem" class="mass-checkbox" /> <span>Margem de Lucro</span></label>
+                  <div class="mass-input-wrapper" id="groupMargem">
+                    <div class="mass-margem-toggle" role="group" aria-label="Tipo de margem">
+                      <button type="button" class="mass-toggle-btn active" id="btnMassMargemPct" data-type="pct">% Percentual</button>
+                      <button type="button" class="mass-toggle-btn" id="btnMassMargemFixed" data-type="fixed">R$ Fixo</button>
+                    </div>
+                    <div class="input-addon-wrap input-addon-wrap-suffix"><span class="input-prefix" id="valMargemPrefix" hidden>R$</span><input type="text" inputmode="decimal" id="valMargem" class="input-field percent-input" placeholder="0"><span class="input-suffix" id="valMargemSuffix">%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Os botões "Cancelar" e "Salvar" ficam na barra fixa do canto
+               inferior direito (fim da página). -->
+        </div>
+
+        <!-- ── HISTÓRICO ─────────────────────────────────────────────
+             As últimas 9 atualizações. Cada uma abre o detalhe do que
+             foi alterado. -->
+        <div id="historicoBox" class="card" style="margin-top: var(--sp-xl); display:none;">
+          <div class="card-title">
+            <span class="card-title-dot"></span>
+            Histórico de Atualizações
+          </div>
+          <div id="historicoLista" class="hist-lista"></div>
+        </div>
+
+        <!-- Detalhe de uma atualização do histórico. -->
+        <div id="histDetalheModal" class="modal-overlay" style="display:none;">
+          <div class="modal mass-result-modal">
+            <div id="histDetalheConteudo"></div>
+            <div class="mass-result-acoes">
+              <button type="button" class="btn-primary" id="histDetalheOk">Fechar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RESULTADO ───────────────────────────────────────────── -->
+        <!-- Modal do resultado: o quadro aparece por cima, com um botão
+             que fecha e devolve ao formulário. -->
+        <div id="massResultModal" class="modal-overlay" style="display:none;">
+          <div class="modal mass-result-modal">
+            <div id="massResultConteudo"></div>
+            <div class="mass-result-acoes">
+              <button type="button" class="btn-primary" id="massResultOk">Concluir</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="resultadoBox" class="card" style="display: none; margin-top: var(--sp-xl)">
+          <div class="card-title">
+            <span class="card-title-dot"></span>
+            Resultado da Atualização
+          </div>
+          <div id="resultadoConteudo"></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Salvar / Cancelar: fixos no canto inferior direito da tela.
+         "Salvar" aplica as alterações (o mesmo btnAplicar de antes);
+         "Cancelar" limpa o que foi preenchido. -->
+    <div class="action-bar barra-salvar" role="region" aria-label="Salvar ou cancelar">
+      <div class="action-bar-btns">
+        <button type="button" class="btn-secondary" id="btnCancelarMassa">Cancelar</button>
+        <button type="button" class="btn-primary" id="btnAplicar">✓ Salvar</button>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/calculadora.js"></script>
+    <script src="JS/acoes-massa.js"></script>
+
+    <!-- Modal de confirmacao (substitui o confirm nativo) -->
+    <div class="mass-modal" id="massConfirmModal" role="dialog" aria-modal="true" aria-labelledby="massModalTitle" hidden>
+      <div class="mass-modal__backdrop" data-mass-close></div>
+      <div class="mass-modal__card">
+        <div class="mass-modal__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <h2 class="mass-modal__title" id="massModalTitle">Confirmar alterações</h2>
+        <p class="mass-modal__sub" id="massModalSub">Revise antes de aplicar. Esta ação recalcula preços e kits.</p>
+        <ul class="mass-modal__list" id="massModalList"></ul>
+        <div class="mass-modal__warn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Esta ação não pode ser desfeita.
+        </div>
+        <!-- Quem está aplicando: um dos usuários de Dados da Empresa ›
+             Usuários e Senhas (com senha, ela é pedida ao aplicar). -->
+        <div class="field-group mass-modal__resp">
+          <label for="massResponsavel">Responsável <span class="mass-modal__req">*</span></label>
+          <select id="massResponsavel" class="input-field" title="Os usuários cadastrados em Dados da Empresa › Usuários e Senhas"></select>
+        </div>
+        <div class="mass-modal__actions">
+          <button type="button" class="mass-modal__btn mass-modal__btn--cancel" id="massModalCancel" data-mass-close>Cancelar</button>
+          <button type="button" class="mass-modal__btn mass-modal__btn--confirm" id="massModalConfirm">Aplicar alterações</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Processando: aparece enquanto as alterações são aplicadas (sem
+         botão de fechar — sai sozinho, com o resultado ou com o erro).
+         O andamento é preenchido pelo JS/acoes-massa.js. -->
+    <div class="mass-modal mass-proc" id="massProcModal" role="alertdialog" aria-modal="true" aria-busy="true"
+         aria-labelledby="massProcTitulo" aria-describedby="massProcEtapa" hidden>
+      <div class="mass-modal__backdrop"></div>
+      <div class="mass-modal__card mass-proc__card" tabindex="-1">
+        <div class="mass-proc__roda" aria-hidden="true"></div>
+        <h2 class="mass-modal__title" id="massProcTitulo">Processando ações em massa...</h2>
+        <p class="mass-modal__sub mass-proc__etapa" id="massProcEtapa" aria-live="polite">Preparando os produtos…</p>
+        <div class="mass-proc__barra" id="massProcBarra" role="progressbar" aria-label="Andamento"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span class="mass-proc__barra-fill" id="massProcFill"></span>
+        </div>
+        <div class="mass-proc__num" id="massProcNum" aria-live="off"></div>
+      </div>
+    </div>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_acoes_massa.js"></script>
+  </body>
+</html>

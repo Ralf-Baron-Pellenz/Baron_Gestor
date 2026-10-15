@@ -1,0 +1,3696 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Ativação</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+
+    <style>
+      /* ── Layout base da ativação ── */
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+        box-sizing: border-box;
+        background:
+          radial-gradient(
+            1200px 600px at 50% -10%,
+            var(--clr-primary-lt),
+            transparent 60%
+          ),
+          var(--clr-bg);
+      }
+
+      .ativ-card {
+        width: 100%;
+        max-width: 560px;
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+        padding: 34px 34px 30px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ativ-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        margin-bottom: 6px;
+      }
+      .ativ-brand .brand-icon {
+        color: var(--clr-primary);
+        font-size: 20px;
+      }
+      .ativ-brand .brand-name {
+        font-family: "Sora", sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--clr-text);
+      }
+      .ativ-brand .brand-name strong {
+        color: var(--clr-primary);
+      }
+
+      .ativ-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin: 14px 0 22px;
+      }
+      .ativ-step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--clr-border);
+        transition: all 0.25s ease;
+      }
+      .ativ-step-dot.ativa {
+        background: var(--clr-primary);
+        width: 22px;
+      }
+
+      /* ── Views com transição suave ── */
+      .ativ-view {
+        display: none;
+        animation: ativFade 0.35s ease both;
+      }
+      .ativ-view.ativa {
+        display: block;
+      }
+      @keyframes ativFade {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .ativ-titulo {
+        font-family: "Sora", sans-serif;
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--clr-text);
+        text-align: center;
+        margin: 0 0 6px;
+      }
+      .ativ-sub {
+        font-size: 13.5px;
+        color: var(--clr-text-2);
+        text-align: center;
+        line-height: 1.55;
+        margin: 0 auto 22px;
+        max-width: 440px;
+      }
+
+      .ativ-key-input {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: "DM Sans", monospace;
+        font-size: 13px;
+        letter-spacing: 0.4px;
+        line-height: 1.6;
+        resize: none;
+        min-height: 92px;
+        text-align: center;
+      }
+
+      .ativ-btn-full {
+        width: 100%;
+        justify-content: center;
+        margin-top: 14px;
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      .ativ-link-btn {
+        display: block;
+        width: 100%;
+        margin-top: 16px;
+        background: transparent;
+        border: none;
+        color: var(--clr-text-3);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        transition: color 0.15s ease;
+      }
+      .ativ-link-btn:hover {
+        color: var(--clr-primary);
+      }
+
+      .ativ-erro {
+        display: none;
+        align-items: flex-start;
+        gap: 9px;
+        margin-top: 14px;
+        padding: 11px 13px;
+        border-radius: 10px;
+        background: var(--clr-danger-lt);
+        border: 1px solid var(--clr-danger);
+        color: var(--clr-text);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .ativ-erro.mostra {
+        display: flex;
+      }
+      .ativ-erro svg {
+        flex-shrink: 0;
+        margin-top: 1px;
+        color: var(--clr-danger);
+      }
+
+      /* ── Blocos de dados (ID do computador / código) ── */
+      .ativ-dado {
+        background: var(--clr-surface-alt);
+        border: 1px solid var(--clr-border);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+      }
+      .ativ-dado-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--clr-text-3);
+        margin-bottom: 6px;
+      }
+      .ativ-dado-valor {
+        font-family: "Sora", monospace;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--clr-text);
+        letter-spacing: 1px;
+        user-select: all;
+        word-break: break-all;
+      }
+
+      .ativ-aviso-copia {
+        font-size: 12.5px;
+        color: var(--clr-text-3);
+        text-align: center;
+        line-height: 1.5;
+        margin: 14px auto 0;
+        max-width: 430px;
+      }
+      .ativ-aviso-copia strong {
+        color: var(--clr-warning);
+      }
+
+      .ativ-instru {
+        background: var(--clr-surface-alt);
+        border: 1px solid var(--clr-border);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 8px;
+      }
+      .ativ-instru ul {
+        margin: 8px 0 0;
+        padding-left: 20px;
+      }
+      .ativ-instru li {
+        font-size: 13.5px;
+        color: var(--clr-text);
+        margin-bottom: 5px;
+        line-height: 1.5;
+      }
+      .ativ-email {
+        display: block;
+        text-align: center;
+        font-family: "Sora", sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--clr-primary);
+        margin: 16px 0;
+        user-select: all;
+      }
+
+      /* ── Tela de sucesso ── */
+      .ativ-sucesso {
+        text-align: center;
+        padding: 8px 0;
+      }
+      .ativ-check-wrap {
+        width: 84px;
+        height: 84px;
+        margin: 0 auto 20px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--clr-success-lt, rgba(34, 197, 94, 0.12));
+        border: 2px solid var(--clr-success, #22c55e);
+        animation: ativPop 0.5s cubic-bezier(0.18, 1.25, 0.4, 1) both;
+      }
+      .ativ-check-wrap svg {
+        color: var(--clr-success, #22c55e);
+      }
+      @keyframes ativPop {
+        from {
+          opacity: 0;
+          transform: scale(0.4);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .ativ-sucesso h2 {
+        font-family: "Sora", sans-serif;
+        font-size: 23px;
+        font-weight: 800;
+        color: var(--clr-text);
+        margin: 0 0 10px;
+      }
+      .ativ-sucesso p {
+        font-size: 14px;
+        color: var(--clr-text-2);
+        line-height: 1.6;
+        margin: 0 auto 6px;
+        max-width: 420px;
+      }
+
+      /* ── Termos de Uso ── */
+      .ativ-termos {
+        max-height: 320px;
+        overflow-y: auto;
+        text-align: left;
+        border: 1px solid var(--clr-border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        background: var(--clr-surface-alt);
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--clr-text-2);
+        margin-bottom: 16px;
+      }
+      /* Barra com o botão de expandir, alinhado à direita */
+      .ativ-termos-barra {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+      }
+      .ativ-termos-expandir {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: transparent;
+        border: 1px solid var(--clr-border);
+        color: var(--clr-text-2);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 13px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+      }
+      .ativ-termos-expandir:hover {
+        background: var(--clr-surface-alt);
+        border-color: var(--clr-primary);
+        color: var(--clr-primary);
+      }
+      /* Modo expandido: os termos ocupam uma área grande, centralizada */
+      body.termos-expandido-ativo { overflow: hidden; }
+      .termos-expandido-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+        background: rgba(0, 0, 0, 0.6);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        animation: termosFade 0.2s ease both;
+      }
+      @keyframes termosFade { from { opacity: 0; } to { opacity: 1; } }
+      .termos-expandido-caixa {
+        width: 100%;
+        max-width: 900px;
+        height: 100%;
+        max-height: 88vh;
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      }
+      .termos-expandido-topo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--clr-border);
+        flex-shrink: 0;
+      }
+      .termos-expandido-topo h2 {
+        font-family: "Sora", sans-serif;
+        font-size: 17px;
+        color: var(--clr-text);
+        margin: 0;
+      }
+      /* Dentro do modo expandido, o container dos termos cresce e rola sozinho */
+      .termos-expandido-caixa .ativ-termos {
+        max-height: none;
+        flex: 1;
+        border: none;
+        border-radius: 0;
+        margin: 0;
+        font-size: 13.5px;
+        padding: 24px 28px;
+      }
+      .ativ-termos h1.doc {
+        font-family: "Sora", sans-serif;
+        font-size: 15.5px;
+        color: var(--clr-text);
+        text-align: center;
+        margin: 0 0 14px;
+        line-height: 1.4;
+      }
+      .ativ-termos h2 {
+        font-family: "Sora", sans-serif;
+        font-size: 13.5px;
+        color: var(--clr-text);
+        margin: 18px 0 8px;
+      }
+      .ativ-termos p {
+        margin: 0 0 9px;
+      }
+      .ativ-termos ul {
+        margin: 0 0 9px;
+        padding-left: 18px;
+      }
+      .ativ-termos li {
+        margin-bottom: 6px;
+      }
+      .ativ-termos strong {
+        color: var(--clr-text);
+      }
+      .ativ-check {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        justify-content: center;
+        font-size: 13.5px;
+        color: var(--clr-text);
+        margin-bottom: 2px;
+        cursor: pointer;
+        user-select: none;
+      }
+      .ativ-check input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--clr-primary);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      #confeteCanvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 9999999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ativ-card">
+      <div class="ativ-brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+      </div>
+
+      <div class="ativ-stepper" id="stepper">
+        <span class="ativ-step-dot ativa" data-step="termos"></span>
+        <span class="ativ-step-dot" data-step="ativar"></span>
+        <span class="ativ-step-dot" data-step="solicitar"></span>
+        <span class="ativ-step-dot" data-step="instrucoes"></span>
+        <span class="ativ-step-dot" data-step="sucesso"></span>
+      </div>
+
+      <!-- ETAPA 2: Termos de Uso -->
+      <section class="ativ-view ativa" data-view="termos">
+        <h1 class="ativ-titulo">Termos de Uso</h1>
+        <p class="ativ-sub">
+          Leia os termos abaixo e marque o aceite para continuar a ativação.
+        </p>
+        <div class="ativ-termos-barra">
+          <button type="button" class="ativ-termos-expandir" id="btnExpandirTermos" aria-expanded="false">
+            <svg class="ico-expandir" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            <svg class="ico-recolher" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            <span class="txt-expandir">Expandir para ler melhor</span>
+          </button>
+        </div>
+        <div class="ativ-termos" id="termosScroll">
+          <h1 class="doc">
+            TERMOS DE USO, LICENÇA DE SOFTWARE E CONDIÇÕES GERAIS —
+            BAPELL GESTOR PRO
+          </h1>
+
+          <p>
+            <strong
+              >IMPORTANTE: LEIA ATENTAMENTE ESTE DOCUMENTO ANTES DE INSTALAR,
+              ATIVAR, ADQUIRIR OU UTILIZAR O SOFTWARE.</strong
+            >
+          </p>
+          <p>
+            Ao instalar, ativar, adquirir ou utilizar o Bapell Gestor Pro, ou ao
+            contratar qualquer Serviço Adicional relacionado ao Fabricante, o
+            Usuário declara que teve acesso prévio a este documento, pôde conhecer
+            seu conteúdo e, quando aplicável, manifesta sua concordância com suas
+            condições.
+          </p>
+          <p>
+            Caso não concorde com estas condições, o Usuário não deverá instalar,
+            ativar ou utilizar o Software, ressalvados os direitos que não possam
+            ser afastados por lei.
+          </p>
+          <p>
+            <strong>ATENÇÃO ESPECIAL:</strong> as Cláusulas 5 e 6 (planos e
+            módulos — nem todo plano inclui todos os módulos), 7 (novos módulos),
+            8 (Chave de Ativação vinculada ao computador), 9 (renovação e
+            upgrade), 10 (expiração), 11 (licença vitalícia e versões futuras), 13
+            (funcionamento local e parâmetros), 14 e 15 (backup e
+            responsabilidade sobre os dados), 16 a 19 (usuários, senhas e
+            segurança), 20 a 27 (precificação e ferramentas de cálculo), 28 (notas
+            fiscais), 29 (informações financeiras), 30 (Informações de Venda e
+            Gerador de EAN), 31 (lembretes), 42 e 43 (garantias e suporte técnico)
+            e 44 (limitação de responsabilidade) estabelecem condições importantes
+            sobre o funcionamento e os limites de utilização do Software.
+          </p>
+
+          <h2>CAPÍTULO I — DISPOSIÇÕES INICIAIS</h2>
+
+          <h2>CLÁUSULA 1 – DEFINIÇÕES</h2>
+          <p>1.1. Para os fins deste documento, considera-se:</p>
+          <ul>
+            <li>
+              <strong>Software:</strong> o programa Bapell Gestor Pro, seus
+              módulos, telas, funcionalidades, arquivos, documentação, tutoriais e
+              componentes disponibilizados pelo Fabricante.
+            </li>
+            <li>
+              <strong>Fabricante:</strong> [RAZÃO SOCIAL / NOME COMPLETO],
+              inscrito no [CNPJ/CPF] nº [NÚMERO], com endereço em [ENDEREÇO],
+              e-mail bapellgestorpro@gmail.com, titular ou licenciado dos direitos
+              relativos ao Software.
+            </li>
+            <li>
+              <strong>Usuário:</strong> pessoa física ou jurídica que adquira,
+              instale, ative ou utilize o Software.
+            </li>
+            <li>
+              <strong>Usuário Consumidor:</strong> o Usuário que se enquadre como
+              consumidor nos termos da legislação aplicável.
+            </li>
+            <li>
+              <strong>Usuário Profissional:</strong> pessoa física ou jurídica que
+              utilize o Software no exercício de atividade econômica, observadas as
+              regras legais aplicáveis ao seu enquadramento.
+            </li>
+            <li>
+              <strong>Licença:</strong> autorização limitada de uso do Software,
+              sem transferência de propriedade intelectual.
+            </li>
+            <li>
+              <strong>Modalidade:</strong> o tipo de prazo da licença — de teste,
+              anual ou vitalícia (Cláusula 5).
+            </li>
+            <li>
+              <strong>Plano:</strong> a combinação de uma modalidade com um
+              conjunto de módulos, conforme a oferta comercial apresentada na
+              contratação — por exemplo, Licença Anual, Licença Vitalícia, Pro e
+              Platinum.
+            </li>
+            <li>
+              <strong>Módulo:</strong> conjunto de telas ou funcionalidades do
+              Software que pode estar incluído, ou não, em determinado Plano.
+            </li>
+            <li>
+              <strong>Módulos Plus:</strong> módulos que não fazem parte de todos
+              os Planos e só são incluídos nos Planos indicados na Cláusula 6,
+              ressalvada a Licença de Teste (item 5.3).
+            </li>
+            <li>
+              <strong>Chave de Ativação:</strong> código fornecido pelo Fabricante
+              que habilita a licença no computador do Usuário e registra a
+              modalidade, a data de vencimento, quando houver, e os módulos
+              incluídos.
+            </li>
+            <li>
+              <strong>ID do Computador:</strong> identificador calculado pelo
+              Software a partir de características do equipamento e utilizado para
+              vincular a Chave de Ativação ao computador autorizado (chamado de
+              "Hardware ID" em versões anteriores destes Termos).
+            </li>
+            <li>
+              <strong>Código de Solicitação:</strong> código gerado pelo Software
+              no computador do Usuário para identificar o pedido de Chave de
+              Ativação.
+            </li>
+            <li>
+              <strong>Versão Licenciada:</strong> versão ou edição do Software
+              abrangida pela licença adquirida.
+            </li>
+            <li>
+              <strong>Versão Futura:</strong> nova versão, edição, geração, produto
+              ou evolução comercial do Software que venha a ser disponibilizada
+              separadamente pelo Fabricante.
+            </li>
+            <li>
+              <strong>Atualização:</strong> correção, melhoria ou ajuste
+              disponibilizado pelo Fabricante para a Versão Licenciada.
+            </li>
+            <li>
+              <strong>Administrador:</strong> quem detém a senha de Administrador
+              definida no Software e, com ela, gerencia usuários, senhas e
+              proteções de acesso.
+            </li>
+            <li>
+              <strong>Colaborador:</strong> quem recebe do Administrador a senha de
+              Colaborador, que dá acesso aos módulos protegidos, mas não à gestão
+              de usuários e senhas.
+            </li>
+            <li>
+              <strong>Usuários Cadastrados:</strong> pessoas cadastradas na tela
+              Usuários e Senhas, com nome e, opcionalmente, senha própria, que
+              podem ser indicadas como responsáveis por registros e ações no
+              Software.
+            </li>
+            <li>
+              <strong>Credenciais:</strong> senhas, respostas às perguntas de
+              segurança, Chave de Ativação e quaisquer outros dados que permitam
+              acessar o Software, seus módulos ou suas funcionalidades.
+            </li>
+            <li>
+              <strong>Dados do Usuário:</strong> as informações inseridas,
+              importadas, configuradas ou geradas pelo Usuário no Software, como
+              cadastros, produtos, preços, vendas, clientes, lançamentos
+              financeiros, notas fiscais, documentos, imagens, campos
+              personalizados, regras e configurações.
+            </li>
+            <li>
+              <strong>Serviços Adicionais:</strong> serviços contratados
+              separadamente do direito de uso do Software.
+            </li>
+          </ul>
+
+          <h2>CLÁUSULA 2 – OBJETO</h2>
+          <p>2.1. Este documento regula:</p>
+          <ul>
+            <li>I – a licença de uso do Bapell Gestor Pro, seus Planos e módulos;</li>
+            <li>II – as condições de utilização do Software;</li>
+            <li>III – os direitos e obrigações relacionados à licença;</li>
+            <li>
+              IV – as limitações e responsabilidades relativas às funcionalidades
+              do Software; e
+            </li>
+            <li>
+              V – as condições gerais dos Serviços Adicionais eventualmente
+              contratados.
+            </li>
+          </ul>
+          <p>
+            2.2. O Bapell Gestor Pro é uma ferramenta de apoio à gestão e
+            organização de negócios, especialmente operações de comércio
+            eletrônico.
+          </p>
+          <p>
+            2.3. Entre suas funcionalidades podem estar disponíveis, conforme a
+            versão instalada e o Plano contratado:
+          </p>
+          <ul>
+            <li>cadastro de empresas e de seus dados;</li>
+            <li>cadastro e gestão de plataformas de venda;</li>
+            <li>
+              cadastro de produtos, com formação de custo, precificação, margens e
+              lucros;
+            </li>
+            <li>
+              valores por tipo de anúncio, como Premium e Clássico no Mercado
+              Livre;
+            </li>
+            <li>kits e produtos compostos;</li>
+            <li>Preços Extras;</li>
+            <li>ações em massa;</li>
+            <li>central de cálculos;</li>
+            <li>registro de vendas e cadastro de clientes;</li>
+            <li>controle financeiro e demonstrativos gerenciais (DRE);</li>
+            <li>organização e armazenamento de notas fiscais;</li>
+            <li>lembretes e notificações;</li>
+            <li>usuários, senhas e proteção de acesso;</li>
+            <li>campos personalizados, seções e regras configuradas pelo Usuário;</li>
+            <li>backup e restauração de dados;</li>
+            <li>
+              Processador de Planilhas, Informações de Venda e Gerador de EAN, nos
+              Planos que incluem os Módulos Plus;
+            </li>
+            <li>central de ajuda, tutoriais e ferramentas auxiliares de gestão.</li>
+          </ul>
+          <p>
+            2.4. A existência, a disponibilidade, a organização e a quantidade de
+            módulos podem variar conforme a versão instalada, o Plano e as
+            condições comerciais contratados.
+            <strong
+              >A aquisição de um Plano não significa, necessariamente, acesso a
+              todos os módulos existentes no Software</strong
+            >
+            (Cláusula 6).
+          </p>
+          <p>
+            2.5. O Software é executado no computador do Usuário e armazena os
+            Dados do Usuário localmente, nesse equipamento (Cláusula 14).
+          </p>
+          <p>
+            2.6. O Software constitui ferramenta de apoio e organização e
+            <strong>não substitui</strong> serviços de contabilidade, consultoria
+            tributária, fiscal, jurídica, financeira, empresarial ou qualquer outra
+            atividade privativa de profissional legalmente habilitado.
+          </p>
+          <p>
+            2.7. Os resultados apresentados pelo Software dependem das
+            informações, parâmetros, regras e configurações fornecidos ou definidos
+            pelo Usuário.
+          </p>
+
+          <h2>CLÁUSULA 3 – REGIME JURÍDICO APLICÁVEL</h2>
+          <p>
+            3.1. Este documento aplica-se aos Usuários do Software, observadas as
+            diferenças determinadas pela legislação aplicável.
+          </p>
+          <p>
+            3.2. Quando caracterizada relação de consumo, serão aplicadas as normas
+            obrigatórias de proteção ao consumidor, em especial o Código de Defesa
+            do Consumidor (Lei nº 8.078/1990) e as regras de contratação no
+            comércio eletrônico (Decreto nº 7.962/2013).
+          </p>
+          <p>
+            3.3. Nenhuma disposição deste documento pretende excluir direitos que
+            sejam irrenunciáveis por força de lei.
+          </p>
+          <p>
+            3.4. Nas relações que não forem caracterizadas como de consumo,
+            aplicam-se as disposições do Código Civil, da legislação de programas
+            de computador (Lei nº 9.609/1998), de direitos autorais (Lei nº
+            9.610/1998) e demais normas aplicáveis.
+          </p>
+          <p>
+            3.5. O tratamento de dados pessoais observa a Lei Geral de Proteção de
+            Dados Pessoais (Lei nº 13.709/2018), nos termos da Cláusula 46.
+          </p>
+          <p>
+            3.6. Em caso de conflito entre este documento e norma legal de
+            aplicação obrigatória, prevalecerá a legislação aplicável, permanecendo
+            válidas as demais disposições.
+          </p>
+
+          <h2>CAPÍTULO II — LICENÇA, PLANOS E MÓDULOS</h2>
+
+          <h2>CLÁUSULA 4 – NATUREZA E ALCANCE DA LICENÇA</h2>
+          <p>
+            4.1. O Fabricante concede ao Usuário uma licença de uso não exclusiva,
+            limitada e, salvo disposição comercial específica, intransferível, nos
+            termos deste documento.
+          </p>
+          <p>
+            4.2. A licença não representa venda do código-fonte ou transferência da
+            propriedade intelectual do Software.
+          </p>
+          <p>
+            4.3. Todos os direitos relativos ao código, arquitetura, algoritmos,
+            interface, identidade visual, marca, documentação e demais elementos
+            protegidos permanecem com o Fabricante ou seus respectivos titulares.
+          </p>
+          <p>
+            4.4. Salvo condição comercial expressamente informada, cada Chave de
+            Ativação permite a utilização do Software em um único computador,
+            identificado pelo ID do Computador.
+          </p>
+          <p>
+            4.5. O uso simultâneo em computadores adicionais exige licença
+            adicional, salvo autorização expressa do Fabricante.
+          </p>
+          <p>
+            4.6. O Usuário não poderá utilizar uma única Chave de Ativação para
+            disponibilizar o Software a computadores além daquele autorizado.
+          </p>
+          <p>
+            4.7. A licença abrange a modalidade e os módulos do Plano contratado,
+            conforme registrados na Chave de Ativação.
+          </p>
+          <p>
+            4.8. O cadastro de Administrador, Colaborador e Usuários Cadastrados
+            (Capítulo IV) organiza o acesso das pessoas que utilizam o Software no
+            computador autorizado e não amplia a licença para outros computadores.
+          </p>
+
+          <h2>CLÁUSULA 5 – MODALIDADES DE LICENÇA E PLANOS</h2>
+          <p>
+            5.1. A licença possui duas características independentes, ambas
+            registradas na Chave de Ativação: (a) a modalidade, que define por
+            quanto tempo a licença vale; e (b) os módulos incluídos, que definem o
+            que ela libera.
+          </p>
+          <p><strong>I – Licença de Teste</strong></p>
+          <p>
+            5.2. A Licença de Teste destina-se exclusivamente à avaliação do
+            Software e vale por 7 (sete) dias corridos, contados da emissão da
+            Chave de Ativação de teste.
+          </p>
+          <p>
+            5.3. Durante a Licença de Teste, o Software pode liberar todos os
+            módulos, inclusive os Módulos Plus. Ao abrir um Módulo Plus nesse
+            período, o Usuário é avisado de que o módulo deixará de abrir ao fim do
+            teste caso o Plano adquirido não o inclua.
+          </p>
+          <p>
+            5.4. A Licença de Teste poderá ser disponibilizada gratuitamente, a
+            critério do Fabricante, que poderá limitá-la a uma por computador, por
+            Usuário ou por outro critério técnico razoável.
+          </p>
+          <p>
+            5.5. Encerrado o prazo da Licença de Teste, aplica-se a Cláusula 10, e
+            a continuidade do uso depende da aquisição de um Plano.
+          </p>
+          <p><strong>II – Modalidade anual</strong></p>
+          <p>
+            5.6. A modalidade anual — dos Planos Licença Anual e Pro — autoriza o
+            uso do Software por 365 (trezentos e sessenta e cinco) dias corridos,
+            contados da emissão da Chave de Ativação, salvo condição comercial
+            diversa expressamente informada. A data de vencimento fica registrada
+            na Chave e pode ser consultada no Software.
+          </p>
+          <p>
+            5.7. Encerrado o prazo sem renovação, aplica-se a Cláusula 10.
+          </p>
+          <p><strong>III – Modalidade vitalícia</strong></p>
+          <p>
+            5.8. A modalidade vitalícia — dos Planos Licença Vitalícia e Platinum
+            — concede o direito de uso sem prazo determinado da Versão
+            Licenciada, nos limites da Cláusula 11.
+          </p>
+          <p><strong>IV – Planos</strong></p>
+          <p>
+            5.9. Na data desta versão dos Termos, são oferecidos os seguintes
+            Planos:
+          </p>
+          <ul>
+            <li>
+              <strong>Licença Anual:</strong> modalidade anual, sem os Módulos
+              Plus;
+            </li>
+            <li>
+              <strong>Licença Vitalícia:</strong> modalidade vitalícia, sem os
+              Módulos Plus;
+            </li>
+            <li>
+              <strong>Pro:</strong> modalidade anual, com os Módulos Plus;
+            </li>
+            <li>
+              <strong>Platinum:</strong> modalidade vitalícia, com os Módulos
+              Plus.
+            </li>
+          </ul>
+          <p>
+            5.10. As regras destes Termos sobre o prazo da licença anual aplicam-se
+            aos Planos Licença Anual e Pro, e as regras sobre o prazo e o alcance
+            da licença vitalícia — inclusive as da Cláusula 11 — aplicam-se aos
+            Planos Licença Vitalícia e Platinum. Os Planos de mesma modalidade
+            diferem pelos módulos incluídos (Cláusula 6) e pelas condições
+            comerciais de cada um.
+          </p>
+          <p>
+            5.11. Os preços, as formas de pagamento e as demais condições de cada
+            Plano são os apresentados no momento da contratação (Cláusula 12).
+          </p>
+          <p>
+            5.12. Poderão existir ofertas promocionais ou modalidades especiais,
+            desde que suas condições sejam informadas previamente ao Usuário.
+          </p>
+          <p>
+            5.13. A modalidade e os módulos efetivamente contratados são os
+            apresentados no momento da aquisição e registrados na Chave de
+            Ativação emitida para o Usuário.
+          </p>
+
+          <h2>CLÁUSULA 6 – MÓDULOS E MÓDULOS PLUS</h2>
+          <p>
+            6.1. O Software é organizado em módulos. Parte deles está disponível em
+            todos os Planos; outros — os Módulos Plus — somente nos Planos que os
+            incluem.
+          </p>
+          <p>
+            6.2. Na data desta versão dos Termos, os Módulos Plus são o
+            <strong>Processador de Planilhas</strong> (também exibido no Software
+            como "Processador de Planilha"), as
+            <strong>Informações de Venda</strong> e o
+            <strong>Gerador de EAN</strong>, incluídos nos Planos Pro e Platinum.
+          </p>
+          <p>
+            6.3.
+            <strong
+              >A aquisição de um Plano não significa acesso a todos os módulos
+              existentes no Software.</strong
+            >
+            O acesso a cada módulo depende do Plano contratado e dos módulos
+            registrados na Chave de Ativação.
+          </p>
+          <p>
+            6.4. Ao abrir um módulo que não faz parte da sua licença, o Usuário vê
+            um aviso informando que o módulo não está incluído e quais Planos o
+            incluem. Para utilizá-lo, será necessário adquirir um Plano que o
+            inclua (Cláusula 9).
+          </p>
+          <p>
+            6.5. Os Módulos Plus podem continuar aparecendo no menu e no painel
+            inicial mesmo quando não estiverem incluídos na licença do Usuário.
+            Nesse caso, são sinalizados como parte dos Módulos Plus e, ao serem
+            abertos, exibem o aviso do item 6.4. A exibição de um módulo não
+            significa que ele esteja incluído na licença.
+          </p>
+          <p>
+            6.6. Chaves de Ativação emitidas em formatos anteriores à criação dos
+            módulos licenciáveis não registram módulos e, por isso, não incluem os
+            Módulos Plus, salvo condição diferente informada pelo Fabricante.
+          </p>
+          <p>
+            6.7. A composição dos Planos e dos Módulos Plus poderá ser alterada
+            para novas contratações. A alteração não retira da licença já
+            adquirida aquilo que nela estiver expressamente incluído.
+          </p>
+
+          <h2>CLÁUSULA 7 – NOVOS MÓDULOS E NOVAS FUNCIONALIDADES</h2>
+          <p>
+            7.1. O Software poderá receber novos módulos e novas funcionalidades
+            ao longo do tempo.
+          </p>
+          <p>
+            7.2. Um novo módulo poderá, conforme definido pelo Fabricante quando
+            for disponibilizado:
+          </p>
+          <ul>
+            <li>fazer parte de determinado Plano;</li>
+            <li>ser disponibilizado separadamente;</li>
+            <li>exigir atualização da licença, com nova Chave de Ativação;</li>
+            <li>exigir a aquisição de outro Plano.</li>
+          </ul>
+          <p>
+            7.3.
+            <strong
+              >A inclusão de um novo módulo no Software — mesmo quando ele chega
+              por uma Atualização instalada pelo Usuário — não significa que ele
+              estará disponível para as licenças adquiridas anteriormente</strong
+            >, inclusive a Licença Vitalícia e os Planos Pro e Platinum.
+          </p>
+          <p>
+            7.4. As condições de acesso a cada novo módulo serão informadas pelo
+            Fabricante quando ele for disponibilizado.
+          </p>
+          <p>
+            7.5. Melhorias e novas funcionalidades em módulos já incluídos na
+            licença do Usuário poderão ser disponibilizadas por meio de
+            Atualizações, a critério do Fabricante, sem alteração do Plano
+            contratado.
+          </p>
+
+          <h2>CLÁUSULA 8 – CHAVE DE ATIVAÇÃO, ATIVAÇÃO E VERIFICAÇÃO</h2>
+          <p>
+            8.1. A ativação do Software exige Chave de Ativação válida, emitida
+            pelo Fabricante para o ID do Computador em que o Software será
+            utilizado.
+          </p>
+          <p>
+            8.2. Para obter a Chave, o Usuário informa ao Fabricante o ID do
+            Computador e o Código de Solicitação exibidos pelo Software, além dos
+            dados de compra pedidos no formulário de solicitação — como nome,
+            e-mail e CPF ou CNPJ — e, quando solicitado, o comprovante de
+            pagamento.
+          </p>
+          <p>
+            8.3. A Chave de Ativação é enviada para o e-mail informado pelo
+            Usuário, no prazo informado nos canais oficiais ou no momento da
+            contratação. O Usuário é responsável por informar um e-mail correto e
+            de seu acesso.
+          </p>
+          <p>
+            8.4. A Chave registra a modalidade, a data de vencimento, quando
+            houver, e os módulos incluídos. Esses dados são protegidos por
+            assinatura digital, de modo que a Chave não pode ser alterada sem
+            perder a validade.
+          </p>
+          <p>
+            8.5. A Chave é vinculada ao ID do Computador e não funciona em outro
+            equipamento.
+          </p>
+          <p>
+            8.6. Na versão atual, a verificação da licença é feita no próprio
+            computador, sem necessidade de conexão com a internet.
+          </p>
+          <p>
+            8.7. O ID do Computador é calculado a partir de características do
+            equipamento. A troca de componentes, como a placa-mãe, e outras
+            alterações de hardware ou de configuração podem alterar o ID do
+            Computador e exigir nova Chave de Ativação.
+          </p>
+          <p>
+            8.8. A transferência da licença para outro computador depende de
+            solicitação ao Fabricante e da emissão de nova Chave para o novo ID do
+            Computador, nas condições informadas pelo Fabricante. A transferência
+            pressupõe que o Software deixe de ser utilizado no computador anterior,
+            salvo aquisição de licença adicional.
+          </p>
+          <p>8.9. O Usuário é responsável pela guarda da Chave de Ativação.</p>
+          <p>
+            8.10. A divulgação, o compartilhamento, a comercialização ou a
+            utilização irregular da Chave poderá resultar nas medidas previstas
+            neste documento e na legislação aplicável.
+          </p>
+          <p>
+            8.11. O Fabricante poderá utilizar mecanismos técnicos de proteção
+            destinados a impedir duplicação, compartilhamento ou utilização não
+            autorizada da licença.
+          </p>
+          <p>
+            8.12. A Chave de Ativação não se confunde com as senhas do Software: a
+            Chave habilita a licença no computador; as senhas controlam o acesso
+            das pessoas a telas e ações (Capítulo IV).
+          </p>
+
+          <h2>CLÁUSULA 9 – RENOVAÇÃO, UPGRADE E MUDANÇA DE PLANO</h2>
+          <p>9.1. Conforme as ofertas vigentes, o Usuário poderá:</p>
+          <ul>
+            <li>renovar uma licença com prazo determinado;</li>
+            <li>
+              fazer upgrade para um Plano mais completo — por exemplo, da Licença
+              Anual para a Licença Vitalícia, para o Pro ou para o Platinum; e do
+              Pro ou da Licença Vitalícia para o Platinum;
+            </li>
+            <li>adquirir módulos adicionais, quando oferecidos separadamente;</li>
+            <li>migrar para outro Plano.</li>
+          </ul>
+          <p>
+            9.2. A renovação, o upgrade, a aquisição de módulos e a migração de
+            Plano são feitos com a emissão de uma nova Chave de Ativação, que
+            substitui a anterior no computador do Usuário.
+          </p>
+          <p>
+            9.3. A nova Chave pode ser inserida pela opção de troca de chave do
+            Software (Central de Ajuda, em "Alterar minha chave") ou pela tela de
+            ativação. A troca, por si só, não exige reinstalação nem apaga os
+            Dados do Usuário.
+          </p>
+          <p>
+            9.4. As condições comerciais aplicáveis — preço, forma de pagamento,
+            prazo e eventual aproveitamento de valores ou do período já pagos —
+            serão aquelas apresentadas no momento da contratação.
+          </p>
+          <p>
+            9.5.
+            <strong
+              >Salvo condição diferente informada na contratação, o prazo de uma
+              nova licença com prazo determinado é contado da emissão da nova
+              Chave; a renovação antecipada não acrescenta automaticamente o
+              período que restava da licença anterior.</strong
+            >
+          </p>
+          <p>
+            9.6. Ao migrar para um Plano que não inclua determinado módulo, esse
+            módulo deixará de abrir. A migração, por si só, não apaga os dados já
+            registrados nesse módulo, que permanecem armazenados no computador e
+            voltam a ficar acessíveis se o módulo voltar a ser contratado.
+          </p>
+
+          <h2>CLÁUSULA 10 – EXPIRAÇÃO E MODO RESTRITO</h2>
+          <p>
+            10.1. Encerrado o prazo de uma Licença de Teste ou de uma licença
+            anual — Licença Anual ou Pro — sem renovação, o Software entra em
+            modo restrito.
+          </p>
+          <p>10.2. Na versão atual, no modo restrito:</p>
+          <ul>
+            <li>
+              continuam acessíveis a tela inicial, a Central de Ajuda — onde ficam
+              a exportação e a importação de backup —, as Notas Fiscais e a tela
+              Usuários e Senhas;
+            </li>
+            <li>
+              os demais módulos ficam bloqueados até a inserção de nova Chave de
+              Ativação válida.
+            </li>
+          </ul>
+          <p>
+            10.3.
+            <strong
+              >A expiração da licença, por si só, não exclui os Dados do
+              Usuário</strong
+            >, que permanecem armazenados no computador e voltam a ficar
+            disponíveis com a inserção de nova Chave.
+          </p>
+          <p>
+            10.4. A disponibilidade de funções de consulta, exportação, backup ou
+            restauração após a expiração observará a arquitetura da versão
+            instalada e os direitos assegurados pela legislação aplicável.
+          </p>
+          <p>
+            10.5. O Software pode exibir avisos de vencimento próximo. A ausência
+            ou a não visualização desses avisos não altera nem prorroga a data de
+            vencimento registrada na Chave de Ativação.
+          </p>
+          <p>
+            10.6. A expiração de licença com prazo determinado constitui
+            funcionamento previsto da modalidade contratada e, por si só, não
+            caracteriza defeito do Software.
+          </p>
+          <p>
+            10.7. O desbloqueio das funcionalidades depende da inserção de nova
+            Chave de Ativação válida.
+          </p>
+
+          <h2>CLÁUSULA 11 – LICENÇA VITALÍCIA E VERSÕES FUTURAS</h2>
+          <p><strong>CLÁUSULA DE DESTAQUE COMERCIAL</strong></p>
+          <p>
+            11.1. A Licença Vitalícia — inclusive a do Plano Platinum — é o
+            direito de uso sem prazo determinado da Versão Licenciada, com os
+            módulos registrados na Chave de Ativação, conforme as condições
+            comerciais vigentes no momento da aquisição.
+          </p>
+          <p>
+            11.2. A expressão "vitalícia" significa que a licença não possui prazo
+            periódico de expiração enquanto permanecer válida e enquanto o Usuário
+            observar as condições deste documento.
+          </p>
+          <p>
+            11.3.
+            <strong
+              >A Licença Vitalícia NÃO inclui, de forma automática e
+              gratuita:</strong
+            >
+          </p>
+          <ul>
+            <li>Versões Futuras do Software, inclusive novas versões comerciais;</li>
+            <li>
+              novos módulos, ainda que passem a aparecer no Software por meio de
+              Atualização (Cláusula 7);
+            </li>
+            <li>novos produtos do Fabricante;</li>
+            <li>novas funcionalidades comercializadas separadamente;</li>
+            <li>
+              atualizações que integrem Versão Futura ou módulo comercializado
+              separadamente.
+            </li>
+          </ul>
+          <p>
+            11.4. As Atualizações da Versão Licenciada — correções, melhorias e
+            ajustes — poderão ser disponibilizadas conforme a Cláusula 48, sem que
+            isso inclua na licença uma Versão Futura ou um novo módulo
+            comercializado separadamente.
+          </p>
+          <p>
+            11.5. O Fabricante poderá desenvolver e comercializar, no futuro, novas
+            versões, edições, gerações, produtos ou evoluções substanciais do
+            Bapell Gestor Pro.
+          </p>
+          <p>
+            11.6. Uma Versão Futura poderá ser comercializada separadamente,
+            mediante preço, licença, Plano ou condição comercial própria.
+          </p>
+          <p>
+            11.7. A aquisição da Licença Vitalícia da Versão Licenciada não obriga
+            o Fabricante a disponibilizar gratuitamente uma Versão Futura ou um
+            novo módulo.
+          </p>
+          <p>
+            11.8. Para evitar dúvidas, a existência de uma Versão Futura poderá
+            ser caracterizada por evolução substancial do produto, alteração
+            relevante de arquitetura, conjunto de funcionalidades, tecnologia,
+            modelo comercial ou posicionamento do Software.
+          </p>
+          <p>
+            11.9. O Fabricante não poderá utilizar a simples alteração visual,
+            correção de erro ou pequena melhoria como único fundamento para retirar
+            do Usuário aquilo que já estiver expressamente incluído na licença
+            adquirida.
+          </p>
+          <p>
+            11.10. As condições específicas de uma eventual Versão Futura ou de um
+            novo módulo serão divulgadas antes de sua contratação.
+          </p>
+          <p>
+            11.11. As comunicações comerciais do Fabricante não devem apresentar a
+            Licença Vitalícia como promessa de acesso gratuito a Versões Futuras
+            ou a módulos e produtos comercializados separadamente. Expressões
+            como "plano mais completo" descrevem a oferta existente na data da
+            contratação e não constituem essa promessa, salvo quando ela for feita
+            de forma expressa.
+          </p>
+          <p>
+            11.12. A Licença Vitalícia permanece limitada ao objeto efetivamente
+            adquirido e às condições comerciais expressamente informadas no momento
+            da contratação.
+          </p>
+
+          <h2>CLÁUSULA 12 – PREÇOS E CONDIÇÕES COMERCIAIS</h2>
+          <p>
+            12.1. Os preços das licenças, dos Planos, dos módulos e dos Serviços
+            Adicionais poderão ser alterados pelo Fabricante para novas
+            contratações.
+          </p>
+          <p>
+            12.2. Alterações futuras de preço não alteram o valor já pago por uma
+            licença cujo período contratado ainda esteja vigente.
+          </p>
+          <p>
+            12.3. Na Licença Vitalícia, alterações futuras de preço não geram
+            cobrança adicional pelo uso da Versão Licenciada já adquirida,
+            respeitados os limites da Cláusula 11.
+          </p>
+          <p>
+            12.4. Promoções e descontos possuem validade conforme período e
+            condições divulgados.
+          </p>
+          <p>
+            12.5. Os Planos e preços exibidos dentro do Software correspondem às
+            condições vigentes quando a versão instalada foi disponibilizada e
+            podem ter sido alterados desde então. Antes de efetuar o pagamento, o
+            Usuário deve confirmar as condições vigentes pelos canais oficiais.
+          </p>
+          <p>
+            12.6. Em caso de divergência, prevalecerá a condição comercial
+            confirmada pelo Fabricante no canal oficial no momento da contratação,
+            ressalvados os direitos assegurados ao consumidor pela legislação.
+          </p>
+          <p>
+            12.7. Os pagamentos, como os realizados por PIX, são processados por
+            instituições financeiras, instituições de pagamento ou intermediadores
+            de terceiros, sujeitos às respectivas condições.
+          </p>
+
+          <h2>CAPÍTULO III — FUNCIONAMENTO, DADOS E BACKUP</h2>
+
+          <h2>CLÁUSULA 13 – FUNCIONAMENTO LOCAL, OFFLINE E PARÂMETROS</h2>
+          <p>
+            13.1. O Bapell Gestor Pro funciona localmente e não depende de conexão
+            com a internet para suas funções principais. Links externos,
+            formulários e canais de atendimento acessados a partir do Software
+            abrem no navegador e dependem de conexão.
+          </p>
+          <p>
+            13.2. Como consequência desse modelo, dados, parâmetros, fórmulas,
+            taxas e regras existentes no Software correspondem à versão instalada
+            no computador do Usuário.
+          </p>
+          <p>
+            13.3. Algumas regras de cálculo podem vir pré-configuradas na versão
+            instalada — por exemplo, a regra pela qual a taxa fixa cadastrada
+            para uma plataforma só é considerada quando o valor de venda fica até
+            determinado limite (na versão atual, R$ 79,00). Essa regra é aplicada
+            a todas as plataformas que tenham taxa fixa cadastrada. As regras
+            pré-configuradas refletem as informações disponíveis ao Fabricante na
+            época da versão, podem não corresponder às regras de todas as
+            plataformas e podem deixar de corresponder às regras vigentes.
+          </p>
+          <p>
+            13.4. O Fabricante não controla alterações promovidas por
+            marketplaces, plataformas de venda, órgãos públicos, entidades
+            reguladoras, fornecedores ou terceiros.
+          </p>
+          <p>
+            13.5. Taxas, comissões, impostos, alíquotas, regras comerciais e
+            parâmetros externos podem sofrer alterações independentemente do
+            Fabricante.
+          </p>
+          <p>
+            13.6. O Usuário reconhece que uma informação existente em determinada
+            versão poderá posteriormente ficar desatualizada em razão de alterações
+            externas.
+          </p>
+          <p>
+            13.7. Cabe ao Usuário verificar a atualidade das informações relevantes
+            antes de utilizá-las em operações comerciais, fiscais ou financeiras.
+          </p>
+          <p>
+            13.8. Quando o Fabricante disponibilizar Atualização aplicável à Versão
+            Licenciada, sua instalação poderá depender de ação do Usuário.
+          </p>
+          <p>
+            13.9. O Fabricante não garante atualização instantânea ou automática de
+            parâmetros que dependam de terceiros.
+          </p>
+          <p>
+            13.10. A ausência de atualização automática não transforma o Software
+            em serviço de monitoramento contínuo de legislação, taxas ou políticas
+            externas.
+          </p>
+
+          <h2>CLÁUSULA 14 – ARMAZENAMENTO, BACKUP E RESTAURAÇÃO</h2>
+          <p>
+            14.1. Os Dados do Usuário são armazenados localmente, no computador em
+            que o Software está instalado, na pasta de dados do programa.
+          </p>
+          <p>
+            14.2. O Fabricante não mantém, como regra geral, cópia dos Dados do
+            Usuário e não tem acesso a eles, salvo quando o próprio Usuário os
+            enviar, como um arquivo de backup ou de diagnóstico encaminhado ao
+            suporte.
+          </p>
+          <p>
+            14.3. A função de backup, disponível na Central de Ajuda, gera um
+            arquivo com as categorias de dados selecionadas pelo Usuário,
+            existentes no momento da execução.
+          </p>
+          <p>
+            14.4. O backup não é automático, contínuo nem em nuvem: depende de ação
+            do Usuário.
+          </p>
+          <p>
+            14.5. O backup pode não incluir todas as informações, arquivos e
+            configurações do Software. Na versão atual, por exemplo, os Usuários
+            Cadastrados, a senha de Colaborador e as proteções de botões não são
+            incluídos no backup e precisam ser configurados novamente após uma
+            restauração em outro computador. Antes de depender de um backup, o
+            Usuário deve conferir o que foi incluído e testar a restauração (item
+            14.8).
+          </p>
+          <p>
+            14.6.
+            <strong
+              >O arquivo de backup não é protegido por senha pelo
+              Software.</strong
+            >
+            Quem tiver acesso ao arquivo poderá ver seu conteúdo, que pode incluir
+            dados comerciais, financeiros e pessoais. Quando o backup inclui o
+            Controle Financeiro, ele também leva, em forma codificada, a senha de
+            Administrador, as respostas de segurança e a escolha dos módulos
+            protegidos, que podem passar a valer no computador em que for
+            restaurado, se nele ainda não houver senha de Administrador. O Usuário
+            é responsável por guardar o arquivo em local seguro.
+          </p>
+          <p>
+            14.7. O Usuário é responsável por executar backups regularmente e
+            armazená-los em local seguro, de preferência distinto do computador
+            principal.
+          </p>
+          <p>
+            14.8. O Usuário deve conferir se a operação de backup foi concluída e,
+            quando possível, testar periodicamente a restauração.
+          </p>
+          <p>
+            14.9. Na restauração, o Usuário escolhe o que importar. Conforme a
+            versão e a opção escolhida, os dados do arquivo podem ser mesclados
+            aos existentes — caso em que itens repetidos, ou mesmo categorias de
+            dados já existentes no computador, podem não ser importados — ou
+            substituí-los; o Usuário deve ler os avisos exibidos antes de
+            confirmar e conferir o resultado.
+          </p>
+          <p>
+            14.10. A restauração poderá depender da compatibilidade entre a versão
+            que gerou o backup e a versão utilizada para restauração.
+          </p>
+          <p>
+            14.11. O Usuário deve verificar a integridade dos dados após qualquer
+            restauração.
+          </p>
+          <p>
+            14.12. O Fabricante não será responsável por perda de dados causada
+            exclusivamente por:
+          </p>
+          <ul>
+            <li>defeito de HD, SSD ou outro componente;</li>
+            <li>formatação;</li>
+            <li>
+              exclusão acidental, inclusive por pessoa a quem o Usuário tenha dado
+              acesso ao Software;
+            </li>
+            <li>vírus, malware ou ransomware;</li>
+            <li>falha do sistema operacional;</li>
+            <li>desligamento indevido;</li>
+            <li>queda ou instabilidade de energia;</li>
+            <li>acesso de terceiros ao equipamento;</li>
+            <li>desinstalação sem backup;</li>
+            <li>troca de computador sem cópia prévia;</li>
+            <li>ausência de backup;</li>
+            <li>backup incompleto, corrompido ou desatualizado;</li>
+            <li>restauração de backup que substitua dados mais recentes;</li>
+            <li>utilização inadequada da ferramenta de backup.</li>
+          </ul>
+          <p>
+            14.13. Quando comprovado defeito de funcionamento da própria ferramenta
+            de backup ou restauração, o Fabricante poderá realizar a correção
+            conforme as condições de suporte e as garantias legalmente aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 15 – RESPONSABILIDADE SOBRE OS DADOS</h2>
+          <p>
+            15.1. O Usuário é responsável pela veracidade, pela exatidão, pela
+            legalidade e pela legitimidade dos Dados do Usuário, inclusive os
+            inseridos, importados ou configurados em:
+          </p>
+          <ul>
+            <li>
+              cadastros de empresas, plataformas e produtos, inclusive SKU,
+              quantidades, custos, preços, margens, taxas, impostos, fretes,
+              kits, produtos compostos, Preços Extras e observações;
+            </li>
+            <li>usuários, senhas e perguntas de segurança;</li>
+            <li>registro de vendas e cadastro de clientes;</li>
+            <li>controle financeiro e DRE;</li>
+            <li>notas fiscais e documentos;</li>
+            <li>Processador de Planilhas e planilhas importadas;</li>
+            <li>campos personalizados, seções, regras e configurações;</li>
+            <li>lembretes, códigos EAN e demais módulos.</li>
+          </ul>
+          <p>
+            15.2. O Usuário declara possuir autorização ou base legal para inserir
+            no Software dados de terceiros — como clientes, sócios, colaboradores e
+            fornecedores — e para utilizá-los nas finalidades pretendidas.
+          </p>
+          <p>
+            15.3. O Software não confere a veracidade nem a legalidade dos Dados do
+            Usuário e não garante que estejam corretos.
+          </p>
+          <p>
+            15.4. Erros de cadastro, de importação ou de configuração podem produzir
+            resultados incorretos nos módulos que dependem dessas informações.
+          </p>
+          <p>
+            15.5. O Software não deve ser utilizado para armazenar ou processar
+            dados obtidos ilicitamente, nem para finalidade ilícita.
+          </p>
+          <p>
+            15.6. Os Dados do Usuário permanecem de titularidade do Usuário, nos
+            termos da Cláusula 39.
+          </p>
+
+          <h2>CAPÍTULO IV — USUÁRIOS, SENHAS E SEGURANÇA</h2>
+
+          <h2>CLÁUSULA 16 – USUÁRIOS, ADMINISTRADOR E COLABORADOR</h2>
+          <p>
+            16.1. O Software permite organizar o acesso das pessoas que o utilizam
+            no computador autorizado, por meio da tela Usuários e Senhas, aberta a
+            partir de Dados da Empresa.
+          </p>
+          <p>16.2. Conforme as funcionalidades da versão instalada, existem:</p>
+          <ul>
+            <li>
+              <strong>Administrador:</strong> define e altera as senhas, cadastra
+              e exclui Usuários Cadastrados, escolhe quais módulos e ações exigem
+              senha e, depois de criada a senha de Administrador, é o único que
+              abre a tela Usuários e Senhas;
+            </li>
+            <li>
+              <strong>Colaborador:</strong> acessa, com a senha de Colaborador, os
+              módulos protegidos, sem poder ver ou alterar as senhas e as
+              proteções;
+            </li>
+            <li>
+              <strong>Usuários Cadastrados:</strong> pessoas cadastradas com nome
+              e, opcionalmente, senha própria, que podem ser indicadas como
+              responsáveis por registros e ações em módulos como Registro de
+              Vendas, Controle Financeiro, Notas Fiscais, Ações em Massa e
+              Processador de Planilhas e que, se tiverem senha própria, podem
+              autorizar as ações protegidas (Cláusula 18).
+            </li>
+          </ul>
+          <p>
+            16.3. A senha de um Usuário Cadastrado identifica o responsável por um
+            registro ou autoriza uma ação protegida, mas não abre os módulos
+            protegidos, que dependem da senha de Administrador ou de Colaborador.
+          </p>
+          <p>
+            16.4. A senha de Colaborador é única para todas as pessoas que a
+            recebem e pode ser gerada automaticamente pelo Software a cada
+            abertura, se o Administrador assim configurar. Ela dá acesso a todos
+            os módulos protegidos — na versão atual, não há permissões de módulos
+            diferentes para cada pessoa — e não identifica individualmente quem a
+            utilizou.
+          </p>
+          <p>
+            16.5. Quando um Usuário Cadastrado não tiver senha própria, o Software
+            não confirma a identidade de quem o indica como responsável por um
+            registro.
+          </p>
+          <p>16.6. O Administrador é responsável por:</p>
+          <ul>
+            <li>cadastrar corretamente os Usuários Cadastrados;</li>
+            <li>definir quem recebe a senha de Colaborador;</li>
+            <li>controlar quem tem acesso ao computador e ao Software;</li>
+            <li>
+              alterar, redefinir ou remover senhas e excluir usuários quando uma
+              pessoa deixar de ter direito de acesso;
+            </li>
+            <li>revisar periodicamente as proteções configuradas.</li>
+          </ul>
+          <p>
+            16.7. O Usuário responde pelo uso do Software feito pelo
+            Administrador, pelos Colaboradores, pelos Usuários Cadastrados e pelas
+            demais pessoas a quem der acesso ao computador ou às Credenciais,
+            observada a legislação aplicável.
+          </p>
+          <p>
+            16.8. O cadastro de pessoas no Software não cria vínculo entre elas e o
+            Fabricante.
+          </p>
+
+          <h2>CLÁUSULA 17 – SENHAS, RECUPERAÇÃO E PERGUNTAS DE SEGURANÇA</h2>
+          <p>
+            17.1. O Software pode utilizar senha de Administrador, senha de
+            Colaborador e senhas de Usuários Cadastrados, conforme as
+            funcionalidades da versão instalada.
+          </p>
+          <p>
+            17.2. As senhas são definidas pelo Usuário ou pelo Administrador, e a
+            senha de Colaborador também pode ser gerada pelo próprio Software. Na
+            versão atual, as senhas devem ter ao menos 4 (quatro) caracteres, sem
+            exigência de letras, números ou símbolos; cabe a quem define a senha
+            escolher combinações difíceis de adivinhar.
+          </p>
+          <p>
+            17.3. Ao criar a senha de Administrador, o Administrador cadastra
+            respostas a perguntas de segurança. Essas respostas permitem redefinir
+            a senha de Administrador no próprio computador, sem contato com o
+            Fabricante, caso ela seja esquecida. Quando não houver respostas
+            cadastradas — por exemplo, em senha trazida de versão anterior do
+            Software ou de backup antigo —, a senha de Administrador não poderá
+            ser recuperada por esse meio, e o Administrador deve cadastrar as
+            perguntas na tela Usuários e Senhas.
+          </p>
+          <p>
+            17.4.
+            <strong
+              >Quem souber a resposta de uma das perguntas de segurança poderá
+              redefinir a senha de Administrador.</strong
+            >
+            Por isso, o Administrador deve escolher respostas que somente ele
+            conheça e não compartilhá-las com outras pessoas.
+          </p>
+          <p>
+            17.5. Após tentativas de recuperação com respostas erradas, o Software
+            pode impor tempo de espera antes de novas tentativas.
+          </p>
+          <p>
+            17.6. O Usuário é responsável pelas informações cadastradas como
+            senhas e respostas.
+            <strong
+              >O Fabricante não se responsabiliza pela perda de acesso decorrente
+              de senhas esquecidas, de respostas incorretas, esquecidas ou
+              conhecidas por terceiros, ou de informações incorretas fornecidas
+              pelo próprio Usuário.</strong
+            >
+          </p>
+          <p>
+            17.7. As senhas e as respostas ficam guardadas no computador do
+            Usuário e, na forma do item 14.6, podem constar do arquivo de backup.
+            O Fabricante não tem acesso a elas e não consegue recuperá-las ou
+            redefini-las remotamente.
+          </p>
+          <p>
+            17.8. O Software pode permitir alterar, redefinir ou remover senhas,
+            conforme suas funcionalidades. A remoção da proteção faz com que os
+            módulos passem a abrir sem senha.
+          </p>
+          <p>
+            17.9. Quem tiver acesso como Administrador pode consultar, na tela
+            Usuários e Senhas, as senhas de Administrador e de Colaborador,
+            quando essa opção estiver disponível.
+          </p>
+
+          <h2>CLÁUSULA 18 – PROTEÇÃO DE MÓDULOS E DE AÇÕES</h2>
+          <p>
+            18.1. O Administrador pode escolher quais módulos exigem senha para
+            abrir. Na versão atual, podem ser protegidos o Controle Financeiro, o
+            Processador de Planilhas, as Ações em Massa, o Registro de Vendas, as
+            Notas Fiscais, os Dados da Empresa, as Informações de Venda, o Gerador
+            de EAN e os Lembretes.
+          </p>
+          <p>
+            18.2. Ao ser criada a senha de Administrador, o Controle Financeiro, o
+            Processador de Planilhas e as Ações em Massa ficam protegidos por
+            padrão, até que o Administrador altere essa escolha.
+          </p>
+          <p>
+            18.3. O Administrador também pode escolher, tela a tela, quais botões
+            ou ações exigem que a pessoa informe usuário e senha antes de
+            prosseguir — por exemplo, salvar um produto ou excluir um lançamento.
+          </p>
+          <p>
+            18.4. Depois de criada a senha de Administrador, a tela Usuários e
+            Senhas abre somente com ela.
+          </p>
+          <p>
+            18.5. Essas configurações podem ser alteradas pelo Administrador a
+            qualquer momento.
+          </p>
+          <p>
+            18.6. O Administrador é responsável por configurar corretamente as
+            proteções. Módulos e ações não protegidos ficam acessíveis a qualquer
+            pessoa que utilize o Software no computador.
+          </p>
+          <p>
+            18.7. Na versão atual, alguns módulos não podem ser protegidos por
+            senha para abrir — como o painel inicial, a Central de Ajuda, a
+            Central de Cálculos e as telas de plataformas e produtos —, sem
+            prejuízo da proteção de ações prevista no item 18.3, quando
+            disponível.
+          </p>
+          <p>
+            18.8.
+            <strong
+              >O controle de acesso é uma funcionalidade de organização do
+              Software e não constitui garantia absoluta contra acesso
+              indevido.</strong
+            >
+            As senhas restringem o acesso pelas telas do Software; elas não
+            criptografam os Dados do Usuário armazenados no computador e não
+            impedem o acesso por quem alcançar os arquivos do equipamento, nem o
+            acesso com Credenciais compartilhadas, expostas ou utilizadas de forma
+            inadequada.
+          </p>
+          <p>
+            18.9. Fechar a janela do Software não o encerra: ele continua em
+            execução na área de notificação do sistema operacional, e as telas e
+            os módulos já liberados permanecem abertos. Para encerrar o Software,
+            o Usuário deve usar a opção "Sair" do ícone na área de notificação; ao
+            se afastar do computador, deve encerrar o Software ou bloquear o
+            computador.
+          </p>
+          <p>
+            18.10. O compartilhamento de Credenciais é de responsabilidade do
+            Usuário.
+          </p>
+
+          <h2>CLÁUSULA 19 – SEGURANÇA DAS CREDENCIAIS E DO AMBIENTE</h2>
+          <p>
+            19.1. O Software disponibiliza mecanismos de autenticação e controle
+            de acesso, mas a segurança também depende das medidas adotadas pelo
+            Usuário.
+          </p>
+          <p>19.2. O Usuário deve proteger adequadamente:</p>
+          <ul>
+            <li>senhas e respostas às perguntas de segurança;</li>
+            <li>a Chave de Ativação e as demais Credenciais;</li>
+            <li>
+              o computador e a conta do sistema operacional em que o Software é
+              utilizado;
+            </li>
+            <li>
+              arquivos de backup, planilhas e documentos importados ou exportados;
+            </li>
+            <li>dados comerciais e informações financeiras.</li>
+          </ul>
+          <p>
+            19.3. O Usuário é responsável pela segurança do computador em que
+            instala o Software, incluindo senha de acesso ao sistema operacional,
+            antivírus, atualizações, controle de usuários, permissões, proteção
+            física e proteção contra malware.
+          </p>
+          <p>
+            19.4. Como os dados permanecem localmente no computador, pessoas que
+            obtenham acesso ao equipamento ou a seus arquivos poderão
+            potencialmente acessar tais informações.
+          </p>
+          <p>
+            19.5. O Usuário deve alterar as senhas e revogar acessos sempre que
+            suspeitar de exposição ou quando uma pessoa deixar de ter direito de
+            acesso.
+          </p>
+          <p>
+            19.6. O Fabricante não promete segurança absoluta, pois nenhum ambiente
+            computacional é completamente imune a riscos.
+          </p>
+          <p>
+            19.7. O Fabricante não responde por incidentes cuja causa exclusiva
+            esteja relacionada ao ambiente comprometido do Usuário, ao
+            compartilhamento ou à exposição de Credenciais pelo Usuário ou por
+            pessoas a quem ele deu acesso, ou a terceiros, sem prejuízo das
+            responsabilidades que a legislação eventualmente imponha.
+          </p>
+
+          <h2>CAPÍTULO V — PRODUTOS, PRECIFICAÇÃO E FERRAMENTAS DE CÁLCULO</h2>
+
+          <h2>CLÁUSULA 20 – PLATAFORMAS, PRODUTOS E PRECIFICAÇÃO</h2>
+          <p>
+            20.1. O Usuário cadastra as plataformas de venda que utiliza; o
+            Software também traz uma loja padrão, a Loja Física. O Software não
+            possui integração direta com as plataformas: preços, taxas e demais
+            informações são informados pelo Usuário.
+          </p>
+          <p>
+            20.2. O módulo de precificação realiza cálculos com base nos dados e
+            parâmetros fornecidos ou configurados pelo Usuário, entre eles:
+          </p>
+          <ul>
+            <li>preço de custo, embalagem, etiqueta e frete pago;</li>
+            <li>impostos sobre o custo, como IPI, DIFAL e ST, e alíquotas;</li>
+            <li>frete do produto, taxa fixa, comissão da plataforma e imposto da nota;</li>
+            <li>margem de lucro, em percentual ou em valor;</li>
+            <li>campos personalizados;</li>
+            <li>quantidade e condições específicas de plataformas.</li>
+          </ul>
+          <p>
+            20.3. A partir desses dados, o Software apresenta, entre outros, o
+            custo total, o preço de venda sugerido e o lucro e a margem estimados.
+          </p>
+          <p>
+            20.4. Para plataformas reconhecidas como Mercado Livre, o Software pode
+            apresentar valores separados para os tipos de anúncio Premium e
+            Clássico, cada um com a comissão informada pelo Usuário. O
+            reconhecimento é feito pelo nome da plataforma cadastrada; para outras
+            plataformas e outros tipos de anúncio, os cálculos dependem dos
+            parâmetros informados pelo Usuário.
+          </p>
+          <p>
+            20.5. Regras pré-configuradas na versão (item 13.3), como a da taxa
+            fixa, são aplicadas automaticamente aos cálculos. Próximo ao limite de
+            valor dessa regra, o Software pode considerar a taxa fixa mesmo que o
+            preço resultante ultrapasse o limite, de modo que o preço, o lucro e a
+            margem estimados podem diferir dos efetivamente obtidos; o Software
+            exibe o resultado estimado, que deve ser conferido pelo Usuário.
+          </p>
+          <p>
+            20.6. Salvo indicação expressa em contrário, o Software não garante que
+            as taxas de marketplaces ou os tributos utilizados estejam
+            automaticamente atualizados.
+          </p>
+          <p>20.7. O Usuário é responsável por verificar os parâmetros utilizados.</p>
+          <p>
+            20.8. Cálculos matematicamente corretos feitos com dados incorretos
+            podem produzir conclusões incorretas.
+          </p>
+          <p>
+            20.9. O preço calculado pelo Software
+            <strong>não constitui garantia</strong> de:
+          </p>
+          <ul>
+            <li>lucro;</li>
+            <li>venda;</li>
+            <li>competitividade;</li>
+            <li>aceitação pelo mercado;</li>
+            <li>margem efetivamente obtida;</li>
+            <li>demanda;</li>
+            <li>resultado financeiro.</li>
+          </ul>
+          <p>
+            20.10. O Software não substitui análise comercial, contábil, tributária
+            ou financeira profissional.
+          </p>
+          <p>
+            20.11. A decisão de utilizar determinado preço é exclusivamente do
+            Usuário.
+          </p>
+          <p>
+            20.12. Comparações entre tipos de anúncio, plataformas ou cenários
+            representam simulações baseadas nos parâmetros utilizados e não
+            constituem recomendação obrigatória.
+          </p>
+
+          <h2>CLÁUSULA 21 – KITS E PRODUTOS COMPOSTOS</h2>
+          <p>
+            21.1. O Software permite criar kits de um mesmo produto — por exemplo,
+            com 2, 3 ou mais unidades —, cada um com SKU, frete e taxas adicionais
+            próprios, e produtos compostos, formados por outros produtos
+            cadastrados na mesma plataforma.
+          </p>
+          <p>
+            21.2. Nos kits, a quantidade é definida pelo Usuário, e o custo, o
+            preço e a logística são calculados a partir dos dados do produto e do
+            próprio kit, como o frete e as taxas adicionais informados. O peso e as
+            medidas do kit são estimados a partir dos da unidade — por exemplo,
+            considerando as unidades empilhadas — e podem não corresponder à
+            embalagem real. Os valores devem ser conferidos pelo Usuário.
+          </p>
+          <p>
+            21.3. No produto composto, o custo é a soma do custo de cada item
+            multiplicado pela respectiva quantidade.
+          </p>
+          <p>
+            21.4. Quando um produto usado como item é salvo — pela ficha do
+            produto ou pelas Ações em Massa —, o Software atualiza automaticamente
+            os produtos compostos da mesma plataforma que o utilizam: os dados do
+            item no composto, como custo, nome, SKU e imagem, e o custo, o preço,
+            os kits e os Preços Extras calculados por margem do composto. Quando o
+            custo muda, a atualização segue para os compostos que usam outros
+            compostos.
+          </p>
+          <p>
+            21.5. Ao salvar um novo preço de custo na ficha de um produto, os
+            demais produtos da mesma plataforma com o mesmo SKU recebem o mesmo
+            preço de custo e são recalculados com os próprios parâmetros, salvo se
+            o SKU tiver sido alterado no mesmo salvamento. Essa regra não se
+            aplica a produtos compostos, que seguem o item 21.4.
+          </p>
+          <p>
+            21.6. O Software informa, por aviso na tela, os produtos atualizados
+            automaticamente. O Usuário deve conferi-los antes da utilização
+            comercial e manter backup atualizado.
+          </p>
+          <p>
+            21.7. Alterações em produtos ou parâmetros que repercutam em kits,
+            produtos compostos ou outros cálculos deverão ser conferidas antes da
+            utilização comercial.
+          </p>
+
+          <h2>CLÁUSULA 22 – PREÇOS EXTRAS</h2>
+          <p>
+            22.1. A funcionalidade Preços Extras, na tela de produtos, permite
+            trabalhar com referências de preço adicionais — Preço Mínimo, Preço
+            Ideal e Preço Máximo — para a unidade e para cada kit.
+          </p>
+          <p>
+            22.2. Em cada referência, o Usuário pode digitar o preço de venda ou
+            informar uma margem desejada, em percentual ou em valor, para que o
+            Software calcule o preço correspondente com os parâmetros cadastrados.
+            Nas plataformas reconhecidas como Mercado Livre, podem ser
+            apresentados valores para Premium e Clássico.
+          </p>
+          <p>
+            22.3. Os valores dos Preços Extras são referências configuradas pelo
+            Usuário e não alteram a precificação principal da ficha do produto.
+          </p>
+          <p>
+            22.4. Os resultados apresentados, como lucro e margem estimados,
+            dependem das informações cadastradas e podem ser recalculados quando
+            custos, taxas ou outros parâmetros mudarem, inclusive por atualização
+            automática de produtos compostos ou por Ações em Massa.
+          </p>
+          <p>
+            22.5. Quando a margem informada não puder ser atingida com os
+            parâmetros cadastrados, o Software pode deixar de calcular o preço e
+            exibir aviso.
+          </p>
+          <p>
+            22.6.
+            <strong
+              >O Software não determina qual preço o Usuário deve
+              praticar.</strong
+            >
+            O Usuário é responsável por avaliar os preços antes de utilizá-los
+            comercialmente.
+          </p>
+
+          <h2>CLÁUSULA 23 – AÇÕES EM MASSA</h2>
+          <p>
+            23.1. As Ações em Massa permitem alterar, de uma só vez, campos como
+            custo, taxas e margem de produtos identificados por SKU, em uma ou mais
+            plataformas selecionadas pelo Usuário.
+          </p>
+          <p>
+            23.2. A aplicação exige confirmação e a indicação de um responsável, e
+            o Software mantém um histórico das atualizações mais recentes.
+          </p>
+          <p>
+            23.3.
+            <strong
+              >As alterações aplicadas por Ações em Massa não podem ser desfeitas
+              automaticamente pelo Software.</strong
+            >
+            Recomenda-se fazer backup antes de aplicá-las.
+          </p>
+          <p>
+            23.4. O Usuário é responsável por conferir o SKU, as plataformas e os
+            campos selecionados, bem como os resultados após a aplicação, inclusive
+            nos produtos compostos atualizados automaticamente (Cláusula 21).
+          </p>
+
+          <h2>CLÁUSULA 24 – CAMPOS PERSONALIZADOS, SEÇÕES E REGRAS</h2>
+          <p>
+            24.1. O Software pode permitir que o Usuário crie e configure:
+          </p>
+          <ul>
+            <li>campos personalizados de texto, valor, percentual ou número;</li>
+            <li>seções próprias nas telas que oferecem esse recurso;</li>
+            <li>
+              regras personalizadas e operações matemáticas, como somar, subtrair,
+              multiplicar e dividir;
+            </li>
+            <li>ajustes sobre valores calculados;</li>
+            <li>
+              configurações específicas, como renomear ou ocultar campos.
+            </li>
+          </ul>
+          <p>
+            24.2. Essas funcionalidades são configuradas pelo próprio Usuário, e
+            o resultado depende das informações e das configurações fornecidas por
+            ele.
+          </p>
+          <p>
+            24.3. Campos personalizados de valor ou percentual podem entrar nos
+            cálculos de custo, de venda e de preço, conforme a configuração
+            escolhida.
+          </p>
+          <p>
+            24.4. Ocultar um campo pode retirá-lo dos cálculos. O Usuário deve
+            conferir os resultados após alterar configurações.
+          </p>
+          <p>
+            24.5. O Fabricante não se responsabiliza por resultados decorrentes de
+            configurações, fórmulas ou regras definidas pelo Usuário, sem prejuízo
+            do disposto na Cláusula 42 quanto a erros de programação do próprio
+            Software.
+          </p>
+
+          <h2>CLÁUSULA 25 – PROCESSADOR DE PLANILHAS</h2>
+          <p>
+            25.1. O Processador de Planilhas, incluído nos Planos com Módulos Plus,
+            pode permitir:
+          </p>
+          <ul>
+            <li>
+              importar planilhas de vendas, como relatórios exportados pelas
+              plataformas, em formatos como .xlsx, .xls e .csv;
+            </li>
+            <li>
+              configurar as colunas e os intervalos de onde cada informação será
+              lida;
+            </li>
+            <li>
+              escolher como o valor recebido será obtido — da própria planilha ou
+              por estimativa informada pelo Usuário;
+            </li>
+            <li>
+              processar as informações, relacionando cada SKU ao produto cadastrado
+              na plataforma e ao seu custo;
+            </li>
+            <li>
+              criar campos de cálculo e regras personalizadas, aplicados sobre os
+              totais;
+            </li>
+            <li>gerar cálculos, agregações e relatórios, inclusive por SKU;</li>
+            <li>salvar importações e consultar estimativas de impostos;</li>
+            <li>
+              exportar o resultado para o Controle Financeiro, onde é criado um
+              lançamento de venda.
+            </li>
+          </ul>
+          <p>
+            25.2. A planilha é lida para o processamento e não é armazenada pelo
+            Software; ficam guardados apenas os resultados que o Usuário salvar ou
+            exportar.
+          </p>
+          <p>
+            25.3. O Software soma e processa exatamente as colunas e os intervalos
+            indicados pelo Usuário. Colunas ou intervalos incorretos produzem
+            resultados incorretos.
+          </p>
+          <p>
+            25.4. As regras personalizadas são aplicadas sobre os totais, na
+            ordem configurada pelo Usuário, e podem alterar o valor exportado
+            para o Controle Financeiro; o relatório por SKU não é alterado por
+            elas.
+          </p>
+          <p>
+            25.5. Quando um SKU da planilha não for encontrado nos produtos da
+            plataforma, o custo desse item pode ser considerado zero, com aviso na
+            tela, até que o Usuário cadastre o produto.
+          </p>
+          <p>
+            25.6. Quando o valor recebido for estimado por percentual informado
+            pelo Usuário, o resultado é uma estimativa, e não o valor efetivamente
+            creditado pela plataforma.
+          </p>
+          <p>
+            25.7. As estimativas de impostos são aproximadas, baseadas nas
+            configurações informadas pelo Usuário, e não substituem a apuração feita
+            por contador ou profissional habilitado.
+          </p>
+          <p>25.8. O Usuário é responsável:</p>
+          <ul>
+            <li>pela origem dos dados;</li>
+            <li>pela legitimidade das informações inseridas;</li>
+            <li>pela configuração das colunas, das regras e dos cálculos;</li>
+            <li>
+              pela conferência dos resultados e dos cálculos antes de utilizá-los
+              comercial, fiscal ou financeiramente;
+            </li>
+            <li>
+              pela conferência dos lançamentos exportados para o Controle
+              Financeiro, evitando duplicidades.
+            </li>
+          </ul>
+          <p>
+            25.9.
+            <strong
+              >Os resultados do Processador de Planilhas não constituem apuração
+              jurídica, contábil ou fiscal, e o Software não garante que os
+              cálculos estejam jurídica, contábil ou fiscalmente corretos em todas
+              as situações.</strong
+            >
+            Os resultados dependem das planilhas, das colunas e das regras
+            definidas pelo Usuário e devem ser conferidos por ele.
+          </p>
+
+          <h2>CLÁUSULA 26 – CENTRAL DE CÁLCULOS</h2>
+          <p>
+            26.1. A Central de Cálculos disponibiliza ferramentas de simulação
+            matemática e financeira para fins auxiliares.
+          </p>
+          <p>26.2. As calculadoras não constituem:</p>
+          <ul>
+            <li>consultoria contábil;</li>
+            <li>consultoria tributária;</li>
+            <li>consultoria fiscal;</li>
+            <li>consultoria jurídica;</li>
+            <li>consultoria financeira;</li>
+            <li>parecer técnico;</li>
+            <li>recomendação profissional.</li>
+          </ul>
+          <p>
+            26.3. Os resultados dependem das fórmulas, parâmetros e informações
+            utilizados.
+          </p>
+          <p>
+            26.4. O Usuário é responsável por conferir os dados utilizados e
+            verificar se a fórmula ou a metodologia se aplica à sua situação.
+          </p>
+          <p>
+            26.5. Alterações legislativas, regulatórias ou metodológicas podem
+            tornar determinado resultado inadequado para situações futuras.
+          </p>
+          <p>
+            26.6. Antes de tomar decisões que possam gerar obrigações fiscais,
+            tributárias, contábeis, jurídicas, financeiras ou empresariais
+            relevantes, o Usuário deverá buscar orientação de profissional
+            habilitado quando necessário.
+          </p>
+          <p>
+            26.7. O Fabricante não garante que determinado resultado seja aplicável
+            a todas as situações concretas.
+          </p>
+          <p>
+            26.8. Eventual prejuízo decorrente de decisão tomada exclusivamente com
+            base em simulação, sem a análise adequada da situação concreta, será
+            avaliado conforme a legislação aplicável e as circunstâncias do caso.
+          </p>
+
+          <h2>CLÁUSULA 27 – INFORMAÇÕES TRIBUTÁRIAS E FISCAIS</h2>
+          <p>
+            27.1. O Software poderá possuir campos e ferramentas relacionados a
+            tributos, impostos, alíquotas ou outros parâmetros fiscais, como o
+            percentual de imposto por nota cadastrado nos Dados da Empresa.
+          </p>
+          <p>
+            27.2. O Software não substitui escrituração contábil ou fiscal
+            profissional.
+          </p>
+          <p>
+            27.3. O Software não determina, por si só, o regime tributário
+            aplicável ao Usuário.
+          </p>
+          <p>
+            27.4. O Software não garante a correta aplicação de determinada
+            alíquota em todas as situações.
+          </p>
+          <p>
+            27.5. O Usuário é responsável pela conferência das informações
+            tributárias utilizadas.
+          </p>
+          <p>27.6. A legislação tributária poderá variar conforme:</p>
+          <ul>
+            <li>Estado;</li>
+            <li>Município;</li>
+            <li>produto;</li>
+            <li>operação;</li>
+            <li>regime tributário;</li>
+            <li>atividade;</li>
+            <li>destinatário;</li>
+            <li>período;</li>
+            <li>benefício fiscal;</li>
+            <li>enquadramento específico.</li>
+          </ul>
+          <p>
+            27.7. A utilização de campos tributários no Software não caracteriza
+            prestação de serviço contábil ou consultoria tributária.
+          </p>
+          <p>
+            27.8. O Usuário deverá consultar profissional habilitado sempre que
+            necessário para determinar a correta aplicação da legislação ao seu
+            caso.
+          </p>
+
+          <h2>CAPÍTULO VI — DEMAIS MÓDULOS</h2>
+
+          <h2>CLÁUSULA 28 – NOTAS FISCAIS</h2>
+          <p>
+            28.1. O módulo de Notas Fiscais tem finalidade de organização e
+            armazenamento de arquivos fornecidos pelo próprio Usuário, conforme os
+            recursos disponíveis na versão utilizada.
+          </p>
+          <p>
+            28.2. Salvo indicação expressa em contrário, o módulo
+            <strong>não constitui emissor fiscal</strong>.
+          </p>
+          <p>
+            28.3. O módulo não deve ser interpretado como serviço de emissão,
+            transmissão ou validação fiscal perante órgãos públicos.
+          </p>
+          <p>
+            28.4. Salvo indicação expressa da versão utilizada, o módulo
+            <strong>não</strong>:
+          </p>
+          <ul>
+            <li>transmite NF-e à SEFAZ;</li>
+            <li>utiliza certificado digital para emissão;</li>
+            <li>assina documentos fiscais;</li>
+            <li>gera autorização fiscal;</li>
+            <li>substitui sistema emissor fiscal;</li>
+            <li>realiza escrituração fiscal;</li>
+            <li>garante validade fiscal de documentos.</li>
+          </ul>
+          <p>
+            28.5. A guarda legal dos documentos fiscais permanece sob
+            responsabilidade do Usuário, que deve manter cópia dos arquivos
+            originais fora do Software.
+          </p>
+          <p>
+            28.6. O armazenamento no Software constitui recurso de organização e
+            não substitui outras obrigações legais de guarda.
+          </p>
+
+          <h2>CLÁUSULA 29 – REGISTRO DE VENDAS, CONTROLE FINANCEIRO E DRE</h2>
+          <p>
+            29.1. Os módulos de vendas e financeiros processam os lançamentos e as
+            informações fornecidos pelo Usuário.
+          </p>
+          <p>
+            29.2. O Software não realiza conciliação bancária automática e não
+            possui integração direta com marketplaces ou bancos. Os lançamentos do
+            Controle Financeiro são feitos pelo Usuário: diretamente no módulo; ao
+            registrar uma venda no Registro de Vendas com a opção de lançá-la no
+            Controle Financeiro; ou, quando o Processador de Planilhas estiver
+            incluído no Plano, ao exportar o resultado de uma planilha processada
+            (Cláusula 25). O Processador não registra vendas no Registro de
+            Vendas.
+          </p>
+          <p>
+            29.3. Os relatórios financeiros são demonstrativos de apoio gerencial.
+          </p>
+          <p>
+            29.4. O DRE disponibilizado pelo Software não deve ser interpretado
+            automaticamente como demonstração contábil formal ou substituto da
+            escrituração realizada por profissional habilitado.
+          </p>
+          <p>
+            29.5. A qualidade dos relatórios depende da qualidade e da completude
+            dos dados inseridos.
+          </p>
+          <p>
+            29.6. Lançamentos ausentes, duplicados ou incorretos poderão alterar os
+            resultados apresentados. O Usuário deve evitar lançar a mesma venda
+            mais de uma vez — por exemplo, pelo Registro de Vendas e pela
+            exportação do Processador de Planilhas.
+          </p>
+          <p>
+            29.7. O Registro de Vendas pode armazenar dados pessoais de clientes,
+            como nome, CPF ou CNPJ, telefone, e-mail e endereço. O tratamento
+            desses dados é de responsabilidade do Usuário (Cláusula 46).
+          </p>
+          <p>
+            29.8. Decisões financeiras, comerciais ou empresariais tomadas pelo
+            Usuário permanecem sob sua responsabilidade, observadas as
+            responsabilidades que a legislação eventualmente atribua ao Fabricante.
+          </p>
+
+          <h2>CLÁUSULA 30 – INFORMAÇÕES DE VENDA E GERADOR DE EAN</h2>
+          <p>
+            30.1. O módulo Informações de Venda, incluído nos Planos com Módulos
+            Plus, organiza informações e configurações de venda definidas pelo
+            Usuário, como parcelamento, descontos e logística. As condições
+            oferecidas pelo Usuário a seus clientes são de sua exclusiva
+            responsabilidade.
+          </p>
+          <p>
+            30.2. O Gerador de EAN, incluído nos Planos com Módulos Plus, poderá
+            calcular sequências numéricas e o respectivo dígito verificador
+            conforme o algoritmo aplicável.
+          </p>
+          <p>
+            30.3. A geração matemática de uma sequência não significa que o código
+            esteja registrado ou autorizado para uso comercial.
+          </p>
+          <p>30.4. O Software não garante:</p>
+          <ul>
+            <li>disponibilidade do código;</li>
+            <li>titularidade;</li>
+            <li>registro;</li>
+            <li>exclusividade;</li>
+            <li>aceitação por marketplaces;</li>
+            <li>aceitação por varejistas;</li>
+            <li>aceitação por distribuidores;</li>
+            <li>reconhecimento por entidades reguladoras.</li>
+          </ul>
+          <p>
+            30.5. O Usuário é responsável por verificar os requisitos aplicáveis ao
+            código que pretende utilizar.
+          </p>
+          <p>
+            30.6. O Fabricante não declara vínculo, autorização ou representação
+            perante a GS1 ou entidade equivalente, salvo se expressamente
+            informado.
+          </p>
+
+          <h2>CLÁUSULA 31 – LEMBRETES E NOTIFICAÇÕES</h2>
+          <p>
+            31.1. O módulo de Lembretes constitui ferramenta auxiliar de
+            organização.
+          </p>
+          <p>
+            31.2. Para exibir lembretes, o Software continua em execução na área
+            de notificação do sistema operacional quando a janela é fechada (item
+            18.9) e, se o Usuário ativar essa opção, pode iniciar junto com o
+            sistema.
+          </p>
+          <p>31.3. O funcionamento das notificações poderá depender de:</p>
+          <ul>
+            <li>computador ligado;</li>
+            <li>Software em execução;</li>
+            <li>permissões do sistema operacional;</li>
+            <li>configurações de notificações;</li>
+            <li>antivírus;</li>
+            <li>configurações de segurança;</li>
+            <li>modo de concentração;</li>
+            <li>atualizações do sistema operacional.</li>
+          </ul>
+          <p>
+            31.4. O Fabricante não garante que determinado lembrete será
+            necessariamente visualizado pelo Usuário.
+          </p>
+          <p>
+            31.5. O Usuário permanece responsável pelo acompanhamento de obrigações
+            e prazos relevantes.
+          </p>
+          <p>
+            31.6. O módulo não deve ser utilizado como único mecanismo de controle
+            de prazos fiscais, tributários, trabalhistas, judiciais ou
+            contratuais.
+          </p>
+
+          <h2>CLÁUSULA 32 – CENTRAL DE AJUDA, TUTORIAIS E LINKS EXTERNOS</h2>
+          <p>
+            32.1. A Central de Ajuda, os tutoriais, os textos explicativos e os
+            exemplos do Software têm caráter orientativo e podem ser alterados nas
+            Atualizações.
+          </p>
+          <p>
+            32.2. A Central de Ajuda pode conter links para sites, ferramentas,
+            vídeos e políticas de terceiros, como páginas de taxas de marketplaces.
+            Esses conteúdos são de responsabilidade dos respectivos titulares, e o
+            Fabricante não controla sua disponibilidade, atualidade ou exatidão.
+          </p>
+          <p>
+            32.3. A Central de Ajuda pode gerar um arquivo de diagnóstico de
+            problemas, que o Usuário pode exportar e enviar ao suporte, se quiser
+            (Cláusula 43).
+          </p>
+
+          <h2>CAPÍTULO VII — AMBIENTE E TERCEIROS</h2>
+
+          <h2>CLÁUSULA 33 – AMBIENTE E COMPATIBILIDADE</h2>
+          <p>
+            33.1. O Software é disponibilizado para computadores com sistema
+            operacional Windows e é desenvolvido para ambiente compatível com os
+            requisitos técnicos informados pelo Fabricante.
+          </p>
+          <p>
+            33.2. O funcionamento depende do equipamento e do ambiente do Usuário.
+          </p>
+          <p>33.3. Podem influenciar o funcionamento:</p>
+          <ul>
+            <li>hardware;</li>
+            <li>memória;</li>
+            <li>armazenamento;</li>
+            <li>sistema operacional;</li>
+            <li>permissões;</li>
+            <li>antivírus;</li>
+            <li>outros programas;</li>
+            <li>configurações do computador.</li>
+          </ul>
+          <p>
+            33.4. O Fabricante não garante compatibilidade permanente com todas as
+            futuras versões de sistemas operacionais.
+          </p>
+          <p>
+            33.5. Alterações estruturais promovidas por terceiros poderão exigir
+            adequações no Software.
+          </p>
+          <p>
+            33.6. Quando a alteração externa inviabilizar tecnicamente determinada
+            funcionalidade, o Fabricante poderá avaliar a necessidade de
+            atualização ou substituição da funcionalidade, observadas as obrigações
+            legais aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 34 – SOFTWARES E SERVIÇOS DE TERCEIROS</h2>
+          <p>
+            34.1. O Software poderá depender de componentes de terceiros e do
+            sistema operacional e ser utilizado em conjunto com plataformas,
+            marketplaces e serviços externos, com os quais não possui integração
+            direta, salvo indicação expressa.
+          </p>
+          <p>
+            34.2. Formulários de solicitação de chave e de serviços, meios de
+            pagamento e canais de atendimento poderão ser operados por terceiros —
+            como plataformas de formulários online, provedores de e-mail,
+            aplicativos de mensagens e instituições de pagamento —, sujeitos às
+            respectivas políticas e condições.
+          </p>
+          <p>34.3. O Fabricante não controla:</p>
+          <ul>
+            <li>preços;</li>
+            <li>taxas;</li>
+            <li>políticas;</li>
+            <li>disponibilidade;</li>
+            <li>regras;</li>
+            <li>APIs;</li>
+            <li>serviços;</li>
+            <li>alterações operacionais de terceiros.</li>
+          </ul>
+          <p>
+            34.4. Alterações promovidas por terceiros poderão exigir alterações no
+            Software.
+          </p>
+          <p>
+            34.5. A indisponibilidade de serviço externo poderá afetar
+            funcionalidades que dependam desse serviço.
+          </p>
+          <p>
+            34.6. O Fabricante não assume obrigação de controlar ou garantir a
+            continuidade de serviços que não estejam sob sua administração.
+          </p>
+
+          <h2>CAPÍTULO VIII — SERVIÇOS ADICIONAIS</h2>
+
+          <h2>CLÁUSULA 35 – INDEPENDÊNCIA DOS SERVIÇOS</h2>
+          <p>
+            35.1. Serviços Adicionais não estão automaticamente incluídos na
+            aquisição da licença.
+          </p>
+          <p>
+            35.2. Cada serviço deverá possuir escopo, preço, prazo e condições
+            próprios.
+          </p>
+          <p>
+            35.3. A contratação de um Serviço Adicional não implica contratação
+            automática de outro.
+          </p>
+          <p>
+            35.4. Em caso de conflito, a proposta específica do serviço poderá
+            complementar este documento quanto ao respectivo serviço.
+          </p>
+
+          <h2>CLÁUSULA 36 – SERVIÇOS RELACIONADOS AO BLING E A OUTRAS PLATAFORMAS</h2>
+          <p>
+            36.1. Poderão ser oferecidos serviços de apoio operacional relacionados
+            ao Bling e a outras plataformas, marketplaces e ferramentas de
+            terceiros.
+          </p>
+          <p>36.2. Esses serviços poderão incluir:</p>
+          <ul>
+            <li>cadastro;</li>
+            <li>organização de produtos;</li>
+            <li>configuração;</li>
+            <li>auxílio operacional;</li>
+            <li>organização de categorias;</li>
+            <li>configuração de canais;</li>
+            <li>auxílio na configuração de marketplaces;</li>
+            <li>organização de informações.</li>
+          </ul>
+          <p>
+            36.3. Os serviços não incluem, salvo contratação específica e
+            legalmente permitida:
+          </p>
+          <ul>
+            <li>contabilidade;</li>
+            <li>escrituração fiscal;</li>
+            <li>apuração tributária;</li>
+            <li>consultoria jurídica;</li>
+            <li>consultoria trabalhista;</li>
+            <li>consultoria tributária.</li>
+          </ul>
+          <p>
+            36.4. O Fabricante não se apresenta como representante, sócio,
+            preposto ou parceiro comercial de terceiros sem autorização ou
+            comunicação expressa.
+          </p>
+          <p>
+            36.5. Quando forem fornecidas credenciais pelo Usuário, estas deverão
+            ser utilizadas exclusivamente para execução do serviço contratado.
+          </p>
+          <p>
+            36.6. O Usuário declara possuir autorização para fornecer os acessos
+            utilizados.
+          </p>
+          <p>
+            36.7. O Usuário deverá revisar as configurações realizadas antes de
+            utilizá-las comercialmente.
+          </p>
+
+          <h2>CLÁUSULA 37 – INDICAÇÃO DE SERVIÇOS DE RECURSOS HUMANOS</h2>
+          <p>
+            37.1. O Software poderá apresentar informações sobre terceiros que
+            prestem serviços de Recursos Humanos.
+          </p>
+          <p>
+            37.2. Nessa hipótese, o Fabricante atua apenas como divulgador ou canal
+            de informação.
+          </p>
+          <p>
+            37.3. O Fabricante não garante a qualidade, o resultado, o preço ou a
+            execução dos serviços do terceiro.
+          </p>
+          <p>
+            37.4. A contratação será realizada diretamente entre o Usuário e o
+            terceiro.
+          </p>
+          <p>
+            37.5. Reclamações relativas à execução do serviço deverão ser
+            direcionadas ao respectivo prestador.
+          </p>
+
+          <h2>CLÁUSULA 38 – DESENVOLVIMENTO DE SOLUÇÕES PERSONALIZADAS</h2>
+          <p>
+            38.1. O Fabricante poderá oferecer desenvolvimento de sistemas,
+            aplicativos, automações, integrações e ferramentas personalizadas.
+          </p>
+          <p>38.2. Cada projeto deverá possuir proposta própria.</p>
+          <p>
+            38.3. Somente funcionalidades expressamente previstas na proposta serão
+            consideradas incluídas.
+          </p>
+          <p>38.4. Alterações posteriores poderão constituir novo escopo.</p>
+          <p>
+            38.5. Novo escopo poderá exigir novo orçamento, prazo e condições.
+          </p>
+          <p>
+            38.6. O prazo poderá ser afetado por atraso do Usuário no fornecimento
+            de informações, acessos, materiais ou aprovações.
+          </p>
+          <p>
+            38.7. O Usuário declara possuir os direitos necessários sobre materiais
+            fornecidos ao Fabricante.
+          </p>
+          <p>
+            38.8. Custos de terceiros não estarão incluídos salvo previsão expressa.
+          </p>
+          <p>
+            38.9. A propriedade intelectual do projeto personalizado será definida
+            na proposta específica.
+          </p>
+
+          <h2>CAPÍTULO IX — PROPRIEDADE INTELECTUAL E CONDUTA</h2>
+
+          <h2>CLÁUSULA 39 – PROPRIEDADE INTELECTUAL</h2>
+          <p>
+            39.1. O Software, código-fonte, código objeto, arquitetura, interface,
+            identidade visual, marca, documentação, textos, imagens, elementos
+            gráficos e demais componentes protegíveis pertencem ao Fabricante ou
+            aos respectivos titulares.
+          </p>
+          <p>39.2. A licença não transfere propriedade intelectual.</p>
+          <p>39.3. O Usuário não adquire direito sobre o código-fonte.</p>
+          <p>
+            39.4. Os Dados do Usuário permanecem de titularidade do Usuário,
+            ressalvados direitos de terceiros eventualmente existentes sobre tais
+            dados.
+          </p>
+          <p>
+            39.5. O Fabricante não reivindica propriedade sobre os Dados do
+            Usuário.
+          </p>
+
+          <h2>CLÁUSULA 40 – RESTRIÇÕES DE USO</h2>
+          <p>40.1. Salvo autorização expressa ou permissão legal, é vedado:</p>
+          <ul>
+            <li>reproduzir ou redistribuir o Software;</li>
+            <li>sublicenciar;</li>
+            <li>revender;</li>
+            <li>alugar;</li>
+            <li>comercializar cópias;</li>
+            <li>compartilhar Chaves de Ativação;</li>
+            <li>remover mecanismos de proteção;</li>
+            <li>contornar mecanismos de licença ou de liberação de módulos;</li>
+            <li>modificar arquivos para burlar restrições;</li>
+            <li>distribuir versões adulteradas;</li>
+            <li>remover avisos de propriedade intelectual;</li>
+            <li>
+              realizar engenharia reversa além das hipóteses permitidas por lei;
+            </li>
+            <li>utilizar o Software para finalidade ilícita.</li>
+          </ul>
+          <p>
+            40.2. As restrições deste documento não pretendem afastar direitos que
+            a legislação reconheça expressamente ao usuário legítimo.
+          </p>
+          <p>
+            40.3. A utilização do Software fora dos limites da licença poderá
+            resultar em suspensão, invalidação ou rescisão da licença, observadas
+            as garantias e os procedimentos legalmente aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 41 – FRAUDE, COMPARTILHAMENTO E USO INDEVIDO</h2>
+          <p>41.1. São considerados exemplos de uso indevido:</p>
+          <ul>
+            <li>compartilhamento de Chave de Ativação;</li>
+            <li>comercialização não autorizada de Chave de Ativação;</li>
+            <li>tentativa de burlar a expiração;</li>
+            <li>
+              tentativa de liberar módulos não incluídos no Plano contratado;
+            </li>
+            <li>manipulação do sistema de licença;</li>
+            <li>alteração deliberada de mecanismos de proteção;</li>
+            <li>distribuição de cópias não autorizadas;</li>
+            <li>utilização de Chave de Ativação obtida irregularmente.</li>
+          </ul>
+          <p>
+            41.2. Diante de indícios de uso indevido, o Fabricante poderá adotar
+            medidas técnicas e contratuais proporcionais, observando a legislação
+            aplicável e, quando necessário, oportunizando esclarecimento ou
+            regularização.
+          </p>
+          <p>41.3. Medidas poderão incluir:</p>
+          <ul>
+            <li>bloqueio da Chave de Ativação, quando tecnicamente viável;</li>
+            <li>suspensão da licença;</li>
+            <li>rescisão;</li>
+            <li>impedimento de novas ativações;</li>
+            <li>adoção de medidas administrativas ou judiciais.</li>
+          </ul>
+          <p>
+            41.4. A adoção de medidas contra uso indevido não autoriza o Fabricante
+            a apropriar-se dos Dados do Usuário.
+          </p>
+          <p>
+            41.5. O Fabricante poderá buscar reparação de prejuízos
+            comprovadamente causados por utilização ilícita, conforme a legislação
+            aplicável.
+          </p>
+
+          <h2>CAPÍTULO X — GARANTIAS, SUPORTE E RESPONSABILIDADE</h2>
+
+          <h2>CLÁUSULA 42 – GARANTIAS E FUNCIONAMENTO TÉCNICO</h2>
+          <p>
+            42.1. O Software estará sujeito às garantias legais aplicáveis à
+            relação jurídica existente entre as partes.
+          </p>
+          <p>
+            42.2. Durante o prazo de validade técnica da versão comercializada,
+            serão observadas as obrigações legalmente aplicáveis ao fornecedor de
+            programa de computador.
+          </p>
+          <p>
+            42.3. O Fabricante poderá corrigir erros de programação que
+            comprovadamente impeçam o funcionamento do Software conforme suas
+            especificações.
+          </p>
+          <p>42.4. A correção dependerá da análise técnica do problema.</p>
+          <p>42.5. Não constituem, por si só, defeito do Software:</p>
+          <ul>
+            <li>resultado baseado em dado incorreto;</li>
+            <li>parâmetro incorreto informado pelo Usuário;</li>
+            <li>
+              configuração de campos, regras, colunas, senhas ou proteções feita
+              pelo Usuário;
+            </li>
+            <li>taxa externa alterada;</li>
+            <li>legislação alterada;</li>
+            <li>indisponibilidade de terceiro;</li>
+            <li>problema de hardware;</li>
+            <li>vírus;</li>
+            <li>malware;</li>
+            <li>sistema operacional incompatível;</li>
+            <li>falta de atualização disponibilizada;</li>
+            <li>utilização em desacordo com as instruções;</li>
+            <li>funcionalidade ou módulo não incluído no Plano contratado;</li>
+            <li>expiração de licença por prazo determinado.</li>
+          </ul>
+          <p>
+            42.6. O Fabricante não garante que todas as funcionalidades
+            permanecerão idênticas indefinidamente, especialmente diante de
+            alterações técnicas, legais ou de terceiros, observados os direitos
+            adquiridos e as obrigações legais aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 43 – SUPORTE TÉCNICO</h2>
+          <p>43.1. O suporte técnico poderá abranger:</p>
+          <ul>
+            <li>instalação;</li>
+            <li>ativação;</li>
+            <li>troca de chave, upgrade e transferência de licença;</li>
+            <li>esclarecimentos sobre funcionalidades;</li>
+            <li>orientação sobre backup;</li>
+            <li>análise de erros reproduzíveis;</li>
+            <li>orientações relacionadas ao funcionamento do Software.</li>
+          </ul>
+          <p>43.2. Salvo contratação específica, o suporte não inclui:</p>
+          <ul>
+            <li>consultoria contábil;</li>
+            <li>consultoria tributária;</li>
+            <li>consultoria jurídica;</li>
+            <li>consultoria financeira;</li>
+            <li>cadastro de dados;</li>
+            <li>digitação;</li>
+            <li>configuração de planilhas, regras ou campos para o Usuário;</li>
+            <li>treinamento personalizado;</li>
+            <li>recuperação de dados perdidos;</li>
+            <li>recuperação de senhas ou de respostas de segurança esquecidas;</li>
+            <li>manutenção de hardware;</li>
+            <li>manutenção do sistema operacional;</li>
+            <li>suporte a softwares de terceiros;</li>
+            <li>desenvolvimento personalizado.</li>
+          </ul>
+          <p>
+            43.3. As condições de suporte de cada Plano são as informadas no
+            momento da contratação.
+          </p>
+          <p>
+            43.4. O atendimento ocorre pelos canais oficiais indicados nas
+            Informações do Fabricante, ao final deste documento.
+          </p>
+          <p>
+            43.5. Para análise de um problema, o Fabricante poderá pedir ao Usuário
+            o arquivo de diagnóstico gerado pela Central de Ajuda ou outras
+            informações. O envio é voluntário, e o Usuário deve avaliar se os
+            arquivos enviados contêm dados que não deseja compartilhar.
+          </p>
+          <p>
+            43.6. Horários e canais poderão ser alterados mediante comunicação
+            adequada.
+          </p>
+          <p>43.7. Não há promessa de atendimento instantâneo.</p>
+          <p>
+            43.8. Solicitações manifestamente abusivas, repetitivas ou fora do
+            escopo poderão ser limitadas, sem prejuízo do atendimento das
+            obrigações legais aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 44 – LIMITAÇÃO E DELIMITAÇÃO DE RESPONSABILIDADE</h2>
+          <p>
+            44.1. O Fabricante não responde por prejuízos decorrentes
+            exclusivamente de:
+          </p>
+          <ul>
+            <li>informações incorretas fornecidas pelo Usuário;</li>
+            <li>parâmetros desatualizados mantidos pelo Usuário;</li>
+            <li>decisões comerciais tomadas pelo Usuário;</li>
+            <li>utilização inadequada do Software;</li>
+            <li>utilização em desacordo com as instruções;</li>
+            <li>
+              configuração incorreta de senhas, proteções, usuários, campos
+              personalizados, regras ou planilhas pelo Usuário;
+            </li>
+            <li>
+              compartilhamento, exposição ou uso inadequado de Credenciais;
+            </li>
+            <li>
+              alterações aplicadas pelo Usuário, inclusive por Ações em Massa, sem
+              a devida conferência;
+            </li>
+            <li>ausência de backup;</li>
+            <li>falha de hardware;</li>
+            <li>vírus ou malware;</li>
+            <li>falha do sistema operacional;</li>
+            <li>intervenção de terceiros;</li>
+            <li>alteração de políticas de marketplaces;</li>
+            <li>alteração de legislação;</li>
+            <li>indisponibilidade de serviços de terceiros;</li>
+            <li>não instalação de atualização disponibilizada;</li>
+            <li>
+              utilização de resultados de simulações sem análise adequada da
+              situação concreta;
+            </li>
+            <li>perda de dados decorrente das hipóteses previstas na Cláusula 14.</li>
+          </ul>
+          <p>
+            44.2. Nas relações com Usuário Profissional, quando juridicamente
+            admissível, eventual responsabilidade indenizatória poderá ser limitada
+            aos danos diretos comprovadamente decorrentes de falha imputável ao
+            Fabricante, observados os limites e as condições da legislação
+            aplicável e do contrato específico.
+          </p>
+          <p>
+            44.3. Nenhuma limitação desta cláusula será interpretada como exclusão
+            de responsabilidade que não possa legalmente ser excluída ou limitada.
+          </p>
+          <p>
+            44.4. Nas relações de consumo, prevalecem integralmente os direitos
+            assegurados pelo Código de Defesa do Consumidor.
+          </p>
+          <p>
+            44.5. A eventual nulidade de uma limitação não prejudicará as demais
+            disposições deste documento.
+          </p>
+
+          <h2>CLÁUSULA 45 – CASO FORTUITO E FORÇA MAIOR</h2>
+          <p>
+            45.1. Nenhuma parte será responsabilizada pelo descumprimento
+            decorrente de eventos que não possam ser razoavelmente controlados, nos
+            termos da legislação aplicável.
+          </p>
+          <p>45.2. Podem constituir exemplos:</p>
+          <ul>
+            <li>desastres naturais;</li>
+            <li>interrupções prolongadas de energia;</li>
+            <li>falhas de infraestrutura;</li>
+            <li>ataques cibernéticos de larga escala;</li>
+            <li>atos governamentais;</li>
+            <li>conflitos;</li>
+            <li>emergências;</li>
+            <li>falhas generalizadas de serviços de terceiros.</li>
+          </ul>
+          <p>
+            45.3. A aplicação desta cláusula não afasta obrigações legais que não
+            possam ser excluídas.
+          </p>
+
+          <h2>CAPÍTULO XI — DADOS PESSOAIS E LGPD</h2>
+
+          <h2>CLÁUSULA 46 – TRATAMENTO DE DADOS PESSOAIS</h2>
+          <p>
+            46.1. O Software funciona localmente: os Dados do Usuário — inclusive
+            os dados pessoais de clientes, sócios, colaboradores, Usuários
+            Cadastrados e demais pessoas, inseridos pelo Usuário — permanecem no
+            computador do próprio Usuário.
+          </p>
+          <p>
+            46.2. O Fabricante não tem acesso aos dados armazenados localmente e
+            não os trata em seus próprios sistemas, salvo quando o Usuário os
+            enviar voluntariamente, por exemplo em atendimento de suporte; nesse
+            caso, o tratamento observará a finalidade do atendimento e a
+            legislação aplicável.
+          </p>
+          <p>
+            46.3. Quanto aos dados pessoais inseridos pelo Usuário em sua operação
+            local, o Usuário será responsável pelas obrigações que lhe couberem como
+            agente de tratamento, conforme o caso, inclusive quanto à base legal,
+            à informação aos titulares e à segurança desses dados.
+          </p>
+          <p>
+            46.4. O Fabricante poderá tratar dados necessários à contratação, à
+            emissão da licença e ao atendimento, tais como:
+          </p>
+          <ul>
+            <li>nome;</li>
+            <li>e-mail;</li>
+            <li>telefone;</li>
+            <li>CPF ou CNPJ;</li>
+            <li>dados e comprovantes de pagamento necessários à contratação;</li>
+            <li>ID do Computador e Código de Solicitação;</li>
+            <li>
+              Chave de Ativação e informações da licença, como Plano, modalidade,
+              validade, módulos e data da compra;
+            </li>
+            <li>
+              informações necessárias ao atendimento e ao suporte, inclusive
+              arquivos enviados voluntariamente pelo Usuário.
+            </li>
+          </ul>
+          <p>
+            46.5. Esses dados são tratados para emitir e administrar as licenças,
+            prevenir fraudes e uso indevido, prestar atendimento, cumprir
+            obrigações legais e exercer direitos, nas bases legais aplicáveis a
+            cada finalidade, conforme a legislação vigente.
+          </p>
+          <p>
+            46.6. Formulários, pagamentos e canais de atendimento poderão ser
+            operados por terceiros (Cláusula 34), sujeitos às respectivas
+            políticas e condições.
+          </p>
+          <p>
+            46.7. O Fabricante poderá conservar dados pelo período necessário ao
+            cumprimento de obrigações legais, exercício regular de direitos,
+            execução contratual e demais finalidades juridicamente admitidas.
+          </p>
+          <p>
+            46.8. O titular poderá exercer os direitos previstos na legislação
+            aplicável pelo e-mail indicado nas Informações do Fabricante.
+          </p>
+          <p>
+            46.9. O Fabricante adotará medidas técnicas e administrativas razoáveis
+            para os dados pessoais que efetivamente tratar, conforme sua natureza e
+            os riscos envolvidos.
+          </p>
+          <p>
+            46.10. Nenhuma disposição deste documento pretende afastar direitos
+            assegurados pela legislação de proteção de dados.
+          </p>
+
+          <h2>CAPÍTULO XII — VIGÊNCIA, CANCELAMENTO E DISPOSIÇÕES FINAIS</h2>
+
+          <h2>CLÁUSULA 47 – RESCISÃO, CANCELAMENTO E ARREPENDIMENTO</h2>
+          <p>
+            47.1. Nas hipóteses em que houver relação de consumo e contratação fora
+            do estabelecimento comercial, serão observados os direitos de
+            arrependimento previstos na legislação aplicável, como o prazo de 7
+            (sete) dias do art. 49 do Código de Defesa do Consumidor.
+          </p>
+          <p>
+            47.2. O arrependimento pode ser comunicado pelos canais oficiais
+            indicados nas Informações do Fabricante — e-mail ou WhatsApp —, sem
+            prejuízo de outros meios admitidos em lei. O Fabricante confirmará o
+            recebimento da manifestação.
+          </p>
+          <p>
+            47.3. Quando exercido validamente o direito de arrependimento, serão
+            observadas as consequências legais aplicáveis à contratação e aos
+            valores pagos — inclusive a devolução dos valores na forma da lei —,
+            e a licença correspondente será cancelada.
+          </p>
+          <p>
+            47.4. Cancelamentos, estornos ou chargebacks poderão resultar no
+            cancelamento da licença correspondente, respeitados os procedimentos e
+            direitos previstos em lei. Cancelada a licença, a continuidade de uso
+            da Chave de Ativação deixa de ser autorizada.
+          </p>
+          <p>
+            47.5. O Fabricante poderá rescindir a licença em caso de violação
+            contratual grave ou uso ilícito, observada a legislação aplicável.
+          </p>
+          <p>
+            47.6. O encerramento da licença não transfere ao Fabricante a
+            propriedade dos Dados do Usuário.
+          </p>
+          <p>
+            47.7. Serviços Adicionais serão cancelados conforme suas condições
+            específicas e os direitos legais aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 48 – ATUALIZAÇÕES E MANUTENÇÃO</h2>
+          <p>
+            48.1. O Fabricante poderá disponibilizar Atualizações para a Versão
+            Licenciada, quando considerar necessário ou conveniente.
+          </p>
+          <p>48.2. Atualizações poderão incluir:</p>
+          <ul>
+            <li>correções;</li>
+            <li>melhorias;</li>
+            <li>ajustes de segurança;</li>
+            <li>alterações de interface;</li>
+            <li>correções de cálculo;</li>
+            <li>ajustes técnicos;</li>
+            <li>adequações necessárias ao funcionamento.</li>
+          </ul>
+          <p>
+            48.3. As Atualizações da Versão Licenciada não geram cobrança adicional,
+            ressalvados os novos módulos e as Versões Futuras comercializados
+            separadamente.
+          </p>
+          <p>
+            48.4. Uma Atualização pode trazer novos módulos ou funcionalidades
+            cujo acesso dependa do Plano contratado (Cláusula 7); a Atualização da
+            Versão Licenciada não significa inclusão automática de uma Versão
+            Futura (Cláusula 11).
+          </p>
+          <p>
+            48.5. O Fabricante não é obrigado a transformar indefinidamente uma
+            versão existente em produto tecnicamente compatível com todas as
+            futuras tecnologias, sistemas operacionais ou serviços de terceiros,
+            sem prejuízo das obrigações legais aplicáveis.
+          </p>
+          <p>48.6. A instalação de Atualizações poderá depender de ação do Usuário.</p>
+          <p>
+            48.7. O Usuário não poderá presumir que toda Atualização futura
+            constitui direito adquirido à próxima geração comercial do Software.
+          </p>
+
+          <h2>CLÁUSULA 49 – ALTERAÇÃO DESTES TERMOS</h2>
+          <p>
+            49.1. O Fabricante poderá atualizar estes Termos para refletir
+            alterações no Software, nos serviços, na legislação ou nas condições
+            operacionais.
+          </p>
+          <p>
+            49.2. Alterações relevantes serão comunicadas pelos canais disponíveis
+            quando necessário.
+          </p>
+          <p>
+            49.3. Direitos já adquiridos pelo Usuário não serão eliminados por mera
+            alteração unilateral destes Termos quando a legislação não permitir tal
+            alteração.
+          </p>
+          <p>
+            49.4. Uma alteração deste documento não transforma retroativamente uma
+            licença já adquirida em modalidade ou Plano diferente.
+          </p>
+          <p>
+            49.5. Condições comerciais específicas informadas antes da contratação
+            deverão ser consideradas juntamente com estes Termos.
+          </p>
+          <p>
+            49.6. Versões anteriores destes Termos poderão ser mantidas para fins de
+            registro e consulta.
+          </p>
+
+          <h2>CLÁUSULA 50 – DISPOSIÇÕES FINAIS</h2>
+          <p>
+            50.1. A nulidade de uma cláusula não invalida automaticamente as
+            demais.
+          </p>
+          <p>
+            50.2. A tolerância de uma parte quanto a determinada conduta não
+            representa renúncia de direito.
+          </p>
+          <p>
+            50.3. Comunicações poderão ser realizadas pelos canais oficiais
+            disponibilizados pelo Fabricante.
+          </p>
+          <p>
+            50.4. O Usuário deverá manter seus dados de contato atualizados quando
+            necessário.
+          </p>
+          <p>
+            50.5. Este documento, juntamente com a oferta comercial e eventual
+            proposta específica de serviço, representa o conjunto das condições
+            aplicáveis à contratação, respeitada a legislação.
+          </p>
+          <p>
+            50.6. Informações publicitárias deverão ser interpretadas em conjunto
+            com as condições efetivamente apresentadas ao Usuário antes da
+            contratação.
+          </p>
+          <p>
+            50.7. Este documento será interpretado de acordo com a legislação
+            brasileira.
+          </p>
+          <p>
+            50.8. Em relações de consumo, será respeitada a competência territorial
+            assegurada ao consumidor pela legislação aplicável.
+          </p>
+          <p>
+            50.9. Nas demais relações, poderá ser eleito foro contratualmente
+            válido, observadas as regras legais aplicáveis.
+          </p>
+
+          <h2>CLÁUSULA 51 – ACEITE</h2>
+          <p>
+            51.1. Ao marcar a opção de aceite, instalar, ativar, adquirir ou
+            utilizar o Software, o Usuário declara que teve acesso às condições
+            aplicáveis e concorda com este documento, na extensão permitida pela
+            legislação.
+          </p>
+          <p>
+            51.2. As condições que limitem ou delimitem funcionalidades, Planos,
+            módulos, modalidade de licença, período de utilização, responsabilidade
+            do Usuário ou abrangência da Licença Vitalícia deverão ser apresentadas
+            de maneira clara e previamente acessível ao Usuário.
+          </p>
+          <p>
+            51.3. Em especial, as informações de que nem todo Plano inclui todos os
+            módulos e de que a Licença Vitalícia não inclui automaticamente
+            Versões Futuras nem novos módulos comercializados separadamente
+            deverão ser apresentadas de maneira destacada na página de venda ou no
+            ambiente de contratação.
+          </p>
+          <p>
+            51.4. O aceite eletrônico poderá ser utilizado como manifestação de
+            vontade, observados a legislação aplicável e os meios disponíveis para
+            comprovação da contratação.
+          </p>
+          <p>
+            51.5. O Usuário declara ser responsável pela veracidade das informações
+            fornecidas na contratação e na utilização do Software.
+          </p>
+          <p>
+            51.6. Este documento poderá ser consultado nos canais oficiais
+            disponibilizados pelo Fabricante.
+          </p>
+
+          <h2>INFORMAÇÕES DO FABRICANTE</h2>
+          <p><strong>BAPELL GESTOR PRO</strong></p>
+          <ul>
+            <li>Fabricante: [RAZÃO SOCIAL / NOME COMPLETO]</li>
+            <li>CNPJ/CPF: [NÚMERO]</li>
+            <li>Endereço: [ENDEREÇO]</li>
+            <li>E-mail: bapellgestorpro@gmail.com</li>
+            <li>WhatsApp: (41) 98899-5503</li>
+            <li>Canais oficiais de atendimento: o e-mail e o WhatsApp acima</li>
+            <li>Versão destes Termos: 4.0</li>
+            <li>Vigente a partir de: [DATA DE PUBLICAÇÃO]</li>
+          </ul>
+
+          <h2>AVISO FINAL AO USUÁRIO</h2>
+          <p>
+            O Bapell Gestor Pro é uma ferramenta de apoio à gestão e organização
+            empresarial.
+          </p>
+          <p>
+            O Usuário permanece responsável pelas informações que fornece ao
+            Software, pela conferência dos parâmetros, das regras e das
+            configurações utilizados, pela guarda de suas senhas e demais
+            Credenciais, pela realização de backups, pela validação de informações
+            tributárias e fiscais quando aplicável e pelas decisões tomadas a partir
+            dos resultados apresentados.
+          </p>
+          <p>
+            O Software não substitui profissionais legalmente habilitados nem
+            garante determinado resultado comercial, financeiro ou tributário.
+          </p>
+          <p>
+            A aquisição de uma licença refere-se ao Plano, à versão e às condições
+            comerciais expressamente contratadas. Nem todo Plano inclui todos os
+            módulos, e Versões Futuras ou novos módulos que venham a ser
+            comercializados separadamente não estão automaticamente incluídos na
+            licença anteriormente adquirida, inclusive na Licença Vitalícia.
+          </p>
+
+          <p style="margin-top: 16px; color: var(--clr-text-3); font-size: 12px;">
+          Bapell Gestor Pro
+          </p>
+        </div>
+        <label class="ativ-check">
+          <input type="checkbox" id="chkTermos" />
+          <span>Li e concordo com os Termos de Uso.</span>
+        </label>
+        <button
+          class="btn-primary ativ-btn-full"
+          id="btnProximoTermos"
+          disabled
+        >
+          Próximo
+        </button>
+      </section>
+
+
+
+
+      <!-- ETAPA 3: Ativação -->
+      <section class="ativ-view" data-view="ativar">
+        <h1 class="ativ-titulo">Ativação da Licença</h1>
+        <p class="ativ-sub">
+          Digite a chave de ativação que você recebeu por e-mail e clique em
+          <strong>Ativar</strong> para liberar o sistema neste computador.
+        </p>
+
+        <label
+          class="ativ-dado-label"
+          for="inpChave"
+          style="margin-bottom: 6px; display: block"
+          >Chave de Ativação</label
+        >
+        <textarea
+          id="inpChave"
+          class="input-field ativ-key-input"
+          spellcheck="false"
+          placeholder="Cole aqui a sua chave de ativação"
+        ></textarea>
+
+        <div class="ativ-erro" id="erroAtivar">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            ></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span id="erroAtivarTxt"></span>
+        </div>
+
+        <button class="btn-primary ativ-btn-full" id="btnAtivar">Ativar</button>
+        <button class="ativ-link-btn" id="btnSemChave">
+          Ainda não tenho uma chave de ativação
+        </button>
+      </section>
+
+      <!-- ETAPA 4: Solicitação (dados da máquina) -->
+      <section class="ativ-view" data-view="solicitar">
+        <h1 class="ativ-titulo">Solicitar Licença</h1>
+        <p class="ativ-sub">
+          Os dados abaixo identificam este computador e serão usados para gerar
+          a sua chave de ativação.
+        </p>
+
+        <div class="ativ-dado">
+          <div class="ativ-dado-label">ID do Computador</div>
+          <div class="ativ-dado-valor" id="valComputerId">—</div>
+        </div>
+        <div class="ativ-dado">
+          <div class="ativ-dado-label">Código de Solicitação</div>
+          <div class="ativ-dado-valor" id="valCodigo">—</div>
+        </div>
+
+        <!-- NOVO BOTÃO DO FORMULÁRIO -->
+        <button class="btn-primary ativ-btn-full" id="btnFormulario">
+          Preencher Formulário
+        </button>
+
+        <button class="ativ-link-btn" id="btnVoltarAtivar1">
+          Voltar para Ativação
+        </button>
+      </section>
+
+      <!-- ETAPA 5: Instruções de envio -->
+      <section class="ativ-view" data-view="instrucoes">
+        <h1 class="ativ-titulo">Formulário Aberto!</h1>
+        <p class="ativ-sub">
+          Uma nova janela foi aberta no seu navegador com o formulário de
+          solicitação.
+        </p>
+
+        <div class="ativ-instru" style="text-align: center">
+          <p style="font-size: 14px; margin-bottom: 10px">
+            Preencha seus dados de compra (Nome, E-mail, CPF/CNPJ) na página que
+            se abriu.
+          </p>
+          <p
+            style="font-weight: 700; color: var(--clr-primary); font-size: 13px"
+          >
+            ✓ O ID do Computador e o Código de Solicitação já foram preenchidos
+            automaticamente para você!
+          </p>
+        </div>
+
+        <p class="ativ-sub" style="margin-top: 14px">
+          Após enviar o formulário, nossa equipe validará as informações e sua
+          <strong>Chave de Ativação</strong> será enviada para o seu e-mail.
+        </p>
+
+        <button class="btn-primary ativ-btn-full" id="btnVoltarAtivar2">
+          Voltar para Ativação
+        </button>
+      </section>
+
+      <!-- ETAPA 7: Sucesso -->
+      <section class="ativ-view" data-view="sucesso">
+        <div class="ativ-sucesso">
+          <div class="ativ-check-wrap">
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h2>🎉 Licença ativada com sucesso!</h2>
+          <p>Obrigado por adquirir o <strong>Bapell Gestor Pro</strong>.</p>
+          <p>
+            Sua licença foi validada e seu sistema está pronto para uso.
+            Desejamos muito sucesso na gestão da sua empresa!
+          </p>
+
+          <!-- Resumo do tipo/validade da chave recém-ativada (preenchido via JS) -->
+          <div
+            id="ativResumoLicenca"
+            class="ativ-dado"
+            style="display: none; text-align: left; margin: 18px auto 4px; max-width: 420px"
+          >
+            <div class="ativ-dado-label">Tipo de licença</div>
+            <div
+              class="ativ-dado-valor"
+              id="ativResumoTipo"
+              style="font-size: 16px; letter-spacing: 0.5px; margin-bottom: 10px"
+            >
+              —
+            </div>
+            <div class="ativ-dado-label" id="ativResumoValLabel">Vencimento</div>
+            <div
+              class="ativ-dado-valor"
+              id="ativResumoValidade"
+              style="font-size: 16px; letter-spacing: 0.5px"
+            >
+              —
+            </div>
+            <!-- Nova chave de teste: o plano escolhido e a licença paga guardada -->
+            <div
+              id="ativResumoNota"
+              style="display: none; margin-top: 12px; font-size: 13px; line-height: 1.55; color: var(--clr-text-2)"
+            ></div>
+          </div>
+
+          <button
+            class="btn-primary ativ-btn-full"
+            id="btnContinuar"
+            style="max-width: 280px; margin-left: auto; margin-right: auto"
+          >
+            Continuar
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var api = window.licencaAPI;
+
+        // ── Navegação entre views ──
+        function irPara(nome) {
+          document.querySelectorAll(".ativ-view").forEach(function (v) {
+            v.classList.toggle("ativa", v.dataset.view === nome);
+          });
+          document.querySelectorAll(".ativ-step-dot").forEach(function (d) {
+            d.classList.toggle("ativa", d.dataset.step === nome);
+          });
+        }
+
+        function mostrarErro(msg) {
+          var box = document.getElementById("erroAtivar");
+          document.getElementById("erroAtivarTxt").textContent = msg;
+          box.classList.add("mostra");
+        }
+        function limparErro() {
+          document.getElementById("erroAtivar").classList.remove("mostra");
+        }
+
+        // ══════════════════════════════════════════
+        //  Lembrete de vencimento + resumo da licença ao ativar
+        // ══════════════════════════════════════════
+        var LEMBRETES_KEY = "precifiq_lembretes";
+
+        // Gera um id no mesmo estilo do módulo de Lembretes.
+        function _gerarIdLembrete() {
+          return (
+            "lic-" +
+            Date.now().toString(36) +
+            Math.random().toString(36).slice(2, 8)
+          );
+        }
+
+        // Data (Date) → "YYYY-MM-DDTHH:mm" (formato que o módulo de Lembretes usa
+        // em dataHora e que o agendador de notificações do app entende).
+        function _paraDataHoraLocal(d) {
+          var p = function (n) { return String(n).padStart(2, "0"); };
+          return (
+            d.getFullYear() +
+            "-" + p(d.getMonth() + 1) +
+            "-" + p(d.getDate()) +
+            "T" + p(d.getHours()) +
+            ":" + p(d.getMinutes())
+          );
+        }
+
+        // dd/mm/aaaa para exibição.
+        function _dataBR(d) {
+          var p = function (n) { return String(n).padStart(2, "0"); };
+          return p(d.getDate()) + "/" + p(d.getMonth() + 1) + "/" + d.getFullYear();
+        }
+
+        // Lê/salva a lista de lembretes (mesmo storage do módulo Lembretes).
+        function _lerLembretes() {
+          try {
+            var a = JSON.parse(localStorage.getItem(LEMBRETES_KEY));
+            return Array.isArray(a) ? a : [];
+          } catch (e) {
+            return [];
+          }
+        }
+        function _salvarLembretes(arr) {
+          try {
+            localStorage.setItem(LEMBRETES_KEY, JSON.stringify(arr));
+            return true;
+          } catch (e) {
+            return false;
+          }
+        }
+
+        // Cria (ou atualiza) o lembrete de vencimento da licença.
+        // `expira` é timestamp Unix em segundos; 0/ausente = vitalícia (não cria).
+        function _criarLembreteVencimento(r) {
+          var expira = Number(r && r.expira) || 0;
+          if (!expira) return; // vitalícia: nunca vence → sem lembrete
+
+          var venc = new Date(expira * 1000);
+          if (isNaN(venc.getTime())) return;
+
+          var rotulo = (r && r.rotuloTipo) || "Licença";
+          var arr = _lerLembretes();
+
+          // Evita duplicar: remove um lembrete de licença anterior (marcado com
+          // origemLicenca) antes de inserir o novo, para uma reativação não
+          // empilhar vários avisos.
+          arr = arr.filter(function (l) {
+            return !(l && l.origemLicenca === true);
+          });
+
+          arr.push({
+            id: _gerarIdLembrete(),
+            titulo: "Vencimento da licença — " + rotulo,
+            recebedor: "",
+            valor: "",
+            valorTipo: "",
+            dataHora: _paraDataHoraLocal(venc),
+            empresaNome: "",
+            concluido: false,
+            oculto: false,
+            criadoEm: new Date().toISOString(),
+            // Marcador interno para identificar/atualizar este lembrete depois.
+            origemLicenca: true,
+          });
+
+          // Nova chave de teste sobre uma licença paga: a paga ficou guardada
+          // e volta quando o teste acabar — o lembrete do vencimento dela
+          // continua valendo (o filtro acima o tirou junto com os outros).
+          var g = r && r.pagaGuardada;
+          var expG = Number(g && g.expira) || 0;
+          if (g && g.ativa && expG) {
+            var vencG = new Date(expG * 1000);
+            if (!isNaN(vencG.getTime())) {
+              arr.push({
+                id: _gerarIdLembrete(),
+                titulo: "Vencimento da licença — " + (g.rotuloPlano || "Licença"),
+                recebedor: "",
+                valor: "",
+                valorTipo: "",
+                dataHora: _paraDataHoraLocal(vencG),
+                empresaNome: "",
+                concluido: false,
+                oculto: false,
+                criadoEm: new Date().toISOString(),
+                origemLicenca: true,
+              });
+            }
+          }
+
+          _salvarLembretes(arr);
+        }
+
+        // Preenche o resumo do tipo/validade na tela de sucesso.
+        function _mostrarResumoLicenca(r) {
+          var box = document.getElementById("ativResumoLicenca");
+          var elTipo = document.getElementById("ativResumoTipo");
+          var elValLabel = document.getElementById("ativResumoValLabel");
+          var elVal = document.getElementById("ativResumoValidade");
+          if (!box || !elTipo || !elVal) return;
+
+          // O nome do plano (Licença Anual, Pro…); na nova chave de teste,
+          // "Teste de 7 dias — plano escolhido: …". Sem ele, o tipo.
+          elTipo.textContent = (r && (r.rotuloPlano || r.rotuloTipo)) || "—";
+
+          // Nova chave de teste: o teste não é pagamento, e a licença paga
+          // que estava instalada fica guardada até o teste terminar.
+          var elNota = document.getElementById("ativResumoNota");
+          if (elNota) {
+            var nota = "";
+            var guardada = r && r.pagaGuardada && r.pagaGuardada.rotuloPlano ? r.pagaGuardada.rotuloPlano : "";
+            if (guardada) {
+              nota += "Sua licença paga (" + guardada + ") fica guardada neste computador e volta a valer quando o teste terminar. ";
+            }
+            if (r && r.planoEscolhido) {
+              nota += "O teste não é pagamento: para continuar com o plano escolhido depois do teste, é preciso comprá-lo.";
+            }
+            elNota.textContent = nota.trim();
+            elNota.style.display = nota ? "block" : "none";
+          }
+
+          var expira = Number(r && r.expira) || 0;
+          if (!expira) {
+            // Vitalícia: sem vencimento nem contagem regressiva.
+            if (elValLabel) elValLabel.textContent = "Validade";
+            elVal.textContent = "Nunca expira";
+          } else {
+            var venc = new Date(expira * 1000);
+            var dias =
+              r && typeof r.diasRestantes === "number" && isFinite(r.diasRestantes)
+                ? r.diasRestantes
+                : Math.ceil((expira - Math.floor(Date.now() / 1000)) / 86400);
+            if (elValLabel) elValLabel.textContent = "Vencimento";
+            elVal.textContent =
+              _dataBR(venc) +
+              (dias >= 0
+                ? "  •  " + dias + (dias === 1 ? " dia restante" : " dias restantes")
+                : "");
+          }
+          box.style.display = "block";
+        }
+
+        function _aoAtivarComSucesso(r) {
+          _mostrarResumoLicenca(r);
+          _criarLembreteVencimento(r);
+        }
+
+        // ── Termos de Uso: habilita "Próximo" só após aceitar ──
+        var chkTermos = document.getElementById("chkTermos");
+        var btnProxTermos = document.getElementById("btnProximoTermos");
+        if (chkTermos && btnProxTermos) {
+          chkTermos.addEventListener("change", function () {
+            btnProxTermos.disabled = !chkTermos.checked;
+          });
+          btnProxTermos.addEventListener("click", function () {
+            if (chkTermos.checked) irPara("ativar");
+          });
+        }
+
+        // ── Termos de Uso: expandir para leitura em área maior ──
+        (function () {
+          var btn = document.getElementById("btnExpandirTermos");
+          var termos = document.getElementById("termosScroll");
+          if (!btn || !termos) return;
+
+          var marcador = null;   // guarda o lugar original dos termos
+          var overlay = null;
+
+          function expandir() {
+            if (overlay) return;
+            // Marca a posição original para devolver depois
+            marcador = document.createComment("termos-aqui");
+            termos.parentNode.insertBefore(marcador, termos);
+
+            overlay = document.createElement("div");
+            overlay.className = "termos-expandido-overlay";
+            var caixa = document.createElement("div");
+            caixa.className = "termos-expandido-caixa";
+            var topo = document.createElement("div");
+            topo.className = "termos-expandido-topo";
+            topo.innerHTML =
+              '<h2>Termos de Uso</h2>' +
+              '<button type="button" class="ativ-termos-expandir" id="btnRecolherTermos">' +
+                '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>' +
+                '<span>Recolher</span>' +
+              '</button>';
+            caixa.appendChild(topo);
+            caixa.appendChild(termos);          // move o container real para cá
+            overlay.appendChild(caixa);
+            document.body.appendChild(overlay);
+            document.body.classList.add("termos-expandido-ativo");
+
+            btn.setAttribute("aria-expanded", "true");
+            termos.scrollTop = 0;
+
+            document.getElementById("btnRecolherTermos").addEventListener("click", recolher);
+            overlay.addEventListener("click", function (e) { if (e.target === overlay) recolher(); });
+            document.addEventListener("keydown", onEsc);
+          }
+
+          function recolher() {
+            if (!overlay) return;
+            // Devolve os termos ao lugar original
+            if (marcador && marcador.parentNode) {
+              marcador.parentNode.insertBefore(termos, marcador);
+              marcador.parentNode.removeChild(marcador);
+            }
+            marcador = null;
+            overlay.remove();
+            overlay = null;
+            document.body.classList.remove("termos-expandido-ativo");
+            btn.setAttribute("aria-expanded", "false");
+            document.removeEventListener("keydown", onEsc);
+          }
+
+          function onEsc(e) { if (e.key === "Escape") recolher(); }
+
+          btn.addEventListener("click", expandir);
+        })();
+
+        // ── Carrega dados da máquina para a tela de solicitação ──
+        var dados = { computerId: "—", codigoSolicitacao: "—" };
+        var elId = document.getElementById("valComputerId");
+        var elCod = document.getElementById("valCodigo");
+
+        function _falhaId(motivo) {
+          // Antes, os 3 modos de falha (IPC rejeitado, retorno vazio, exceção)
+          // deixavam o mesmo "—" mudo, sem o usuário saber o que fazer.
+          if (elId) elId.textContent = "não foi possível ler";
+          if (elCod) elCod.textContent = "—";
+          var box = document.getElementById("erroAtivar");
+          // Mostra um aviso discreto explicando (sem bloquear a tela).
+          if (typeof console !== "undefined") console.warn("[ativacao] ID indisponível:", motivo);
+        }
+
+        if (api && api.dadosMaquina) {
+          api.dadosMaquina().then(function (d) {
+            // Modo de falha 2: a chamada resolve, mas com retorno vazio/sem ID.
+            if (!d || !d.computerId || d.computerId === "—") {
+              _falhaId("retorno vazio");
+              return;
+            }
+            dados = d;
+            if (elId) elId.textContent = dados.computerId;
+            if (elCod) elCod.textContent = dados.codigoSolicitacao || "—";
+          }).catch(function (e) {
+            // Modo de falha 1: a Promise rejeita (IPC falhou). Sem este catch,
+            // o ID ficava eternamente em "—" sem explicação.
+            _falhaId(e && e.message ? e.message : String(e));
+          });
+        } else {
+          // Modo de falha 3: a ponte nem existe (fora do Electron).
+          _falhaId("ponte de licença indisponível");
+        }
+
+        // ── Ativar ──
+        document
+          .getElementById("btnAtivar")
+          .addEventListener("click", function () {
+            limparErro();
+            var chave = document.getElementById("inpChave").value.trim();
+            if (!chave) {
+              mostrarErro("Digite a chave de ativação.");
+              return;
+            }
+            if (!api || !api.ativar) {
+              mostrarErro("Ambiente de ativação indisponível.");
+              return;
+            }
+            var btn = this;
+            btn.disabled = true;
+            btn.textContent = "Validando…";
+            api.ativar(chave).then(function (r) {
+              btn.disabled = false;
+              btn.textContent = "Ativar";
+              if (r && r.ok) {
+                // Ao ativar: registra o resumo do tipo/validade na tela de
+                // sucesso e, se a licença tiver prazo (teste/anual), cria um
+                // lembrete de vencimento no mesmo formato do módulo Lembretes.
+                try { _aoAtivarComSucesso(r); } catch (e) {}
+                irPara("sucesso");
+                dispararConfete();
+              } else if (r && r.erroConfig) {
+                // Problema de configuração do PRÓPRIO app (chave pública
+                // inválida), não da chave do cliente.
+                mostrarErro(
+                  (r && r.motivo) ||
+                    "Configuração de licença do aplicativo inválida. Contate o suporte.",
+                );
+              } else {
+                mostrarErro(
+                  (r && r.motivo) ||
+                    "Chave inválida ou não pertence a este computador.",
+                );
+              }
+            }).catch(function (e) {
+              // Sem este catch, uma rejeição da Promise (falha de IPC, erro no
+              // processo principal) deixava o botão preso em "Validando…" para
+              // sempre — o usuário nem conseguia tentar de novo.
+              btn.disabled = false;
+              btn.textContent = "Ativar";
+              mostrarErro(
+                "Não foi possível validar a chave agora. Tente novamente em alguns instantes."
+              );
+            });
+          });
+
+        // ── Ainda não tenho chave → tela de solicitação ──
+        document
+          .getElementById("btnSemChave")
+          .addEventListener("click", function () {
+            irPara("solicitar");
+          });
+
+        // ── Abre o formulário do Google já com os DOIS dados preenchidos ──
+        var btnFormulario = document.getElementById("btnFormulario");
+        if (btnFormulario) {
+          btnFormulario.addEventListener("click", function () {
+            // 1. Link base do seu formulário Google
+            var linkBase =
+              "https://docs.google.com/forms/d/e/1FAIpQLSeRZyldQhURWQ-ucAwxKUybHhoVWxeY9JR2wZmL5XStagmLcA/viewform?usp=pp_url";
+
+            // 2. Injeta o ID da Placa Mãe (entry.2082484356)
+            var parametroPlacaMae =
+              "&entry.2082484356=" + encodeURIComponent(dados.computerId);
+
+            // 3. Injeta o Código Aleatório (entry.81417517)
+            var parametroCodigoAleatorio =
+              "&entry.81417517=" +
+              encodeURIComponent(dados.codigoSolicitacao);
+
+            // 4. Junta tudo e abre em uma nova aba do navegador do cliente
+            window.open(
+              linkBase + parametroPlacaMae + parametroCodigoAleatorio,
+              "_blank",
+            );
+
+            // 5. Avança a tela do app para a mensagem de conclusão
+            irPara("instrucoes");
+          });
+        }
+
+        document
+          .getElementById("btnVoltarAtivar1")
+          .addEventListener("click", function () {
+            irPara("ativar");
+          });
+        document
+          .getElementById("btnVoltarAtivar2")
+          .addEventListener("click", function () {
+            irPara("ativar");
+          });
+
+        // ── Continuar → carrega o sistema ──
+        document
+          .getElementById("btnContinuar")
+          .addEventListener("click", function () {
+            if (api && api.continuar) api.continuar();
+          });
+
+        // ══════════════════════════════════════════
+        //  Confete — explosão central + rajadas laterais (sem dependências)
+        // ══════════════════════════════════════════
+        function dispararConfete() {
+          var anterior = document.getElementById("confeteCanvas");
+          if (anterior) anterior.remove();
+
+          var canvas = document.createElement("canvas");
+          canvas.id = "confeteCanvas";
+          document.body.appendChild(canvas);
+
+          var ctx = canvas.getContext("2d");
+          var dpr = window.devicePixelRatio || 1;
+          var L = window.innerWidth,
+            A = window.innerHeight;
+          canvas.width = L * dpr;
+          canvas.height = A * dpr;
+          canvas.style.width = L + "px";
+          canvas.style.height = A + "px";
+          ctx.scale(dpr, dpr);
+
+          var CORES = [
+            "#22c55e",
+            "#3b82f6",
+            "#f59e0b",
+            "#ef4444",
+            "#a855f7",
+            "#06b6d4",
+            "#ec4899",
+            "#eab308",
+          ];
+          var GRAV = 0.14,
+            ARRASTO = 0.992,
+            DURACAO = 2600;
+
+          function emitir(ox, oy, qtd, angMin, angMax, fMin, fMax) {
+            var arr = [];
+            for (var i = 0; i < qtd; i++) {
+              var ang = angMin + Math.random() * (angMax - angMin);
+              var f = fMin + Math.random() * (fMax - fMin);
+              arr.push({
+                x: ox,
+                y: oy,
+                vx: Math.cos(ang) * f,
+                vy: Math.sin(ang) * f,
+                w: 6 + Math.random() * 6,
+                h: 9 + Math.random() * 7,
+                cor: CORES[(Math.random() * CORES.length) | 0],
+                giro: Math.random() * Math.PI * 2,
+                velGiro: -0.2 + Math.random() * 0.4,
+              });
+            }
+            return arr;
+          }
+
+          var pecas = []
+            .concat(
+              emitir(
+                L / 2,
+                A * 0.42,
+                90,
+                -Math.PI * 0.95,
+                -Math.PI * 0.05,
+                7,
+                15,
+              ),
+            )
+            .concat(
+              emitir(0, A * 0.72, 32, -Math.PI * 0.5, -Math.PI * 0.05, 9, 16),
+            )
+            .concat(
+              emitir(L, A * 0.72, 32, -Math.PI * 0.95, -Math.PI * 0.5, 9, 16),
+            );
+
+          var inicio = performance.now(),
+            rafId;
+          function quadro(agora) {
+            var t = agora - inicio;
+            ctx.clearRect(0, 0, L, A);
+            ctx.globalAlpha =
+              t > DURACAO - 700 ? Math.max(0, (DURACAO - t) / 700) : 1;
+            var vivos = 0;
+            for (var i = 0; i < pecas.length; i++) {
+              var p = pecas[i];
+              p.vx *= ARRASTO;
+              p.vy = p.vy * ARRASTO + GRAV;
+              p.x += p.vx;
+              p.y += p.vy;
+              p.giro += p.velGiro;
+              if (p.y < A + 30) vivos++;
+              ctx.save();
+              ctx.translate(p.x, p.y);
+              ctx.rotate(p.giro);
+              ctx.fillStyle = p.cor;
+              ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+              ctx.restore();
+            }
+            if (t < DURACAO && vivos > 0) rafId = requestAnimationFrame(quadro);
+            else {
+              cancelAnimationFrame(rafId);
+              canvas.remove();
+            }
+          }
+          rafId = requestAnimationFrame(quadro);
+        }
+      })();
+    </script>
+  </body>
+</html>

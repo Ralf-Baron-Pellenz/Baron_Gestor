@@ -1,0 +1,918 @@
+/* ═══════════════════════════════════════════
+   Precificador — Ações em Massa (CSS)
+   ═══════════════════════════════════════════ */
+/* ============================================
+   BOTÃO AÇÕES EM MASSA - ALINHADO COM OS OUTROS
+   ============================================ */
+.btn-mass-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text);
+  padding: 10px 18px;
+  border-radius: 9999px;           /* Mesmo arredondamento dos outros */
+  font-family: "Sora", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  height: 42px;                    /* Altura similar aos outros botões */
+  align-self: center;
+}
+.btn-mass-action:hover {
+  background: var(--clr-border);
+  border-color: var(--clr-border-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.btn-mass-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.btn-mass-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.btn-mass-title {
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.3px;
+}
+.btn-mass-subtitle {
+  font-size: 11px;
+  color: var(--clr-text-2);
+  font-weight: 500;
+  margin-top: 1px;
+}
+/* Estilos da página de Ações em Massa (mantidos) */
+.mass-card {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Duas colunas: Formação do Custo | Variáveis de Venda */
+.mass-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.mass-col {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .mass-cols {
+    grid-template-columns: 1fr;
+  }
+}
+.mass-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 12px;
+  padding: 14px 18px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  min-height: 58px;
+  transition: border-color var(--t-fast, 0.15s ease), box-shadow var(--t-fast, 0.15s ease);
+}
+.mass-field-row:hover {
+  border-color: var(--clr-border-soft);
+  box-shadow: var(--shadow-sm);
+}
+.mass-field-row:has(.mass-checkbox:checked) {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+}
+.mass-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 200px;
+}
+.mass-checkbox {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--clr-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.mass-checkbox-text {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--clr-text);
+}
+.mass-input-wrapper {
+  flex: 1;
+  max-width: 320px;
+  display: none;
+}
+.mass-input-wrapper.show {
+  display: block;
+}
+.btn-large {
+  width: 100%;
+  padding: 18px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: normal;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  border-radius: var(--r-md);
+  letter-spacing: 0.3px;
+}
+#resultadoBox .stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+#resultadoBox .stat-item {
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  padding: 16px;
+  text-align: center;
+}
+#resultadoBox .stat-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--clr-primary);
+  display: block;
+}
+#resultadoBox .stat-label {
+  font-size: 13px;
+  color: var(--clr-text-2);
+  margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════════
+   NOVO — Suporte às funcionalidades de Empresa
+   (abas, sócios e colapso de seções)
+   Não altera nada acima; apenas espaçamento dos
+   elementos novos. As abas reutilizam .btn-secondary.
+   ═══════════════════════════════════════════ */
+
+/* Container das abas de empresa */
+#empresasTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+/* "X" de remover empresa dentro da aba */
+.empresa-tab-close:hover {
+  opacity: 1 !important;
+}
+
+/* Seta de colapsar/expandir seção */
+.section-toggle-arrow {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--clr-text-3);
+  transition: transform 0.2s ease;
+}
+
+/* ═══════════════════════════════════════════
+   TELA INFORMAÇÕES DE VENDA
+   ═══════════════════════════════════════════ */
+.vendas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+/* Caixa do simulador */
+.simulador-box {
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+
+.simulador-resultado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--clr-border);
+}
+
+.sim-res-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sim-res-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-3);
+}
+
+.sim-res-value {
+  font-family: "Sora", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--clr-primary);
+}
+
+.sim-res-obs {
+  font-size: 12px;
+  color: var(--clr-text-2);
+  line-height: 1.3;
+}
+
+/* Linhas de regra (descontos e faixas de KM) */
+.regra-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+}
+
+.regra-texto {
+  font-size: 13px;
+  color: var(--clr-text-2);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.regra-input {
+  width: 130px;
+  flex-shrink: 0;
+}
+
+.regra-input-pct {
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.regra-linha .btn-danger {
+  margin-left: auto;
+  padding: 4px 9px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Modalidades de entrega */
+.modalidade-box {
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  padding: 16px;
+  margin-bottom: 14px;
+  background: var(--clr-surface);
+}
+
+.modalidade-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.modalidade-nome {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--clr-text);
+}
+
+/* Dentro das colunas lado a lado, as linhas ficam mais compactas */
+.mass-col .mass-field-row {
+  gap: 10px;
+  padding: 12px 14px;
+  min-height: auto;
+}
+
+.mass-col .mass-checkbox-label {
+  min-width: 0;
+  flex: 1;
+}
+
+.mass-col .mass-input-wrapper {
+  max-width: 130px;
+}
+
+/* ═══════════════════════════════════════════
+   Gestão dos botões de módulo (reordenar + ocultar)
+   Adicionado para a nova área da sidebar.
+   ═══════════════════════════════════════════ */
+
+/* Container dos módulos reordenáveis */
+.modules-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Cada item = handle (arraste) + botão do módulo + botão ocultar */
+.module-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: var(--r-sm, 8px);
+}
+.module-nav-item > .sidebar-item-btn {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Handle de arraste — escondido por padrão, aparece no modo reordenar ou hover */
+.module-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  overflow: hidden;
+  color: var(--clr-text-3);
+  cursor: grab;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: width 0.15s, opacity 0.15s;
+}
+.modules-nav.reordenando .module-drag-handle {
+  width: 20px;
+  opacity: 1;
+}
+.modules-nav.reordenando .module-nav-item {
+  cursor: grab;
+  background: var(--clr-surface-alt, rgba(255,255,255,0.03));
+  border: 1px dashed var(--clr-border);
+}
+.modules-nav.reordenando .module-nav-item .sidebar-item-btn {
+  pointer-events: none; /* no modo reordenar, o clique não navega */
+}
+.module-drag-handle:active { cursor: grabbing; }
+
+/* Botão "ocultar" (olho) por item — aparece só no hover do item */
+.module-hide-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--clr-text-3);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+.module-nav-item:hover .module-hide-btn { opacity: 1; }
+.module-hide-btn:hover {
+  background: var(--clr-surface-alt, rgba(255,255,255,0.06));
+  color: var(--clr-danger, #ef4444);
+}
+/* No modo reordenar, esconde o olho para não competir com o arraste */
+.modules-nav.reordenando .module-hide-btn { display: none; }
+
+/* Estado: item sendo arrastado */
+.module-nav-item.arrastando {
+  opacity: 0.5;
+  border: 1px solid var(--clr-primary) !important;
+}
+
+/* Indicadores de onde vai soltar */
+.module-nav-item.drop-antes { box-shadow: 0 -2px 0 0 var(--clr-primary); }
+.module-nav-item.drop-depois { box-shadow: 0 2px 0 0 var(--clr-primary); }
+
+/* Separador antes da nova área de gestão */
+.sidebar-manage-sep {
+  height: 1px;
+  background: var(--clr-border);
+  margin: 12px 4px;
+  border: none;
+}
+
+/* Área de gestão (Reordenar / Ocultos / Lojas Ocultas) */
+.sidebar-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Botão de gestão ativo (ex.: modo reordenar ligado) */
+.sidebar-manage-btn.ativo {
+  background: var(--clr-primary-lt, rgba(76,141,246,0.15));
+  color: var(--clr-primary);
+}
+
+/* Itens dentro do painel "Módulos ocultos" */
+.hidden-mod-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--clr-text-2);
+}
+.hidden-mod-item:hover { background: var(--clr-surface-alt, rgba(255,255,255,0.04)); }
+.hidden-mod-restore {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--clr-border);
+  background: transparent;
+  color: var(--clr-text-3);
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+.hidden-mod-restore:hover {
+  color: var(--clr-primary);
+  border-color: var(--clr-primary);
+}
+
+/* Quando a sidebar está colapsada, oculta handles e botões de ocultar
+   (mantém só o ícone do módulo, como os demais itens) */
+.sidebar-colapsada .module-drag-handle,
+.sidebar-colapsada .module-hide-btn,
+.sidebar-colapsada .sidebar-manage-sep {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════
+   VÁRIOS SKUs · TODOS OS PRODUTOS
+   ═══════════════════════════════════════════ */
+
+.sku-todos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  background: var(--clr-surface);
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--clr-text-2);
+}
+.sku-todos:has(input:checked) {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+  color: var(--clr-text);
+}
+.sku-todos input { width: 20px; height: 20px; accent-color: var(--clr-primary); cursor: pointer; }
+
+/* Cada SKU adicionado vira uma etiqueta removível. */
+.sku-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.sku-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 11px;
+  border: 1px solid var(--clr-primary);
+  border-radius: 999px;
+  background: var(--clr-primary-lt);
+  color: var(--clr-text);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.sku-chip__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--clr-text-3);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+.sku-chip__x:hover { background: var(--clr-danger, #E0625F); color: #fff; }
+
+/* ═══════════════════════════════════════════
+   TAXA DA PLATAFORMA — PREMIUM E CLÁSSICO
+   ═══════════════════════════════════════════ */
+
+.taxa-ml-massa {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.taxa-ml-massa__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.taxa-ml-massa__rot {
+  flex: 0 0 auto;
+  min-width: 58px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.taxa-ml-massa__rot--premium { color: #EAB308; }
+.taxa-ml-massa__rot--classico { color: #3B82F6; }
+.taxa-ml-massa__item .input-addon-wrap { flex: 1 1 auto; min-width: 0; }
+
+/* A linha da taxa fica mais alta com três campos: o alinhamento passa
+   para o topo, senão o rótulo "Taxa Plataforma" flutua no meio. */
+.mass-field-row:has(#groupTaxa) { align-items: flex-start; }
+.mass-field-row:has(#groupTaxa) .mass-checkbox-label { padding-top: 6px; }
+
+/* ═══════════════════════════════════════════
+   RESULTADO EM MODAL
+   ═══════════════════════════════════════════ */
+
+#massResultModal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 20px;
+}
+.mass-result-modal {
+  width: 100%;
+  max-width: 540px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--clr-border);
+  border-radius: 16px;
+  background: var(--clr-surface);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.mass-result-modal .stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.mass-result-modal .stat-item {
+  background: var(--clr-surface-alt);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  text-align: center;
+}
+.mass-result-modal .stat-number {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--clr-primary);
+}
+.mass-result-modal .stat-label { font-size: 12.5px; color: var(--clr-text-2); margin-top: 4px; }
+
+.mass-result-acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--clr-border);
+}
+.mass-result-acoes .btn-primary { min-width: 140px; }
+
+/* ═══════════════════════════════════════════
+   TAXA E MARGEM — CAMPOS EM LINHA, SEM ENCAVALAR
+
+   A .mass-input-wrapper tem largura máxima pequena (130px dentro das
+   colunas). Serve para um campo só — nestes dois casos há mais de um,
+   e eles se espremiam um sobre o outro.
+   ═══════════════════════════════════════════ */
+
+.mass-col .mass-input-wrapper#groupTaxa,
+.mass-col .mass-input-wrapper#groupMargem,
+.mass-input-wrapper#groupTaxa,
+.mass-input-wrapper#groupMargem {
+  max-width: none;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* A linha inteira passa a empilhar: rótulo em cima, campos embaixo. */
+.mass-field-row:has(#groupTaxa),
+.mass-field-row:has(#groupMargem) {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.mass-field-row:has(#groupTaxa) .mass-checkbox-label,
+.mass-field-row:has(#groupMargem) .mass-checkbox-label {
+  min-width: 0;
+  padding-top: 0;
+}
+
+/* ── Taxa: uma linha para a comum, outra para o Mercado Livre ── */
+#groupTaxa.show { display: flex; flex-direction: column; gap: 8px; }
+
+.taxa-ml-massa {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--clr-border);
+}
+.taxa-ml-massa__titulo {
+  flex: 0 0 100%;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-2);
+}
+.taxa-ml-massa__item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1 1 140px;
+  min-width: 0;
+}
+.taxa-ml-massa__item .input-addon-wrap { flex: 1 1 auto; min-width: 0; }
+
+/* ── Margem: o seletor de tipo acima, o valor abaixo ── */
+#groupMargem.show { display: flex; flex-direction: column; gap: 8px; }
+#groupMargem .mass-margem-toggle { display: flex; gap: 6px; flex-wrap: wrap; }
+#groupMargem .mass-margem-toggle .mass-toggle-btn { flex: 1 1 auto; white-space: nowrap; }
+#groupMargem .input-addon-wrap { width: 100%; }
+
+
+
+/* ═══════════════════════════════════════════
+   HISTÓRICO DAS ATUALIZAÇÕES
+   ═══════════════════════════════════════════ */
+.hist-lista { display: flex; flex-direction: column; gap: 8px; }
+
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+  font-family: inherit;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  background: var(--clr-surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.hist-item:hover { border-color: var(--clr-primary); }
+.hist-item__data {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--clr-text-3);
+  font-variant-numeric: tabular-nums;
+}
+.hist-item__resumo {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--clr-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hist-item__num {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--clr-primary);
+}
+
+.hist-det__data { font-size: 12.5px; color: var(--clr-text-3); margin-bottom: 16px; }
+.hist-det__bloco { margin-bottom: 14px; font-size: 13.5px; color: var(--clr-text-2); }
+.hist-det__rot {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--clr-text-3);
+  margin-bottom: 4px;
+}
+.hist-det__skus { font-size: 12px; color: var(--clr-text-3); margin-top: 4px; word-break: break-word; }
+.hist-det__tabela { width: 100%; border-collapse: collapse; }
+.hist-det__tabela td { padding: 5px 0; border-bottom: 1px solid var(--clr-border); }
+.hist-det__tabela td:last-child { text-align: right; }
+
+@media (prefers-reduced-motion: reduce) { .hist-item { transition: none; } }
+
+
+/* ═══════════════════════════════════════════
+   TRÊS PONTINHOS NOS CARTÕES DE PLATAFORMA
+
+   O cartão inteiro é um label clicável. O botão fica por cima dele,
+   no canto, e o menu abre ancorado ao cartão.
+   ═══════════════════════════════════════════ */
+
+/* O espaço reservado é só o necessário para o botão: com mais que isso,
+   o nome da loja perdia caracteres. */
+.plat-com-menu { position: relative; padding-right: 24px !important; }
+
+.plat-pontos {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--clr-text-3);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+.plat-pontos:hover { background: var(--clr-surface-alt); color: var(--clr-text); }
+
+.plat-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  z-index: 60;
+  min-width: 236px;
+  padding: 6px;
+  border: 1px solid var(--clr-border);
+  border-radius: 10px;
+  background: var(--clr-surface);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  cursor: default;
+}
+.plat-menu.aberto { display: block; }
+
+.plat-menu__acao {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--clr-text-2);
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.plat-menu__acao:hover { background: var(--clr-primary-lt); color: var(--clr-text); }
+
+/* ═══════════════════════════════════════════
+   SKU E SELEÇÃO GLOBAL NA MESMA LINHA
+   ═══════════════════════════════════════════ */
+
+/* Os dois SEMPRE lado a lado: `nowrap`. Com quebra permitida, num
+   espaço mais apertado a pílula descia para a linha de baixo.
+   Quem cede espaço é o campo de SKU, que encolhe; a pílula tem o
+   tamanho do seu texto e não encolhe. */
+.sku-linha {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+}
+.sku-linha > .input-addon-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.sku-linha > .input-addon-wrap > .input-field { width: 100%; min-width: 0; }
+.sku-linha > .sel-global {
+  flex: 0 0 auto;
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════
+   SELEÇÃO GLOBAL
+
+   Compacta e logo abaixo do campo de SKU. Antes era uma caixa larga
+   acima, sem acabamento.
+   ═══════════════════════════════════════════ */
+
+/* Mesmo acabamento do campo de SKU ao lado: mesma altura, mesma borda,
+   mesmo arredondamento e mesmo fundo. Lado a lado, dois acabamentos
+   diferentes pareciam dois componentes sem relação. */
+.sel-global {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 0;
+  padding: 0 14px;
+  height: var(--sel-global-altura, 42px);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  /* Mesmo fundo e mesma fonte do campo de SKU ao lado. */
+  background: var(--clr-surface-alt);
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--clr-text-2);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.sel-global:hover { border-color: var(--clr-border-soft); color: var(--clr-text); }
+.sel-global:has(input:checked) {
+  border-color: var(--clr-primary);
+  background: var(--clr-primary-lt);
+  color: var(--clr-text);
+}
+.sel-global input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--clr-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.sel-global strong { color: var(--clr-text); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .plat-pontos, .sel-global, .hist-item { transition: none; }
+}
+
+/* ═══════════════════════════════════════════
+   CARTÕES DE PLATAFORMA — LARGURA PELO NOME
+
+   A grade usava colunas fixas de 160px: nomes maiores eram cortados
+   ("MERCAD…") e nomes curtos deixavam espaço sobrando.
+
+   Vira uma fileira que quebra sozinha, e cada cartão fica do tamanho
+   do seu conteúdo. Nenhum nome é escondido.
+   ═══════════════════════════════════════════ */
+
+#platformSelectionContainer {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px !important;
+  grid-template-columns: none !important;
+}
+
+#platformSelectionContainer > .platform-select-item {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 auto;
+}
+
+/* O nome aparece inteiro: sem reticências e sem teto de largura. */
+#platformSelectionContainer .platform-select-name {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  max-width: none !important;
+  width: auto !important;
+}
+
+#platformSelectionContainer .platform-select-inner {
+  min-width: 0;
+  width: auto !important;
+}

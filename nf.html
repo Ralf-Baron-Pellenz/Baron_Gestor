@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+    <title>Bapell Gestor Pro — Notas Fiscais</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <link rel="stylesheet" href="CSS/ean.css" />
+    <link rel="stylesheet" href="CSS/nf.css" />
+    <link rel="stylesheet" href="CSS/fonts.css" />
+    <link rel="stylesheet" href="CSS/tutorial.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("precifiq_theme");
+          var temas = ["light", "dark", "midnight"];
+          document.documentElement.setAttribute(
+            "data-theme",
+            temas.indexOf(saved) >= 0 ? saved : "dark"
+          );
+        } catch (e) {
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <!-- Senha de acesso (Administrador ou Colaborador), se este módulo
+         estiver bloqueado em Dados da Empresa › Usuários e Senhas. No
+         <head>, para o conteúdo nem ser pintado antes da senha. -->
+    <script src="JS/senhas.js" data-modulo="nf"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+        </a>
+        <div class="header-meta">
+          <span class="header-label">Notas Fiscais</span>
+          <span class="header-dot"></span>
+          <span class="header-label" id="currentDate"></span>
+        </div>
+        <div class="theme-switcher-fixed" id="themeSwitcher">
+          <span class="theme-switcher-label">Tema</span>
+          <button class="theme-btn" data-theme-value="light" title="Modo Claro">⚪</button>
+          <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">🔵</button>
+          <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">⚫</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <!-- ── MENU LATERAL ── -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section sidebar-voltar-sep">
+          <button class="sidebar-item-btn" onclick="window.location.href='index.html'" title="Voltar">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+            <span class="sidebar-label-txt">Voltar</span>
+          </button>
+        </div>
+
+        <div class="sidebar-section" style="flex: 1; overflow-y: auto;">
+          <div class="sidebar-title sidebar-label-txt" style="font-size:10px;font-weight:700;color:var(--clr-text-3);margin-bottom:8px;letter-spacing:1px;">
+            EMPRESAS
+          </div>
+          <div id="listaEmpresas" style="display:flex;flex-direction:column;gap:6px;"></div>
+
+          <button type="button" class="sidebar-item-btn" id="btnAddEmpresa" title="Adicionar Empresa" style="margin-top:10px;">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+            <span class="sidebar-label-txt">Adicionar Empresa</span>
+          </button>
+        </div>
+
+        <div class="sidebar-footer-index">
+          <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+            <span class="sidebar-label-txt">Ajuda</span>
+          </a>
+        </div>
+
+        <div class="sidebar-toggle-footer">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+            <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div style="margin-bottom:24px;">
+          <h1 style="font-family:'Sora',sans-serif;font-size:25px;font-weight:700;color:var(--clr-text);margin:0;text-align:center;">
+            Notas Fiscais
+          </h1>
+        </div>
+
+        <!-- Estado vazio -->
+        <div id="nfVazio" style="text-align:center;padding:60px 20px;">
+          <div style="margin-bottom:14px;display:flex;justify-content:center;">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--clr-text-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <h2 style="font-family:'Sora',sans-serif;font-size:19px;color:var(--clr-text);margin-bottom:8px;">
+            Selecione uma empresa
+          </h2>
+          <p style="color:var(--clr-text-3);font-size:14px;">
+            Escolha uma empresa no menu lateral para ver e anexar suas notas fiscais.
+          </p>
+        </div>
+
+        <!-- Conteúdo -->
+        <div id="nfConteudo" style="display:none;">
+          <div class="card">
+            <!-- Cabeçalho da empresa -->
+            <div class="nf-header">
+              <div class="card-title" style="margin:0;">
+                <span class="card-title-dot"></span>
+                <span id="tituloEmpresa">Empresa</span>
+                <span id="subtituloEmpresa" style="color:var(--clr-text-3);font-weight:500;margin-left:8px;"></span>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span id="contadorNotas" style="font-size:12px;color:var(--clr-text-3);"></span>
+                <input type="text" id="inpBuscaNf" class="input-field" placeholder="Buscar por nome, NF ou emitente..."
+                       style="width:auto;min-width:230px;font-size:13px;" autocomplete="off" />
+                <button class="btn-primary" id="btnAddNf" style="font-size:13px;padding:9px 18px;white-space:nowrap;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom;margin-right:5px;">
+                    <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Adicionar NF
+                </button>
+              </div>
+            </div>
+
+            <input type="file" id="inputArquivoNf" style="display:none;" />
+
+            <!-- Lista de notas -->
+            <div class="nf-table-wrap">
+              <table class="nf-table">
+                <thead>
+                  <tr>
+                    <th>Nome do arquivo</th>
+                    <th>Número da NF</th>
+                    <th>Emitente</th>
+                    <th>Responsável</th>
+                    <th>Data</th>
+                    <th style="text-align:right;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="listaNotas"></tbody>
+              </table>
+              <div id="notasVazio" style="text-align:center;padding:36px 20px;color:var(--clr-text-3);font-size:13px;"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="JS/licenca-ui.js"></script>
+
+    <script src="JS/error-handler.js"></script>
+    <script src="JS/utils.js"></script>
+    <script src="JS/theme.js"></script>
+    <script src="JS/nf.js"></script>
+
+    <!-- Tutorial interativo: controlador central + passos desta tela -->
+    <script src="JS/tutoriais/tutorial_core.js"></script>
+    <script src="JS/tutoriais/tutorial_nf.js"></script>
+  </body>
+</html>

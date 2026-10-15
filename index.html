@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="imagens/favcon.ico" type="image/png" />
+  <title>Bapell Gestor Pro — Dashboard</title>
+  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="CSS/acoes-massa.css" />
+  <link rel="stylesheet" href="CSS/fonts.css" />
+  <link rel="stylesheet" href="CSS/tutorial.css" />
+  <style>
+    /* Divisória entre os botões de módulo e a área de gestão (Reordenar /
+         Módulos ocultos / Lojas Ocultas): aparecer TAMBÉM com o menu encolhido.
+         Antes só aparecia com o menu aberto. Fica aqui (depois do acoes-massa.css)
+         para ganhar por ordem de carga, sem depender daquele arquivo. */
+    .sidebar-colapsada .sidebar-manage-sep {
+      display: block !important;
+      border: none !important;
+      border-top: 1px solid var(--clr-border-soft) !important;
+      height: 0 !important;
+      margin: 10px 8px !important;
+      padding: 0 !important;
+      width: auto !important;
+    }
+  </style>
+  <script>
+    // Aplica o tema salvo ANTES da renderização, evitando flash de tema errado
+    (function () {
+      try {
+        var saved = localStorage.getItem("precifiq_theme");
+        var temas = ["light", "dark", "midnight"];
+        document.documentElement.setAttribute(
+          "data-theme",
+          temas.indexOf(saved) >= 0 ? saved : "dark"
+        );
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+  <!-- Senha nos botões (Usuários e Senhas): os botões escolhidos pedem
+       usuário e senha antes de agir. Sem data-modulo: esta tela não é um
+       módulo bloqueado, o arquivo só traz a proteção dos botões. -->
+  <script src="JS/senhas.js"></script>
+</head>
+
+<body class="dashboard-page">
+  <header class="main-header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-name">Bapell<strong> Gestor Pro</strong></span>
+      </a>
+      <div class="header-meta">
+        <span class="header-label">Plataforma</span>
+        <span class="header-dot"></span>
+        <span class="header-label" id="currentDate"></span>
+      </div>
+
+      <!-- SELETOR DE TEMA -->
+      <div class="theme-switcher-fixed" id="themeSwitcher">
+        <span class="theme-switcher-label">Tema</span>
+        <button class="theme-btn" data-theme-value="light" title="Modo Claro">
+          ⚪
+        </button>
+        <button class="theme-btn" data-theme-value="dark" title="Modo Padrão (Escuro)">
+          🔵
+        </button>
+        <button class="theme-btn" data-theme-value="midnight" title="Modo Dark Absoluto">
+          ⚫
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section" style="display:flex; flex-direction:column; gap:8px;">
+
+        <!-- CATEGORIA: OPERAÇÃO -->
+        <div class="sidebar-label sidebar-label-txt" style="margin-top: 4px;">OPERAÇÃO</div>
+
+        <button class="sidebar-item-btn" id="btnAddPlatform" title="Adicionar Plataforma">
+          <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg></span>
+          <span class="sidebar-label-txt">Adicionar Plataforma</span>
+        </button>
+
+        <!-- ═══ Botões de módulo (reordenáveis via drag-and-drop) ═══ -->
+        <div id="modulesNav" class="modules-nav" style="display:flex; flex-direction:column; gap:8px;">
+
+          <div class="module-nav-item" data-modid="acoes-massa" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='acoes-massa.html'" title="Ações em Massa">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 3l4 4-4 4"></path>
+                  <path d="M20 7H4"></path>
+                  <path d="M8 21l-4-4 4-4"></path>
+                  <path d="M4 17h16"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Ações em Massa</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="registro-vendas" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='registro-vendas.html'"
+              title="Registro de Vendas">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Registro de Vendas</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="vendas" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='vendas.html'" title="Informações de Venda">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg></span>
+              <span class="sidebar-label-txt">Informações de Venda</span>
+            </button>
+          </div>
+
+          
+
+          <!-- CATEGORIA: GESTÃO -->
+          <div class="sidebar-label sidebar-label-txt" style="margin-top: 12px;">GESTÃO</div>
+
+          <div class="module-nav-item" data-modid="empresa" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='empresa.html'" title="Dados da Empresa">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                  <path d="M9 22v-4h6v4"></path>
+                  <path d="M8 6h.01"></path>
+                  <path d="M16 6h.01"></path>
+                  <path d="M8 10h.01"></path>
+                  <path d="M16 10h.01"></path>
+                  <path d="M8 14h.01"></path>
+                  <path d="M16 14h.01"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Dados da Empresa</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="financeiro" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='financeiro.html'"
+              title="Controle Financeiro">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                  <path d="M12 18V6"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Controle Financeiro</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="devolucoes" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='devolucoes.html'"
+              title="Gestor de Devoluções">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 14 4 9 9 4"></polyline>
+                  <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Gestor de Devoluções</span>
+            </button>
+          </div>
+
+
+          <!-- Processador de Planilha.
+                 O modid é PRÓPRIO: este item usava "empresa", o mesmo do
+                 módulo seguinte, e a visibilidade é decidida por esse id —
+                 ocultar um escondia os dois de uma vez. -->
+          <div class="module-nav-item" data-modid="vendas-import" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='vendas-import.html'"
+              title="Processador de Planilha">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg></span>
+              <span class="sidebar-label-txt">Processador de Planilha</span>
+            </button>
+          </div>
+
+
+          <!-- CATEGORIA: FERRAMENTAS -->
+          <div class="sidebar-label sidebar-label-txt" style="margin-top: 12px;">FERRAMENTAS</div>
+
+          <div class="module-nav-item" data-modid="calculos" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg>
+            </span>
+            <button class="sidebar-item-btn" onclick="window.location.href='calculos.html'" title="Central de Cálculos">
+              <span class="sidebar-btn-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                  <line x1="8" y1="6" x2="16" y2="6"></line>
+                  <line x1="16" y1="10" x2="16.01" y2="10"></line>
+                  <line x1="12" y1="10" x2="12.01" y2="10"></line>
+                  <line x1="8" y1="10" x2="8.01" y2="10"></line>
+                  <line x1="16" y1="14" x2="16.01" y2="14"></line>
+                  <line x1="12" y1="14" x2="12.01" y2="14"></line>
+                  <line x1="8" y1="14" x2="8.01" y2="14"></line>
+                  <line x1="16" y1="18" x2="16.01" y2="18"></line>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                  <line x1="8" y1="18" x2="8.01" y2="18"></line>
+                </svg>
+              </span>
+              <span class="sidebar-label-txt">Central de Cálculos</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="ean" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='ean.html'" title="Gerador de EAN">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 5v14"></path>
+                  <path d="M6 5v14"></path>
+                  <path d="M10 5v14"></path>
+                  <path d="M14 5v14"></path>
+                  <path d="M17 5v14"></path>
+                  <path d="M21 5v14"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Gerador de EAN</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="lembretes" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='lembretes.html'" title="Lembretes">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg></span>
+              <span class="sidebar-label-txt">Lembretes</span>
+            </button>
+          </div>
+
+          <div class="module-nav-item" data-modid="nf" draggable="false">
+            <span class="module-drag-handle" title="Arraste para reordenar"><svg width="14" height="14"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="9" cy="6" r="1"></circle>
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="9" cy="18" r="1"></circle>
+                <circle cx="15" cy="6" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="15" cy="18" r="1"></circle>
+              </svg></span>
+            <button class="sidebar-item-btn" onclick="window.location.href='nf.html'" title="Notas Fiscais">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg></span>
+              <span class="sidebar-label-txt">Notas Fiscais</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- CATEGORIA: PERSONALIZAÇÃO -->
+        <div class="sidebar-label sidebar-label-txt" style="margin-top: 4px;">PERSONALIZAÇÃO</div>
+
+        <div class="sidebar-manage" id="sidebarManage" style="display:flex; flex-direction:column; gap:8px;">
+          <button class="sidebar-item-btn sidebar-manage-btn" id="btnReorderModules" title="Reordenar módulos">
+            <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="8 7 5 4 2 7"></polyline>
+                <line x1="5" y1="4" x2="5" y2="20"></line>
+                <polyline points="16 17 19 20 22 17"></polyline>
+                <line x1="19" y1="20" x2="19" y2="4"></line>
+              </svg></span>
+            <span class="sidebar-label-txt">Reordenar módulos</span>
+          </button>
+
+          <div style="position: relative;" id="hideDropdownContainer">
+            <button class="sidebar-item-btn sidebar-manage-btn" id="btnHideModules" title="Ocultar módulos">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                  </path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg></span>
+              <span class="sidebar-label-txt">Módulos ocultos</span>
+              <span id="hiddenModulesBadge" class="sidebar-label-txt"
+                style="background: var(--clr-surface-alt); color: var(--clr-text-2); padding: 1px 8px; border-radius: 999px; font-size: 12px; margin-left: auto;">0</span>
+            </button>
+            <div id="hiddenModulesSection" class="hidden-dropdown-menu" style="display: none">
+              <div class="hidden-dropdown-header">
+                Mostrar ou ocultar módulos
+              </div>
+              <div id="hiddenModulesGrid" class="hidden-dropdown-grid"></div>
+            </div>
+          </div>
+
+          <div style="position: relative;" id="hiddenDropdownContainer">
+            <button class="sidebar-item-btn sidebar-manage-btn" id="btnHiddenPlatforms" title="Lojas Ocultas"
+              style="width:100%;">
+              <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg></span>
+              <span class="sidebar-label-txt">Lojas Ocultas</span>
+              <span id="hiddenCountBadge" class="sidebar-label-txt"
+                style="background: var(--clr-surface-alt); color: var(--clr-text-2); padding: 1px 8px; border-radius: 999px; font-size: 12px; margin-left: auto;">0</span>
+            </button>
+            <div id="hiddenSection" class="hidden-dropdown-menu" style="display: none">
+              <div class="hidden-dropdown-header">
+                Lojas Ocultas (<span id="hiddenCount">0</span>)
+              </div>
+              <div id="hiddenPlatformsGrid" class="hidden-dropdown-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rodapé: Ajuda + linha + encolher -->
+      <div class="sidebar-footer-index">
+        <a href="ajuda.html" class="sidebar-item-btn" title="Central de Ajuda">
+          <span class="sidebar-btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg></span>
+          <span class="sidebar-label-txt">Ajuda</span>
+        </a>
+      </div>
+      <div class="sidebar-toggle-footer">
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Abrir/Fechar menu">
+          <svg class="sidebar-toggle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span class="sidebar-label-txt">&nbsp;Recolher menu</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main main-content">
+      <div class="dashboard-hero">
+        <!-- Título (abaixo dos botões) -->
+        <div class="dashboard-heading">
+          <h1 class="dashboard-title">Selecione a Plataforma</h1>
+        </div>
+      </div>
+
+      <div class="platforms-grid" id="platformsGrid">
+      </div>
+
+      <!-- Estado vazio: nenhuma plataforma cadastrada -->
+      <div id="emptyPlatforms" style="display:none; text-align:center; padding:56px 20px;">
+        <div
+          style="width:64px; height:64px; margin:0 auto 18px; border-radius:16px; display:flex; align-items:center; justify-content:center; background:var(--clr-surface-alt); border:1px solid var(--clr-border); color:var(--clr-text-3);">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <line x1="17.5" y1="14" x2="17.5" y2="21"></line>
+            <line x1="14" y1="17.5" x2="21" y2="17.5"></line>
+          </svg>
+        </div>
+        <h3
+          style="font-family:'Sora',sans-serif; font-size:18px; font-weight:700; color:var(--clr-text); margin:0 0 6px;">
+          Nenhuma plataforma cadastrada</h3>
+        <p style="font-size:14px; color:var(--clr-text-2); margin:0 0 20px;">Cadastre sua primeira plataforma para
+          começar a precificar seus produtos.</p>
+        <button class="btn-primary" id="btnCadastrarPrimeira"
+          style="display:inline-flex; align-items:center; gap:8px; padding:12px 24px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Cadastre sua primeira plataforma
+        </button>
+      </div>
+
+      <!-- Barra de painéis: DRE · Próximos lembretes · Plataformas -->
+      <div class="stats-bar">
+        <div class="stats-panels" id="statsPanels">
+
+          <!-- 1) Panorama do DRE (mês atual, empresa ativa) -->
+          <a href="financeiro.html" class="stats-panel stats-panel-dre" id="panelDRE">
+            <div class="stats-panel-head">
+              <span class="stats-panel-title">Panorama do mês</span>
+              <span class="stats-panel-empresa" id="dreEmpresa"></span>
+            </div>
+            <div class="stats-panel-dre-grid">
+              <div class="stats-dre-item">
+                <span class="stats-dre-label">Faturamento</span>
+                <span class="stats-dre-valor" id="dreFaturamento">—</span>
+              </div>
+              <div class="stats-dre-item">
+                <span class="stats-dre-label">Despesas</span>
+                <span class="stats-dre-valor" id="dreDespesas">—</span>
+              </div>
+              <div class="stats-dre-item">
+                <span class="stats-dre-label">Lucro</span>
+                <span class="stats-dre-valor" id="dreLucro">—</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- 2) Próximos lembretes (até 3) -->
+          <a href="lembretes.html" class="stats-panel stats-panel-lembretes" id="panelLembretes">
+            <div class="stats-panel-head">
+              <span class="stats-panel-title">Próximos lembretes</span>
+            </div>
+            <div class="stats-lembretes-lista" id="lembretesLista"></div>
+          </a>
+
+          <!-- 3) Plataformas ativas + Produtos cadastrados -->
+          <div class="stats-panel stats-panel-plat">
+            <div class="stats-panel-head">
+              <span class="stats-panel-title">Plataformas</span>
+            </div>
+            <div class="stats-plat-grid">
+              <div class="stats-plat-item">
+                <span class="stat-number" id="totalPlataformas">0</span>
+                <span class="stat-label">ativas</span>
+              </div>
+              <div class="stats-plat-item">
+                <span class="stat-number" id="totalProdutos">0</span>
+                <span class="stat-label">produtos</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Adicionar Plataforma -->
+  <div class="modal-overlay" id="modalAddPlatform" style="display: none">
+    <div class="modal">
+      <div class="modal-title">Adicionar Nova Plataforma</div>
+      <div class="modal-subtitle">Crie uma plataforma personalizada.</div>
+
+      <div class="field-group mb-md">
+        <label for="newPlatformName">Nome da Plataforma</label>
+        <input type="text" id="newPlatformName" class="input-field" placeholder="Ex: Shopee Brasil" />
+      </div>
+
+      <div class="field-group mb-md">
+        <label>Logo da Plataforma</label>
+        <input type="file" id="newPlatformLogo" accept="image/*" class="input-field" />
+        <small style="font-size: 12px; color: var(--clr-text-3)">
+          Obrigatório: imagem <strong>quadrada</strong>, entre
+          <strong>200×200px</strong> e <strong>500×500px</strong>.
+          Preferencialmente PNG.
+        </small>
+        <div
+          style="margin-top: 10px; padding: 10px 12px; background: var(--clr-primary-lt); border: 1px solid var(--clr-border); border-radius: var(--r-sm); font-size: 15px; color: var(--clr-text-2);">
+          Precisa de uma logo? Acesse nosso
+          <a href="https://drive.google.com/drive/folders/1VUTqOKYOAj9N3gKnzqttSJ-L48A177Ph?usp=drive_link"
+            target="_blank" rel="noopener"
+            style="color: var(--clr-primary); font-weight: 600; text-decoration: underline;">banco de logos</a>.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelAddPlatform">
+          Cancelar
+        </button>
+        <button class="btn-primary" id="btnConfirmAddPlatform">
+          Adicionar Plataforma
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Plataforma -->
+  <div class="modal-overlay" id="modalEditPlatform" style="display: none">
+    <div class="modal">
+      <div class="modal-title">Editar Plataforma</div>
+      <div class="modal-subtitle">Atualize o nome ou a logo da plataforma.</div>
+      <input type="hidden" id="editPlatformId" />
+
+      <div class="field-group mb-md">
+        <label for="editPlatformName">Nome da Plataforma</label>
+        <input type="text" id="editPlatformName" class="input-field" />
+      </div>
+
+      <div class="field-group mb-md">
+        <label>Nova Logo (Opcional)</label>
+        <input type="file" id="editPlatformLogo" accept="image/*" class="input-field" />
+        <small style="font-size: 12px; color: var(--clr-text-3)">
+          Deixe em branco para manter a logo atual. Obrigatório: imagem <strong>quadrada</strong>, entre
+          <strong>200×200px</strong> e <strong>500×500px</strong>.
+        </small>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btnCancelEditPlatform">
+          Cancelar
+        </button>
+        <button class="btn-primary" id="btnConfirmEditPlatform">
+          Salvar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="JS/licenca-ui.js"></script>
+
+  <script src="JS/error-handler.js"></script>
+
+  <script src="JS/imagestore.js"></script>
+  <script src="JS/utils.js"></script>
+  <script src="JS/theme.js"></script>
+  <script src="JS/main.js"></script>
+
+  <!-- Tutorial interativo: controlador central + passos desta tela -->
+  <script src="JS/tutoriais/tutorial_core.js"></script>
+  <script src="JS/tutoriais/tutorial_index.js"></script>
+</body>
+
+</html>
